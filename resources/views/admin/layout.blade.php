@@ -894,6 +894,7 @@
                         <a href="{{ route('admin.facilities.index') }}" class="nav-link {{ request()->routeIs('admin.facilities.*') ? 'is-active' : '' }}" @if(request()->routeIs('admin.facilities.*')) aria-current="page" @endif>Fasilitas</a>
                         <a href="{{ route('admin.tenants.index') }}" class="nav-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}" @if(request()->routeIs('admin.tenants.*')) aria-current="page" @endif>Penghuni</a>
                         <a href="{{ route('admin.payments.index') }}" class="nav-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}" @if(request()->routeIs('admin.payments.*')) aria-current="page" @endif>Pembayaran</a>
+                        <a href="{{ route('admin.settings.kos-profile.edit') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'is-active' : '' }}" @if(request()->routeIs('admin.settings.*')) aria-current="page" @endif>Pengaturan Kos</a>
                     </nav>
 
                     <form method="POST" action="{{ route('logout') }}">

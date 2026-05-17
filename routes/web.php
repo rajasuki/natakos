@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FacilityController;
+use App\Http\Controllers\Admin\KosProfileController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\TenantController as AdminTenantController;
@@ -27,6 +28,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
         Route::resource('facilities', FacilityController::class)->except('show');
+        Route::prefix('settings')->name('settings.')->group(function () {
+            Route::get('/kos-profile', [KosProfileController::class, 'edit'])->name('kos-profile.edit');
+            Route::match(['put', 'patch'], '/kos-profile', [KosProfileController::class, 'update'])->name('kos-profile.update');
+        });
         Route::get('payments/{payment}/proof', [PaymentController::class, 'proof'])->name('payments.proof');
         Route::resource('payments', PaymentController::class)->except('show');
         Route::resource('rooms', RoomController::class)->except('show');
