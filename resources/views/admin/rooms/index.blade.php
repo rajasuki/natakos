@@ -1,0 +1,72 @@
+@extends('admin.layout')
+
+@section('title', 'Kamar')
+@section('eyebrow', 'Admin Kamar')
+@section('page_title', 'Kelola kamar')
+@section('page_description', 'Atur daftar kamar, harga sewa, status ketersediaan, dan foto utama kamar NATAKOS.')
+
+@section('page_actions')
+    <a href="{{ route('admin.rooms.create') }}" class="button button-primary">Tambah kamar</a>
+@endsection
+
+@section('content')
+    @if ($rooms->isEmpty())
+        <section class="empty-state">
+            <h2>Belum ada kamar</h2>
+            <p>Mulai dengan menambahkan kamar pertama agar admin dapat mengelola harga, status, dan foto utama kamar dari dashboard ini.</p>
+            <a href="{{ route('admin.rooms.create') }}" class="button button-primary">Tambah kamar sekarang</a>
+        </section>
+    @else
+        <section class="card">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Kamar</th>
+                            <th>Harga</th>
+                            <th>Ukuran</th>
+                            <th>Lantai</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($rooms as $room)
+                            <tr>
+                                <td>
+                                    @if ($room->main_image)
+                                        <img src="{{ asset('storage/'.$room->main_image) }}" alt="{{ $room->name }}" class="thumb">
+                                    @else
+                                        <div class="thumb thumb-placeholder">Belum ada foto</div>
+                                    @endif
+                                </td>
+                                <td>
+                                    <p class="room-name">{{ $room->name }}</p>
+                                    <div class="room-slug">/{{ $room->slug }}</div>
+                                </td>
+                                <td>Rp{{ number_format($room->price, 0, ',', '.') }}</td>
+                                <td>{{ $room->size ?: '-' }}</td>
+                                <td>{{ $room->floor ?: '-' }}</td>
+                                <td>
+                                    <span class="badge badge-{{ $room->status }}">{{ $statusLabels[$room->status] ?? $room->status }}</span>
+                                </td>
+                                <td>
+                                    <div class="actions">
+                                        <a href="{{ route('admin.rooms.edit', $room) }}" class="button button-secondary">Edit</a>
+
+                                        <form method="POST" action="{{ route('admin.rooms.destroy', $room) }}" onsubmit="return confirm('Hapus kamar ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="button button-danger">Hapus</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    @endif
+@endsection

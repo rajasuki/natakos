@@ -34,7 +34,6 @@ class Room extends Model
     {
         return [
             'price' => 'integer',
-            'floor' => 'integer',
         ];
     }
 }
