@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\KosProfileController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\RoomController;
+use App\Http\Controllers\Admin\RoomImageController;
 use App\Http\Controllers\Admin\TenantController as AdminTenantController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Public\HomeController as PublicHomeController;
@@ -34,6 +35,9 @@ Route::middleware('auth')->group(function () {
         });
         Route::get('payments/{payment}/proof', [PaymentController::class, 'proof'])->name('payments.proof');
         Route::resource('payments', PaymentController::class)->except('show');
+        Route::get('rooms/{room}/images', [RoomImageController::class, 'index'])->name('rooms.images.index');
+        Route::post('rooms/{room}/images', [RoomImageController::class, 'store'])->name('rooms.images.store');
+        Route::delete('rooms/{room}/images/{image}', [RoomImageController::class, 'destroy'])->name('rooms.images.destroy');
         Route::resource('rooms', RoomController::class)->except('show');
         Route::resource('tenants', AdminTenantController::class)->except('show');
     });

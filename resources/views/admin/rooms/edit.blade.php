@@ -7,6 +7,7 @@
 
 @section('page_actions')
     <a href="{{ route('admin.rooms.index') }}" class="button button-secondary">Kembali ke daftar kamar</a>
+    <a href="{{ route('admin.rooms.images.index', $room) }}" class="button button-subtle">Galeri</a>
 @endsection
 
 @section('content')

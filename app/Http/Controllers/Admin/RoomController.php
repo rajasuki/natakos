@@ -8,6 +8,7 @@ use App\Models\Room;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -93,9 +94,13 @@ class RoomController extends Controller
         }
 
         $mainImage = $room->main_image;
+        $galleryImages = $room->images()->pluck('image_path')->filter()->all();
 
         try {
-            $room->delete();
+            DB::transaction(function () use ($room) {
+                $room->images()->delete();
+                $room->delete();
+            });
         } catch (QueryException) {
             return redirect()
                 ->route('admin.rooms.index')
@@ -103,6 +108,7 @@ class RoomController extends Controller
         }
 
         $this->deleteImage($mainImage);
+        $this->deleteImages($galleryImages);
 
         return redirect()
             ->route('admin.rooms.index')
@@ -219,5 +225,15 @@ class RoomController extends Controller
         }
 
         Storage::disk('public')->delete($path);
+    }
+
+    /**
+     * @param  array<int, string>  $paths
+     */
+    private function deleteImages(array $paths): void
+    {
+        foreach ($paths as $path) {
+            $this->deleteImage($path);
+        }
     }
 }

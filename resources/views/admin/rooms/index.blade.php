@@ -96,6 +96,7 @@
                                 </td>
                                 <td data-label="Aksi">
                                     <div class="actions">
+                                        <a href="{{ route('admin.rooms.images.index', $room) }}" class="button button-subtle">Galeri</a>
                                         <a href="{{ route('admin.rooms.edit', $room) }}" class="button button-secondary">Edit</a>
 
                                         <form method="POST" action="{{ route('admin.rooms.destroy', $room) }}" onsubmit="return confirm('Hapus kamar ini?');">
