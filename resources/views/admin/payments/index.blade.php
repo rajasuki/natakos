@@ -19,7 +19,7 @@
     @else
         <section class="card">
             <div class="table-wrap">
-                <table>
+                <table class="responsive-table">
                     <thead>
                         <tr>
                             <th>Penghuni</th>
@@ -38,26 +38,26 @@
                                 $deadline = $deadlineData[$payment->id] ?? null;
                             @endphp
                             <tr>
-                                <td>
-                                    <p class="room-name">{{ $payment->tenant->user->name }}</p>
-                                    <div class="muted">{{ $payment->tenant->user->email }}</div>
+                                <td data-label="Penghuni">
+                                    <p class="room-name">{{ $payment->tenant?->user?->name ?: 'Penghuni tidak tersedia' }}</p>
+                                    <div class="muted">{{ $payment->tenant?->user?->email ?: '-' }}</div>
                                 </td>
-                                <td>{{ $payment->tenant->room->name }}</td>
-                                <td>Rp{{ number_format($payment->amount, 0, ',', '.') }}</td>
-                                <td>
-                                    <div>{{ $payment->period_start?->format('d M Y') ?? '-' }}</div>
-                                    <div class="muted">s/d {{ $payment->period_end?->format('d M Y') ?? '-' }}</div>
+                                <td data-label="Kamar">{{ $payment->tenant?->room?->name ?: 'Kamar tidak tersedia' }}</td>
+                                <td data-label="Nominal">{{ \App\Support\UiFormatter::currency($payment->amount) }}</td>
+                                <td data-label="Periode">
+                                    <div>{{ \App\Support\UiFormatter::date($payment->period_start) }}</div>
+                                    <div class="muted">s/d {{ \App\Support\UiFormatter::date($payment->period_end) }}</div>
                                 </td>
-                                <td>
-                                    <div>{{ $payment->due_date?->format('d M Y') ?? '-' }}</div>
+                                <td data-label="Tenggat bayar">
+                                    <div>{{ \App\Support\UiFormatter::date($payment->due_date) }}</div>
                                     @if ($payment->paid_at)
-                                        <div class="muted">Dibayar {{ $payment->paid_at->format('d M Y H:i') }}</div>
+                                        <div class="muted">Dibayar {{ \App\Support\UiFormatter::date($payment->paid_at, 'd M Y H:i') }}</div>
                                     @endif
                                 </td>
-                                <td>
+                                <td data-label="Status pembayaran">
                                     <span class="badge badge-{{ str_replace('_', '-', $payment->status) }}">{{ $statusLabels[$payment->status] ?? $payment->status }}</span>
                                 </td>
-                                <td>
+                                <td data-label="Warning tenggat">
                                     @if ($deadline)
                                         <div class="tag-list">
                                             <span class="badge badge-{{ str_replace('_', '-', $deadline['status']) }}">{{ $deadline['label'] }}</span>
@@ -67,7 +67,7 @@
                                         <span class="muted">Belum ada data warning</span>
                                     @endif
                                 </td>
-                                <td>
+                                <td data-label="Aksi">
                                     <div class="actions">
                                         <a href="{{ route('admin.payments.edit', $payment) }}" class="button button-secondary">Edit</a>
 

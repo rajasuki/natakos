@@ -19,7 +19,7 @@
     @else
         <section class="card">
             <div class="table-wrap">
-                <table>
+                <table class="responsive-table">
                     <thead>
                         <tr>
                             <th>Foto</th>
@@ -35,24 +35,24 @@
                     <tbody>
                         @foreach ($rooms as $room)
                             <tr>
-                                <td>
+                                <td data-label="Foto">
                                     @if ($room->main_image)
                                         <img src="{{ asset('storage/'.$room->main_image) }}" alt="{{ $room->name }}" class="thumb">
                                     @else
                                         <div class="thumb thumb-placeholder">Belum ada foto</div>
                                     @endif
                                 </td>
-                                <td>
+                                <td data-label="Kamar">
                                     <p class="room-name">{{ $room->name }}</p>
                                     <div class="room-slug">/{{ $room->slug }}</div>
                                 </td>
-                                <td>Rp{{ number_format($room->price, 0, ',', '.') }}</td>
-                                <td>{{ $room->size ?: '-' }}</td>
-                                <td>{{ $room->floor ?: '-' }}</td>
-                                <td>
+                                <td data-label="Harga">{{ \App\Support\UiFormatter::currency($room->price) }}</td>
+                                <td data-label="Ukuran">{{ $room->size ?: '-' }}</td>
+                                <td data-label="Lantai">{{ $room->floor ?: '-' }}</td>
+                                <td data-label="Status">
                                     <span class="badge badge-{{ $room->status }}">{{ $statusLabels[$room->status] ?? $room->status }}</span>
                                 </td>
-                                <td>
+                                <td data-label="Fasilitas">
                                     @if ($room->facilities->isEmpty())
                                         <span class="muted">Belum dipilih</span>
                                     @else
@@ -67,7 +67,7 @@
                                         </div>
                                     @endif
                                 </td>
-                                <td>
+                                <td data-label="Aksi">
                                     <div class="actions">
                                         <a href="{{ route('admin.rooms.edit', $room) }}" class="button button-secondary">Edit</a>
 

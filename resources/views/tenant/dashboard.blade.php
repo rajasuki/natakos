@@ -60,10 +60,10 @@
             </p>
         </div>
 
-        <div class="card-actions">
-            <a href="{{ $whatsappUrl }}" target="_blank" rel="noreferrer" class="button button-primary">Hubungi Pemilik via WhatsApp</a>
-        </div>
-    </section>
+                <div class="card-actions">
+                    <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="button button-primary">Hubungi Pemilik via WhatsApp</a>
+                </div>
+            </section>
 
     @if ($tenant === null)
         <section class="empty-state">
@@ -73,7 +73,7 @@
             </p>
 
             <div class="card-actions">
-                <a href="{{ $whatsappUrl }}" target="_blank" rel="noreferrer" class="button button-primary">Hubungi Pemilik via WhatsApp</a>
+                <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="button button-primary">Hubungi Pemilik via WhatsApp</a>
             </div>
         </section>
     @else
@@ -108,16 +108,16 @@
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Kamar yang ditempati</div>
-                            <div class="detail-value">{{ $tenant->room->name }}</div>
+                            <div class="detail-value">{{ $tenant->room?->name ?: 'Kamar tidak tersedia' }}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Harga kamar</div>
-                            <div class="detail-value">Rp{{ number_format($tenant->room->price, 0, ',', '.') }}</div>
+                            <div class="detail-value">{{ $tenant->room ? \App\Support\UiFormatter::currency($tenant->room->price) : '-' }}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Status kamar</div>
                             <div class="detail-value">
-                                <span class="badge badge-{{ $tenant->room->status }}">{{ $roomStatusLabels[$tenant->room->status] ?? $tenant->room->status }}</span>
+                                <span class="badge badge-{{ $tenant->room?->status ?? 'maintenance' }}">{{ $roomStatusLabels[$tenant->room?->status] ?? 'Tidak tersedia' }}</span>
                             </div>
                         </div>
                     </div>
@@ -132,11 +132,11 @@
                     <div class="detail-list">
                         <div class="detail-item">
                             <div class="detail-label">Tanggal masuk</div>
-                            <div class="detail-value">{{ $tenant->start_date?->format('d M Y') ?? '-' }}</div>
+                            <div class="detail-value">{{ \App\Support\UiFormatter::date($tenant->start_date) }}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Tanggal keluar</div>
-                            <div class="detail-value">{{ $tenant->end_date?->format('d M Y') ?? '-' }}</div>
+                            <div class="detail-value">{{ \App\Support\UiFormatter::date($tenant->end_date) }}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Status masa tinggal</div>
@@ -177,21 +177,21 @@
                     @else
                         <div class="detail-list">
                             <div class="detail-item">
-                                <div class="detail-label">Nominal pembayaran</div>
-                                <div class="detail-value">Rp{{ number_format($featuredPayment->amount, 0, ',', '.') }}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Periode pembayaran</div>
-                                <div class="detail-value">
-                                    {{ $featuredPayment->period_start?->format('d M Y') ?? '-' }}
+                            <div class="detail-label">Nominal pembayaran</div>
+                            <div class="detail-value">{{ \App\Support\UiFormatter::currency($featuredPayment->amount) }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Periode pembayaran</div>
+                            <div class="detail-value">
+                                    {{ \App\Support\UiFormatter::date($featuredPayment->period_start) }}
                                     <span class="muted">s/d</span>
-                                    {{ $featuredPayment->period_end?->format('d M Y') ?? '-' }}
-                                </div>
+                                    {{ \App\Support\UiFormatter::date($featuredPayment->period_end) }}
                             </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Tenggat pembayaran</div>
-                                <div class="detail-value">{{ $featuredPayment->due_date?->format('d M Y') ?? '-' }}</div>
-                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Tenggat pembayaran</div>
+                            <div class="detail-value">{{ \App\Support\UiFormatter::date($featuredPayment->due_date) }}</div>
+                        </div>
                             <div class="detail-item">
                                 <div class="detail-label">Status pembayaran</div>
                                 <div class="detail-value">

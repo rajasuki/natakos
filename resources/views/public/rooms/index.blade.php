@@ -15,6 +15,11 @@
                 <section class="empty-state">
                     <h2>Belum ada kamar</h2>
                     <p>Saat ini belum ada kamar yang ditampilkan. Silakan cek kembali nanti atau hubungi pengelola melalui WhatsApp.</p>
+
+                    <div class="button-row" style="margin-top: 20px;">
+                        <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer" class="button button-primary">Hubungi via WhatsApp</a>
+                        <a href="{{ route('home') }}" class="button button-subtle">Kembali ke homepage</a>
+                    </div>
                 </section>
             @else
                 <div class="room-grid">
@@ -32,7 +37,7 @@
                             <div class="room-card-body">
                                 <div class="button-row" style="justify-content: space-between; margin-bottom: 12px;">
                                     <span class="status-badge status-{{ $room->status }}">{{ $roomStatusLabels[$room->status] ?? $room->status }}</span>
-                                    <span class="detail-value">Rp{{ number_format($room->price, 0, ',', '.') }}</span>
+                                    <span class="detail-value">{{ \App\Support\UiFormatter::currency($room->price) }}</span>
                                 </div>
 
                                 <h2 class="room-title">{{ $room->name }}</h2>

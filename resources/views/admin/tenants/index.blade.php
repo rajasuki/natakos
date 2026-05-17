@@ -19,7 +19,7 @@
     @else
         <section class="card">
             <div class="table-wrap">
-                <table>
+                <table class="responsive-table">
                     <thead>
                         <tr>
                             <th>Nama penghuni</th>
@@ -35,19 +35,19 @@
                     <tbody>
                         @foreach ($tenants as $tenant)
                             <tr>
-                                <td>
-                                    <p class="room-name">{{ $tenant->user->name }}</p>
+                                <td data-label="Nama penghuni">
+                                    <p class="room-name">{{ $tenant->user?->name ?: 'User tidak tersedia' }}</p>
                                     <div class="muted">Tenant ID #{{ $tenant->id }}</div>
                                 </td>
-                                <td>{{ $tenant->user->email }}</td>
-                                <td>{{ $tenant->user->phone ?: '-' }}</td>
-                                <td>{{ $tenant->room->name }}</td>
-                                <td>{{ $tenant->start_date?->format('d M Y') ?? '-' }}</td>
-                                <td>{{ $tenant->end_date?->format('d M Y') ?? '-' }}</td>
-                                <td>
+                                <td data-label="Email">{{ $tenant->user?->email ?: '-' }}</td>
+                                <td data-label="Nomor HP">{{ $tenant->user?->phone ?: '-' }}</td>
+                                <td data-label="Kamar">{{ $tenant->room?->name ?: 'Kamar tidak tersedia' }}</td>
+                                <td data-label="Tanggal masuk">{{ \App\Support\UiFormatter::date($tenant->start_date) }}</td>
+                                <td data-label="Tanggal keluar">{{ \App\Support\UiFormatter::date($tenant->end_date) }}</td>
+                                <td data-label="Status">
                                     <span class="badge badge-{{ $tenant->status }}">{{ $statusLabels[$tenant->status] ?? $tenant->status }}</span>
                                 </td>
-                                <td>
+                                <td data-label="Aksi">
                                     <div class="actions">
                                         <a href="{{ route('admin.tenants.edit', $tenant) }}" class="button button-secondary">Edit</a>
 

@@ -5,12 +5,23 @@
 @endphp
 
 <div class="card form-card">
-    <form method="POST" action="{{ $action }}" class="grid grid-two">
-        @csrf
+    @if ($rooms->isEmpty() && $tenant === null)
+        <section class="empty-state">
+            <h2>Belum ada kamar untuk penghuni baru</h2>
+            <p>Tambahkan kamar terlebih dahulu sebelum membuat data penghuni baru agar pilihan kamar tersedia pada form ini.</p>
 
-        @isset($method)
-            @method($method)
-        @endisset
+            <div class="form-actions">
+                <a href="{{ route('admin.rooms.create') }}" class="button button-primary">Tambah kamar</a>
+                <a href="{{ route('admin.tenants.index') }}" class="button button-secondary">Kembali ke daftar penghuni</a>
+            </div>
+        </section>
+    @else
+        <form method="POST" action="{{ $action }}" class="grid grid-two">
+            @csrf
+
+            @isset($method)
+                @method($method)
+            @endisset
 
         <div class="field">
             <label for="name">Nama penghuni</label>
@@ -45,20 +56,20 @@
             <div class="helper">{{ $tenant ? 'Kosongkan jika tidak ingin mengubah password lama.' : 'Password wajib diisi saat menambah penghuni.' }}</div>
         </div>
 
-        <div class="field">
-            <label for="room_id">Kamar</label>
-            <select id="room_id" name="room_id" class="select" required>
-                <option value="">Pilih kamar</option>
-                @foreach ($rooms as $room)
-                    <option value="{{ $room->id }}" @selected((string) old('room_id', $tenant?->room_id) === (string) $room->id)>
-                        {{ $room->name }} - {{ $roomStatusLabels[$room->status] ?? $room->status }}
-                    </option>
-                @endforeach
-            </select>
-            @if ($errorBag?->has('room_id'))
-                <div class="field-error">{{ $errorBag->first('room_id') }}</div>
-            @endif
-        </div>
+            <div class="field">
+                <label for="room_id">Kamar</label>
+                <select id="room_id" name="room_id" class="select" required>
+                    <option value="">Pilih kamar</option>
+                    @foreach ($rooms as $room)
+                        <option value="{{ $room->id }}" @selected((string) old('room_id', $tenant?->room_id) === (string) $room->id)>
+                            {{ $room->name }} - {{ $roomStatusLabels[$room->status] ?? $room->status }}
+                        </option>
+                    @endforeach
+                </select>
+                @if ($errorBag?->has('room_id'))
+                    <div class="field-error">{{ $errorBag->first('room_id') }}</div>
+                @endif
+            </div>
 
         <div class="field">
             <label for="status">Status penghuni</label>
@@ -102,5 +113,6 @@
                 <a href="{{ route('admin.tenants.index') }}" class="button button-secondary">Kembali ke daftar penghuni</a>
             </div>
         </div>
-    </form>
+        </form>
+    @endif
 </div>

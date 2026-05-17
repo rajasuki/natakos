@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\KosProfile;
 use App\Models\Payment;
 use App\Models\Tenant;
+use App\Support\WhatsappLink;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -136,17 +137,10 @@ class DashboardController extends Controller
 
     private function whatsappUrl(?string $number): string
     {
-        $normalized = preg_replace('/\D+/', '', $number ?? '') ?? '';
-
-        if ($normalized === '') {
-            $normalized = '6285217430009';
-        }
-
-        if (str_starts_with($normalized, '0')) {
-            $normalized = '62'.substr($normalized, 1);
-        }
-
-        return 'https://wa.me/'.$normalized.'?text='.rawurlencode('Halo, saya ingin bertanya tentang pembayaran kos saya di NATAKOS.');
+        return WhatsappLink::build(
+            WhatsappLink::normalizeNumber($number),
+            'Halo, saya ingin bertanya tentang pembayaran kos saya di NATAKOS.'
+        );
     }
 
     private function featuredPayment(Collection $payments): ?Payment

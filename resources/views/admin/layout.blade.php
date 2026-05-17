@@ -187,13 +187,13 @@
             }
 
             .flash-success {
-                background: #efefef;
-                color: #000000;
+                background: #d1fae5;
+                color: #065f46;
             }
 
             .flash-error {
-                background: #000000;
-                color: #ffffff;
+                background: #fee2e2;
+                color: #991b1b;
             }
 
             .flash ul {
@@ -279,13 +279,13 @@
             }
 
             .badge-available {
-                background: #efefef;
-                color: #000000;
+                background: #000000;
+                color: #ffffff;
             }
 
             .badge-occupied {
-                background: #000000;
-                color: #ffffff;
+                background: #efefef;
+                color: #000000;
             }
 
             .badge-maintenance {
@@ -294,13 +294,13 @@
             }
 
             .badge-room {
-                background: #000000;
-                color: #ffffff;
+                background: #efefef;
+                color: #000000;
             }
 
             .badge-public {
-                background: #efefef;
-                color: #000000;
+                background: #000000;
+                color: #ffffff;
             }
 
             .badge-active {
@@ -530,6 +530,52 @@
                 color: #5e5e5e;
             }
 
+            @media (max-width: 767px) {
+                .responsive-table {
+                    min-width: 0;
+                }
+
+                .responsive-table thead {
+                    display: none;
+                }
+
+                .responsive-table,
+                .responsive-table tbody,
+                .responsive-table tr,
+                .responsive-table td {
+                    display: block;
+                    width: 100%;
+                }
+
+                .responsive-table tbody tr {
+                    padding: 18px;
+                    border-bottom: 1px solid #e2e2e2;
+                }
+
+                .responsive-table tbody tr:last-child {
+                    border-bottom: 0;
+                }
+
+                .responsive-table td {
+                    padding: 0 0 14px;
+                    border: 0;
+                }
+
+                .responsive-table td:last-child {
+                    padding-bottom: 0;
+                }
+
+                .responsive-table td::before {
+                    content: attr(data-label);
+                    display: block;
+                    margin-bottom: 6px;
+                    color: #5e5e5e;
+                    font-size: 12px;
+                    font-weight: 600;
+                    line-height: 1.4;
+                }
+            }
+
             @media (min-width: 768px) {
                 .navbar-shell {
                     flex-direction: row;
@@ -561,11 +607,11 @@
 
                 <div class="nav-row">
                     <nav class="nav-links">
-                        <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">Dashboard</a>
-                        <a href="{{ route('admin.rooms.index') }}" class="nav-link {{ request()->routeIs('admin.rooms.*') ? 'is-active' : '' }}">Kamar</a>
-                        <a href="{{ route('admin.facilities.index') }}" class="nav-link {{ request()->routeIs('admin.facilities.*') ? 'is-active' : '' }}">Fasilitas</a>
-                        <a href="{{ route('admin.tenants.index') }}" class="nav-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}">Penghuni</a>
-                        <a href="{{ route('admin.payments.index') }}" class="nav-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}">Pembayaran</a>
+                        <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}" @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif>Dashboard</a>
+                        <a href="{{ route('admin.rooms.index') }}" class="nav-link {{ request()->routeIs('admin.rooms.*') ? 'is-active' : '' }}" @if(request()->routeIs('admin.rooms.*')) aria-current="page" @endif>Kamar</a>
+                        <a href="{{ route('admin.facilities.index') }}" class="nav-link {{ request()->routeIs('admin.facilities.*') ? 'is-active' : '' }}" @if(request()->routeIs('admin.facilities.*')) aria-current="page" @endif>Fasilitas</a>
+                        <a href="{{ route('admin.tenants.index') }}" class="nav-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}" @if(request()->routeIs('admin.tenants.*')) aria-current="page" @endif>Penghuni</a>
+                        <a href="{{ route('admin.payments.index') }}" class="nav-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}" @if(request()->routeIs('admin.payments.*')) aria-current="page" @endif>Pembayaran</a>
                     </nav>
 
                     <form method="POST" action="{{ route('logout') }}">

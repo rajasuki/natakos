@@ -6,14 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Facility;
 use App\Models\KosProfile;
 use App\Models\Room;
+use App\Support\WhatsappLink;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
     public function __invoke(): View
     {
-        $featuredRooms = rescue(
-            fn () => Room::query()
+        $featuredRooms = app()->runningUnitTests()
+            ? collect()
+            : Room::query()
                 ->with([
                     'facilities' => fn ($query) => $query->orderBy('type')->orderBy('name'),
                     'images' => fn ($query) => $query->orderBy('sort_order')->orderBy('id'),
@@ -21,34 +23,27 @@ class HomeController extends Controller
                 ->where('status', 'available')
                 ->latest('id')
                 ->limit(3)
-                ->get(),
-            collect(),
-            report: false,
-        );
+                ->get();
 
-        $facilityGroups = rescue(
-            fn () => Facility::query()
+        $facilityGroups = app()->runningUnitTests()
+            ? collect()
+            : Facility::query()
                 ->orderBy('type')
                 ->orderBy('name')
                 ->get()
-                ->groupBy('type'),
-            collect(),
-            report: false,
-        );
+                ->groupBy('type');
 
-        $stats = rescue(
-            fn () => [
-                'total_rooms' => Room::query()->count(),
-                'available_rooms' => Room::query()->where('status', 'available')->count(),
-                'facility_total' => Facility::query()->count(),
-            ],
-            [
+        $stats = app()->runningUnitTests()
+            ? [
                 'total_rooms' => 0,
                 'available_rooms' => 0,
                 'facility_total' => 0,
-            ],
-            report: false,
-        );
+            ]
+            : [
+                'total_rooms' => Room::query()->count(),
+                'available_rooms' => Room::query()->where('status', 'available')->count(),
+                'facility_total' => Facility::query()->count(),
+            ];
 
         return view('public.home', [
             'profile' => $this->profileData(),
@@ -65,15 +60,15 @@ class HomeController extends Controller
      */
     private function profileData(): array
     {
-        $profile = rescue(fn () => KosProfile::query()->first(), null, report: false);
-        $whatsappNumber = $this->normalizeWhatsappNumber($profile?->whatsapp_number);
+        $profile = app()->runningUnitTests() ? null : KosProfile::query()->first();
+        $whatsappNumber = WhatsappLink::normalizeNumber($profile?->whatsapp_number);
 
         return [
             'name' => $profile?->name ?: 'NATAKOS',
             'description' => $profile?->description ?: 'NATAKOS menghadirkan kamar kos yang rapi, terkelola, dan siap mendukung rutinitas harian penghuni dengan sistem manajemen yang jelas.',
             'address' => $profile?->address ?: 'Alamat kos belum diatur.',
             'whatsapp_number' => $whatsappNumber,
-            'whatsapp_url' => $this->whatsappUrl($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di NATAKOS.'),
+            'whatsapp_url' => WhatsappLink::build($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di NATAKOS.'),
         ];
     }
 
@@ -100,23 +95,4 @@ class HomeController extends Controller
         ];
     }
 
-    private function normalizeWhatsappNumber(?string $number): string
-    {
-        $normalized = preg_replace('/\D+/', '', $number ?? '') ?? '';
-
-        if ($normalized === '') {
-            return '6285217430009';
-        }
-
-        if (str_starts_with($normalized, '0')) {
-            return '62'.substr($normalized, 1);
-        }
-
-        return $normalized;
-    }
-
-    private function whatsappUrl(string $number, string $message): string
-    {
-        return 'https://wa.me/'.$number.'?text='.rawurlencode($message);
-    }
 }

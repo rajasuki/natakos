@@ -28,7 +28,7 @@
                     <div class="detail-body">
                         <div class="button-row" style="justify-content: space-between; margin-bottom: 16px;">
                             <span class="status-badge status-{{ $room->status }}">{{ $roomStatusLabels[$room->status] ?? $room->status }}</span>
-                            <span class="detail-value">Rp{{ number_format($room->price, 0, ',', '.') }}</span>
+                            <span class="detail-value">{{ \App\Support\UiFormatter::currency($room->price) }}</span>
                         </div>
 
                         <h2 class="detail-title">Informasi utama kamar</h2>
@@ -54,9 +54,9 @@
                         </div>
 
                         <div class="detail-actions">
-                            <a href="{{ $whatsappUrl }}" target="_blank" rel="noreferrer" class="button button-primary">Tanya via WhatsApp</a>
-                            <a href="{{ route('rooms.index') }}" class="button button-subtle">Kembali ke daftar kamar</a>
-                        </div>
+                    <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="button button-primary">Tanya via WhatsApp</a>
+                    <a href="{{ route('rooms.index') }}" class="button button-subtle">Kembali ke daftar kamar</a>
+                </div>
                     </div>
                 </article>
             </div>
@@ -116,7 +116,7 @@
                 <p class="section-copy" style="color: #afafaf; margin-bottom: 20px;">Hubungi pengelola {{ $profile['name'] }} langsung untuk menanyakan ketersediaan, fasilitas, dan detail kamar ini.</p>
 
                 <div class="button-row">
-                    <a href="{{ $whatsappUrl }}" target="_blank" rel="noreferrer" class="button button-secondary">Tanya via WhatsApp</a>
+                    <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="button button-secondary">Tanya via WhatsApp</a>
                     <a href="{{ route('rooms.index') }}" class="button button-subtle">Lihat kamar lain</a>
                 </div>
             </section>

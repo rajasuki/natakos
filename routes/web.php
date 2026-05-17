@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
         Route::resource('facilities', FacilityController::class)->except('show');
+        Route::get('payments/{payment}/proof', [PaymentController::class, 'proof'])->name('payments.proof');
         Route::resource('payments', PaymentController::class)->except('show');
         Route::resource('rooms', RoomController::class)->except('show');
         Route::resource('tenants', AdminTenantController::class)->except('show');

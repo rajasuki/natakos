@@ -109,10 +109,18 @@
                 color: #ffffff;
             }
 
+            .button-primary:hover {
+                background: #282828;
+            }
+
             .button-secondary {
                 background: #ffffff;
                 color: #000000;
                 box-shadow: rgba(0, 0, 0, 0.16) 0px 2px 8px 0px;
+            }
+
+            .button-secondary:hover {
+                background: #efefef;
             }
 
             .button-subtle {
@@ -451,8 +459,8 @@
 
                 <div class="nav-row">
                     <nav class="nav-links">
-                        <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'is-active' : '' }}">Home</a>
-                        <a href="{{ route('rooms.index') }}" class="nav-link {{ request()->routeIs('rooms.*') ? 'is-active' : '' }}">Kamar</a>
+                        <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'is-active' : '' }}" @if(request()->routeIs('home')) aria-current="page" @endif>Home</a>
+                        <a href="{{ route('rooms.index') }}" class="nav-link {{ request()->routeIs('rooms.*') ? 'is-active' : '' }}" @if(request()->routeIs('rooms.*')) aria-current="page" @endif>Kamar</a>
                     </nav>
 
                     <div class="button-row">
@@ -474,7 +482,7 @@
                 <div class="footer-links">
                     <a href="{{ route('home') }}">Home</a>
                     <a href="{{ route('rooms.index') }}">Kamar</a>
-                    <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noreferrer">WhatsApp</a>
+                    <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
                 </div>
 
                 <p class="footer-copy">{{ $profile['address'] }}</p>

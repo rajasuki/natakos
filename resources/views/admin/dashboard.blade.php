@@ -215,7 +215,7 @@
                 <div class="dashboard-empty">Belum ada tagihan yang mendekati tenggat.</div>
             @else
                 <div class="table-wrap">
-                    <table class="dashboard-table">
+                    <table class="dashboard-table responsive-table">
                         <thead>
                             <tr>
                                 <th>Penghuni</th>
@@ -229,18 +229,18 @@
                         <tbody>
                             @foreach ($paymentsDueSoon as $payment)
                                 <tr>
-                                    <td>{{ $payment->tenant_name }}</td>
-                                    <td>{{ $payment->room_name }}</td>
-                                    <td>Rp{{ number_format($payment->amount, 0, ',', '.') }}</td>
-                                    <td>
-                                        <div>{{ \Illuminate\Support\Carbon::parse($payment->period_start)->format('d M Y') }}</div>
-                                        <div class="muted">s/d {{ \Illuminate\Support\Carbon::parse($payment->period_end)->format('d M Y') }}</div>
+                                    <td data-label="Penghuni">{{ $payment->tenant_name }}</td>
+                                    <td data-label="Kamar">{{ $payment->room_name }}</td>
+                                    <td data-label="Nominal">{{ \App\Support\UiFormatter::currency($payment->amount) }}</td>
+                                    <td data-label="Periode">
+                                        <div>{{ \App\Support\UiFormatter::date($payment->period_start) }}</div>
+                                        <div class="muted">s/d {{ \App\Support\UiFormatter::date($payment->period_end) }}</div>
                                     </td>
-                                    <td>
-                                        <div>{{ \Illuminate\Support\Carbon::parse($payment->due_date)->format('d M Y') }}</div>
+                                    <td data-label="Tenggat">
+                                        <div>{{ \App\Support\UiFormatter::date($payment->due_date) }}</div>
                                         <div class="muted">{{ $payment->deadline_status === 'due_today' ? 'Hari ini' : $payment->days_remaining.' hari lagi' }}</div>
                                     </td>
-                                    <td>
+                                    <td data-label="Status Warning">
                                         <span class="badge {{ $paymentBadgeClasses[$payment->deadline_status] ?? 'badge-safe' }}">
                                             {{ $deadlineStatusLabels[$payment->deadline_status] ?? $payment->deadline_status }}
                                         </span>
@@ -263,7 +263,7 @@
                 <div class="dashboard-empty">Belum ada tagihan yang terlambat.</div>
             @else
                 <div class="table-wrap">
-                    <table class="dashboard-table">
+                    <table class="dashboard-table responsive-table">
                         <thead>
                             <tr>
                                 <th>Penghuni</th>
@@ -277,12 +277,12 @@
                         <tbody>
                             @foreach ($paymentsOverdue as $payment)
                                 <tr>
-                                    <td>{{ $payment->tenant_name }}</td>
-                                    <td>{{ $payment->room_name }}</td>
-                                    <td>Rp{{ number_format($payment->amount, 0, ',', '.') }}</td>
-                                    <td>{{ \Illuminate\Support\Carbon::parse($payment->due_date)->format('d M Y') }}</td>
-                                    <td>{{ abs((int) $payment->days_remaining) }} hari</td>
-                                    <td>
+                                    <td data-label="Penghuni">{{ $payment->tenant_name }}</td>
+                                    <td data-label="Kamar">{{ $payment->room_name }}</td>
+                                    <td data-label="Nominal">{{ \App\Support\UiFormatter::currency($payment->amount) }}</td>
+                                    <td data-label="Tenggat">{{ \App\Support\UiFormatter::date($payment->due_date) }}</td>
+                                    <td data-label="Keterlambatan">{{ abs((int) $payment->days_remaining) }} hari</td>
+                                    <td data-label="Status Warning">
                                         <span class="badge {{ $paymentBadgeClasses[$payment->deadline_status] ?? 'badge-overdue' }}">
                                             {{ $deadlineStatusLabels[$payment->deadline_status] ?? $payment->deadline_status }}
                                         </span>
@@ -305,7 +305,7 @@
                 <div class="dashboard-empty">Belum ada masa tinggal yang perlu perhatian khusus.</div>
             @else
                 <div class="table-wrap">
-                    <table class="dashboard-table">
+                    <table class="dashboard-table responsive-table">
                         <thead>
                             <tr>
                                 <th>Penghuni</th>
@@ -319,11 +319,11 @@
                         <tbody>
                             @foreach ($tenantEndWarnings as $tenant)
                                 <tr>
-                                    <td>{{ $tenant->tenant_name }}</td>
-                                    <td>{{ $tenant->room_name }}</td>
-                                    <td>{{ \Illuminate\Support\Carbon::parse($tenant->start_date)->format('d M Y') }}</td>
-                                    <td>{{ \Illuminate\Support\Carbon::parse($tenant->end_date)->format('d M Y') }}</td>
-                                    <td>
+                                    <td data-label="Penghuni">{{ $tenant->tenant_name }}</td>
+                                    <td data-label="Kamar">{{ $tenant->room_name }}</td>
+                                    <td data-label="Tanggal masuk">{{ \App\Support\UiFormatter::date($tenant->start_date) }}</td>
+                                    <td data-label="Tanggal keluar">{{ \App\Support\UiFormatter::date($tenant->end_date) }}</td>
+                                    <td data-label="Sisa waktu">
                                         @if ($tenant->rent_period_status === 'ended')
                                             {{ abs((int) $tenant->days_until_end) }} hari lewat
                                         @elseif ($tenant->rent_period_status === 'ends_today')
@@ -332,7 +332,7 @@
                                             {{ (int) $tenant->days_until_end }} hari lagi
                                         @endif
                                     </td>
-                                    <td>
+                                    <td data-label="Status Masa Tinggal">
                                         <span class="badge {{ $rentBadgeClasses[$tenant->rent_period_status] ?? 'badge-safe' }}">
                                             {{ $rentStatusLabels[$tenant->rent_period_status] ?? $tenant->rent_period_status }}
                                         </span>

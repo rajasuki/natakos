@@ -220,7 +220,16 @@
                 white-space: nowrap;
             }
 
-            .badge-available,
+            .badge-available {
+                background: #000000;
+                color: #ffffff;
+            }
+
+            .badge-occupied {
+                background: #efefef;
+                color: #000000;
+            }
+
             .badge-safe,
             .badge-unpaid,
             .badge-no-end-date {
@@ -228,16 +237,15 @@
                 color: #000000;
             }
 
-            .badge-occupied,
-            .badge-paid {
-                background: #000000;
-                color: #ffffff;
-            }
-
             .badge-maintenance,
             .badge-inactive {
                 background: #d9d9d9;
                 color: #000000;
+            }
+
+            .badge-paid {
+                background: #d1fae5;
+                color: #065f46;
             }
 
             .badge-pending-verification,
@@ -326,7 +334,7 @@
 
                 <div class="nav-row">
                     <nav class="nav-links">
-                        <a href="{{ route('tenant.dashboard') }}" class="nav-link {{ request()->routeIs('tenant.dashboard') ? 'is-active' : '' }}">Dashboard</a>
+                        <a href="{{ route('tenant.dashboard') }}" class="nav-link {{ request()->routeIs('tenant.dashboard') ? 'is-active' : '' }}" @if(request()->routeIs('tenant.dashboard')) aria-current="page" @endif>Dashboard</a>
                     </nav>
 
                     <form method="POST" action="{{ route('logout') }}">

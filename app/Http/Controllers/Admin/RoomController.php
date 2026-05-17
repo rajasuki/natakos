@@ -121,7 +121,7 @@ class RoomController extends Controller
             'floor' => ['nullable', 'string', 'max:50'],
             'description' => ['nullable', 'string'],
             'status' => ['required', Rule::in(array_keys($this->statusLabels()))],
-            'main_image' => ['nullable', 'image'],
+            'main_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'facility_ids' => ['nullable', 'array'],
             'facility_ids.*' => ['integer', 'distinct', Rule::exists('facilities', 'id')],
         ]);

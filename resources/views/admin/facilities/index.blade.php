@@ -19,7 +19,7 @@
     @else
         <section class="card">
             <div class="table-wrap">
-                <table>
+                <table class="responsive-table">
                     <thead>
                         <tr>
                             <th>Nama fasilitas</th>
@@ -32,16 +32,16 @@
                     <tbody>
                         @foreach ($facilities as $facility)
                             <tr>
-                                <td>
+                                <td data-label="Nama fasilitas">
                                     <p class="room-name">{{ $facility->name }}</p>
                                     <div class="muted">ID #{{ $facility->id }}</div>
                                 </td>
-                                <td>
+                                <td data-label="Type">
                                     <span class="badge badge-{{ $facility->type }}">{{ $typeLabels[$facility->type] ?? $facility->type }}</span>
                                 </td>
-                                <td>{{ $facility->icon ?: '-' }}</td>
-                                <td>{{ $facility->created_at?->format('d M Y H:i') ?? '-' }}</td>
-                                <td>
+                                <td data-label="Icon">{{ $facility->icon ?: '-' }}</td>
+                                <td data-label="Dibuat">{{ \App\Support\UiFormatter::date($facility->created_at, 'd M Y H:i') }}</td>
+                                <td data-label="Aksi">
                                     <div class="actions">
                                         <a href="{{ route('admin.facilities.edit', $facility) }}" class="button button-secondary">Edit</a>
 

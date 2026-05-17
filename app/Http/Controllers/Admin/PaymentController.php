@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PaymentController extends Controller
 {
@@ -60,6 +61,17 @@ class PaymentController extends Controller
             'statusLabels' => $this->statusLabels(),
             'tenantStatusLabels' => $this->tenantStatusLabels(),
         ]);
+    }
+
+    public function proof(Payment $payment): StreamedResponse
+    {
+        abort_unless($payment->proof_image, 404);
+
+        $disk = $this->proofImageDisk($payment->proof_image);
+
+        abort_unless($disk !== null, 404);
+
+        return Storage::disk($disk)->response($payment->proof_image);
     }
 
     public function update(Request $request, Payment $payment): RedirectResponse
@@ -111,11 +123,11 @@ class PaymentController extends Controller
             ],
             'amount' => ['required', 'integer', 'min:0'],
             'period_start' => ['required', 'date'],
-            'period_end' => ['required', 'date'],
-            'due_date' => ['required', 'date'],
+            'period_end' => ['required', 'date', 'after_or_equal:period_start'],
+            'due_date' => ['required', 'date', 'after_or_equal:period_start'],
             'paid_at' => ['nullable', 'date'],
             'status' => ['required', Rule::in(array_keys($this->statusLabels()))],
-            'proof_image' => ['nullable', 'image'],
+            'proof_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'notes' => ['nullable', 'string'],
         ]);
 
@@ -123,7 +135,7 @@ class PaymentController extends Controller
         unset($validated['proof_image']);
 
         if ($image !== null) {
-            $validated['proof_image'] = $image->store('payments', 'public');
+            $validated['proof_image'] = $image->store('payments');
         }
 
         return $validated;
@@ -150,14 +162,9 @@ class PaymentController extends Controller
             return $data;
         }
 
-        if (empty($data['paid_at'])) {
-            $data['paid_at'] = null;
-        }
-
-        if ($payment === null) {
-            $data['verified_at'] = null;
-            $data['verified_by'] = null;
-        }
+        $data['paid_at'] = null;
+        $data['verified_at'] = null;
+        $data['verified_by'] = null;
 
         return $data;
     }
@@ -262,6 +269,20 @@ class PaymentController extends Controller
             return;
         }
 
+        Storage::disk('local')->delete($path);
         Storage::disk('public')->delete($path);
+    }
+
+    private function proofImageDisk(string $path): ?string
+    {
+        if (Storage::disk('local')->exists($path)) {
+            return 'local';
+        }
+
+        if (Storage::disk('public')->exists($path)) {
+            return 'public';
+        }
+
+        return null;
     }
 }

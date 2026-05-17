@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class TenantController extends Controller
@@ -38,6 +39,7 @@ class TenantController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $this->validatedData($request);
+        $this->validateRoomAssignment($validated['room_id'], $validated['status']);
 
         DB::transaction(function () use ($validated): void {
             $user = User::create([
@@ -80,6 +82,7 @@ class TenantController extends Controller
         $tenant->load('user');
 
         $validated = $this->validatedData($request, $tenant);
+        $this->validateRoomAssignment($validated['room_id'], $validated['status'], $tenant);
         $previousRoomId = $tenant->room_id;
 
         DB::transaction(function () use ($tenant, $validated, $previousRoomId): void {
@@ -156,8 +159,8 @@ class TenantController extends Controller
     private function validatedData(Request $request, ?Tenant $tenant = null): array
     {
         $passwordRules = $tenant === null
-            ? ['required', 'string']
-            : ['nullable', 'string'];
+            ? ['required', 'string', 'min:8']
+            : ['nullable', 'string', 'min:8'];
 
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -166,7 +169,7 @@ class TenantController extends Controller
             'password' => $passwordRules,
             'room_id' => ['required', 'integer', Rule::exists('rooms', 'id')],
             'start_date' => ['required', 'date'],
-            'end_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'status' => ['required', Rule::in(array_keys($this->statusLabels()))],
             'notes' => ['nullable', 'string'],
         ]);
@@ -234,6 +237,37 @@ class TenantController extends Controller
             if ($room->status === 'occupied') {
                 $room->update(['status' => 'available']);
             }
+        }
+    }
+
+    private function validateRoomAssignment(int $roomId, string $tenantStatus, ?Tenant $tenant = null): void
+    {
+        if ($tenantStatus !== 'active') {
+            return;
+        }
+
+        $room = Room::query()->find($roomId);
+
+        if ($room === null) {
+            return;
+        }
+
+        if ($room->status === 'maintenance') {
+            throw ValidationException::withMessages([
+                'room_id' => 'Kamar yang sedang dalam perbaikan tidak bisa dipilih untuk penghuni aktif.',
+            ]);
+        }
+
+        $hasOtherActiveTenant = Tenant::query()
+            ->where('room_id', $roomId)
+            ->where('status', 'active')
+            ->when($tenant !== null, fn ($query) => $query->where('id', '!=', $tenant->id))
+            ->exists();
+
+        if ($hasOtherActiveTenant) {
+            throw ValidationException::withMessages([
+                'room_id' => 'Kamar ini sudah ditempati penghuni aktif lain.',
+            ]);
         }
     }
 }

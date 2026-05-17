@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\KosProfile;
 use App\Models\Room;
+use App\Support\WhatsappLink;
 use Illuminate\View\View;
 
 class RoomController extends Controller
@@ -39,7 +40,7 @@ class RoomController extends Controller
             'roomStatusLabels' => $this->roomStatusLabels(),
             'facilityTypeLabels' => $this->facilityTypeLabels(),
             'facilityGroups' => $room->facilities->groupBy('type'),
-            'whatsappUrl' => $this->whatsappUrl(
+            'whatsappUrl' => WhatsappLink::build(
                 $profile['whatsapp_number'],
                 'Halo, saya tertarik dengan '.$room->name.' di NATAKOS. Apakah masih tersedia?'
             ),
@@ -52,14 +53,14 @@ class RoomController extends Controller
     private function profileData(): array
     {
         $profile = KosProfile::query()->first();
-        $whatsappNumber = $this->normalizeWhatsappNumber($profile?->whatsapp_number);
+        $whatsappNumber = WhatsappLink::normalizeNumber($profile?->whatsapp_number);
 
         return [
             'name' => $profile?->name ?: 'NATAKOS',
             'description' => $profile?->description ?: 'NATAKOS menghadirkan kamar kos yang rapi, terkelola, dan siap mendukung rutinitas harian penghuni dengan sistem manajemen yang jelas.',
             'address' => $profile?->address ?: 'Alamat kos belum diatur.',
             'whatsapp_number' => $whatsappNumber,
-            'whatsapp_url' => $this->whatsappUrl($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di NATAKOS.'),
+            'whatsapp_url' => WhatsappLink::build($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di NATAKOS.'),
         ];
     }
 
@@ -86,23 +87,4 @@ class RoomController extends Controller
         ];
     }
 
-    private function normalizeWhatsappNumber(?string $number): string
-    {
-        $normalized = preg_replace('/\D+/', '', $number ?? '') ?? '';
-
-        if ($normalized === '') {
-            return '6285217430009';
-        }
-
-        if (str_starts_with($normalized, '0')) {
-            return '62'.substr($normalized, 1);
-        }
-
-        return $normalized;
-    }
-
-    private function whatsappUrl(string $number, string $message): string
-    {
-        return 'https://wa.me/'.$number.'?text='.rawurlencode($message);
-    }
 }

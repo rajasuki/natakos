@@ -4,28 +4,39 @@
 @endphp
 
 <div class="card form-card">
-    <form method="POST" action="{{ $action }}" enctype="multipart/form-data" class="grid grid-two">
-        @csrf
+    @if ($tenants->isEmpty() && $payment === null)
+        <section class="empty-state">
+            <h2>Belum ada penghuni aktif untuk pembayaran</h2>
+            <p>Tambahkan penghuni terlebih dahulu sebelum membuat pembayaran manual agar pilihan tenant tersedia pada form ini.</p>
 
-        @isset($method)
-            @method($method)
-        @endisset
+            <div class="form-actions">
+                <a href="{{ route('admin.tenants.create') }}" class="button button-primary">Tambah penghuni</a>
+                <a href="{{ route('admin.payments.index') }}" class="button button-secondary">Kembali ke daftar pembayaran</a>
+            </div>
+        </section>
+    @else
+        <form method="POST" action="{{ $action }}" enctype="multipart/form-data" class="grid grid-two">
+            @csrf
 
-        <div class="field field-full">
-            <label for="tenant_id">Penghuni</label>
-            <select id="tenant_id" name="tenant_id" class="select" required>
-                <option value="">Pilih penghuni</option>
-                @foreach ($tenants as $tenant)
-                    <option value="{{ $tenant->id }}" @selected((string) old('tenant_id', $payment?->tenant_id) === (string) $tenant->id)>
-                        {{ $tenant->user->name }} - {{ $tenant->room->name }} - {{ $tenantStatusLabels[$tenant->status] ?? $tenant->status }}
-                    </option>
-                @endforeach
-            </select>
-            @if ($errorBag?->has('tenant_id'))
-                <div class="field-error">{{ $errorBag->first('tenant_id') }}</div>
-            @endif
-            <div class="helper">Pilih penghuni yang akan dicatat tagihan atau pembayarannya.</div>
-        </div>
+            @isset($method)
+                @method($method)
+            @endisset
+
+            <div class="field field-full">
+                <label for="tenant_id">Penghuni</label>
+                <select id="tenant_id" name="tenant_id" class="select" required>
+                    <option value="">Pilih penghuni</option>
+                    @foreach ($tenants as $tenant)
+                        <option value="{{ $tenant->id }}" @selected((string) old('tenant_id', $payment?->tenant_id) === (string) $tenant->id)>
+                            {{ $tenant->user?->name ?: 'Penghuni tidak tersedia' }} - {{ $tenant->room?->name ?: 'Kamar tidak tersedia' }} - {{ $tenantStatusLabels[$tenant->status] ?? $tenant->status }}
+                        </option>
+                    @endforeach
+                </select>
+                @if ($errorBag?->has('tenant_id'))
+                    <div class="field-error">{{ $errorBag->first('tenant_id') }}</div>
+                @endif
+                <div class="helper">Pilih penghuni yang akan dicatat tagihan atau pembayarannya.</div>
+            </div>
 
         <div class="field">
             <label for="amount">Nominal</label>
@@ -91,7 +102,7 @@
 
             @if ($payment?->proof_image)
                 <div class="preview">
-                    <img src="{{ asset('storage/'.$payment->proof_image) }}" alt="Bukti pembayaran {{ $payment->tenant?->user?->name }}">
+                    <img src="{{ route('admin.payments.proof', $payment) }}" alt="Bukti pembayaran {{ $payment->tenant?->user?->name ?: 'penghuni' }}">
                     <div class="preview-meta">Path saat ini: <strong>{{ $payment->proof_image }}</strong></div>
                 </div>
             @endif
@@ -111,5 +122,6 @@
                 <a href="{{ route('admin.payments.index') }}" class="button button-secondary">Kembali ke daftar pembayaran</a>
             </div>
         </div>
-    </form>
+        </form>
+    @endif
 </div>
