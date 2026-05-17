@@ -3,25 +3,65 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Facility;
 use App\Models\KosProfile;
 use App\Models\Room;
 use App\Support\WhatsappLink;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class RoomController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $roomStatusLabels = $this->roomStatusLabels();
+        $facilityTypeLabels = $this->facilityTypeLabels();
+        $facilities = Facility::query()
+            ->orderBy('type')
+            ->orderBy('name')
+            ->get();
+
+        $filters = $this->filters($request, $facilities, array_keys($roomStatusLabels));
+        $searchTerm = $filters['q'] !== null ? $this->escapedLikeValue($filters['q']) : null;
+
+        $rooms = Room::query()
+            ->with([
+                'facilities' => fn ($query) => $query->orderBy('type')->orderBy('name'),
+                'images' => fn ($query) => $query->orderBy('sort_order')->orderBy('id'),
+            ])
+            ->when($searchTerm !== null, function ($query) use ($searchTerm) {
+                $query->where(function ($searchQuery) use ($searchTerm) {
+                    $searchQuery
+                        ->where('name', 'like', '%'.$searchTerm.'%')
+                        ->orWhere('description', 'like', '%'.$searchTerm.'%')
+                        ->orWhere('size', 'like', '%'.$searchTerm.'%')
+                        ->orWhere('floor', 'like', '%'.$searchTerm.'%');
+                });
+            })
+            ->when($filters['min_price'] !== null, fn ($query) => $query->where('price', '>=', $filters['min_price']))
+            ->when($filters['max_price'] !== null, fn ($query) => $query->where('price', '<=', $filters['max_price']))
+            ->when($filters['status'] !== null, fn ($query) => $query->where('status', $filters['status']))
+            ->when($filters['facilities'] !== [], function ($query) use ($filters) {
+                $query->whereHas(
+                    'facilities',
+                    fn ($facilityQuery) => $facilityQuery->whereIn('facilities.id', $filters['facilities']),
+                    '=',
+                    count($filters['facilities'])
+                );
+            })
+            ->latest('id')
+            ->get();
+
         return view('public.rooms.index', [
             'profile' => $this->profileData(),
-            'rooms' => Room::query()
-                ->with([
-                    'facilities' => fn ($query) => $query->orderBy('type')->orderBy('name'),
-                    'images' => fn ($query) => $query->orderBy('sort_order')->orderBy('id'),
-                ])
-                ->latest('id')
-                ->get(),
-            'roomStatusLabels' => $this->roomStatusLabels(),
+            'rooms' => $rooms,
+            'roomStatusLabels' => $roomStatusLabels,
+            'facilityTypeLabels' => $facilityTypeLabels,
+            'facilityGroups' => $this->facilityGroups($facilities, $facilityTypeLabels),
+            'filters' => $filters,
+            'hasActiveFilters' => $this->hasActiveFilters($filters),
         ]);
     }
 
@@ -85,6 +125,83 @@ class RoomController extends Controller
             'room' => 'Fasilitas Kamar',
             'public' => 'Fasilitas Umum',
         ];
+    }
+
+    /**
+     * @param  array<int, string>  $allowedStatuses
+     * @return array{q:string|null,min_price:int|null,max_price:int|null,status:string|null,facilities:array<int, int>}
+     */
+    private function filters(Request $request, Collection $facilities, array $allowedStatuses): array
+    {
+        $status = (string) $request->query('status', '');
+        $validFacilityIds = $facilities->modelKeys();
+        $selectedFacilityIds = collect((array) $request->query('facilities', []))
+            ->map(function ($id): ?int {
+                $value = filter_var($id, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+                return $value === false ? null : (int) $value;
+            })
+            ->filter()
+            ->unique()
+            ->intersect($validFacilityIds)
+            ->values()
+            ->all();
+
+        return [
+            'q' => $this->searchTerm($request->query('q')),
+            'min_price' => $this->numericQuery($request->query('min_price')),
+            'max_price' => $this->numericQuery($request->query('max_price')),
+            'status' => in_array($status, $allowedStatuses, true) ? $status : null,
+            'facilities' => $selectedFacilityIds,
+        ];
+    }
+
+    /**
+     * @param  array<string, string>  $facilityTypeLabels
+     * @return array<string, Collection<int, Facility>>
+     */
+    private function facilityGroups(Collection $facilities, array $facilityTypeLabels): array
+    {
+        $groupedFacilities = $facilities->groupBy('type');
+
+        return collect(array_keys($facilityTypeLabels))
+            ->mapWithKeys(fn (string $type) => [$type => $groupedFacilities->get($type, collect())])
+            ->all();
+    }
+
+    /**
+     * @param  array{q:string|null,min_price:int|null,max_price:int|null,status:string|null,facilities:array<int, int>}  $filters
+     */
+    private function hasActiveFilters(array $filters): bool
+    {
+        return $filters['q'] !== null
+            || $filters['min_price'] !== null
+            || $filters['max_price'] !== null
+            || $filters['status'] !== null
+            || $filters['facilities'] !== [];
+    }
+
+    private function numericQuery(mixed $value): ?int
+    {
+        $validated = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+
+        return $validated === false ? null : (int) $validated;
+    }
+
+    private function searchTerm(mixed $value): ?string
+    {
+        $search = Str::squish((string) ($value ?? ''));
+
+        if ($search === '') {
+            return null;
+        }
+
+        return $search;
+    }
+
+    private function escapedLikeValue(string $value): string
+    {
+        return addcslashes($value, '\\%_');
     }
 
 }
