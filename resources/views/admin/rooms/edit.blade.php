@@ -5,6 +5,10 @@
 @section('page_title', 'Edit kamar')
 @section('page_description', 'Perbarui data kamar, harga, status, atau foto utama tanpa mengubah struktur database manual.')
 
+@section('page_actions')
+    <a href="{{ route('admin.rooms.index') }}" class="button button-secondary">Kembali ke daftar kamar</a>
+@endsection
+
 @section('content')
     @include('admin.rooms._form', [
         'action' => route('admin.rooms.update', $room),

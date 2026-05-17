@@ -10,14 +10,41 @@
 @endsection
 
 @section('content')
+    @php
+        $roomCounts = [
+            'Total' => $rooms->count(),
+            'Tersedia' => $rooms->where('status', 'available')->count(),
+            'Terisi' => $rooms->where('status', 'occupied')->count(),
+            'Perbaikan' => $rooms->where('status', 'maintenance')->count(),
+        ];
+    @endphp
+
     @if ($rooms->isEmpty())
         <section class="empty-state">
             <h2>Belum ada kamar</h2>
             <p>Mulai dengan menambahkan kamar pertama agar admin dapat mengelola harga, status, dan foto utama kamar dari dashboard ini.</p>
-            <a href="{{ route('admin.rooms.create') }}" class="button button-primary">Tambah kamar sekarang</a>
+
+            <div class="empty-state-actions">
+                <a href="{{ route('admin.rooms.create') }}" class="button button-primary">Tambah kamar sekarang</a>
+            </div>
         </section>
     @else
         <section class="card">
+            <div class="card-head has-divider">
+                <div class="split-actions">
+                    <div>
+                        <h2 class="card-title">Daftar kamar</h2>
+                        <p class="card-copy">Pantau status ketersediaan, harga, fasilitas ringkas, dan tindakan cepat untuk setiap kamar.</p>
+                    </div>
+
+                    <div class="tag-list">
+                        @foreach ($roomCounts as $label => $total)
+                            <span class="tag">{{ $label }}: {{ number_format($total, 0, ',', '.') }}</span>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
             <div class="table-wrap">
                 <table class="responsive-table">
                     <thead>

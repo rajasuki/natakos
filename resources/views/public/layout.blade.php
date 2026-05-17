@@ -14,6 +14,14 @@
             :root {
                 color-scheme: light;
                 font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                --ui-ink: #000000;
+                --ui-body: #5e5e5e;
+                --ui-canvas: #ffffff;
+                --ui-soft: #efefef;
+                --ui-softer: #f3f3f3;
+                --ui-border: #e2e2e2;
+                --ui-shadow: rgba(0, 0, 0, 0.12) 0px 4px 16px 0px;
+                --ui-shadow-strong: rgba(0, 0, 0, 0.16) 0px 4px 16px 0px;
             }
 
             * {
@@ -23,13 +31,19 @@
             body {
                 margin: 0;
                 min-height: 100vh;
-                background: #ffffff;
-                color: #000000;
+                background: var(--ui-canvas);
+                color: var(--ui-ink);
+                line-height: 1.5;
             }
 
             a {
                 color: inherit;
                 text-decoration: none;
+            }
+
+            img {
+                max-width: 100%;
+                height: auto;
             }
 
             .site-shell {
@@ -41,16 +55,20 @@
             }
 
             .site-header {
-                border-bottom: 1px solid #e2e2e2;
-                background: #ffffff;
+                position: sticky;
+                top: 0;
+                z-index: 30;
+                border-bottom: 1px solid var(--ui-border);
+                background: rgba(255, 255, 255, 0.96);
+                backdrop-filter: blur(8px);
             }
 
             .header-row {
                 display: flex;
                 flex-direction: column;
-                gap: 16px;
-                padding-top: 20px;
-                padding-bottom: 20px;
+                gap: 18px;
+                padding-top: 18px;
+                padding-bottom: 18px;
             }
 
             .brand {
@@ -62,7 +80,7 @@
             .nav-row {
                 display: flex;
                 flex-direction: column;
-                gap: 12px;
+                gap: 14px;
             }
 
             .nav-links,
@@ -90,23 +108,31 @@
 
             .nav-link {
                 padding: 12px 18px;
-                background: #efefef;
+                min-height: 44px;
+                background: var(--ui-soft);
+                transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            .nav-link:hover {
+                background: var(--ui-border);
             }
 
             .nav-link.is-active {
-                background: #000000;
-                color: #ffffff;
+                background: var(--ui-ink);
+                color: var(--ui-canvas);
             }
 
             .button {
                 border: 0;
                 cursor: pointer;
                 padding: 14px 18px;
+                min-height: 44px;
+                transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
             }
 
             .button-primary {
-                background: #000000;
-                color: #ffffff;
+                background: var(--ui-ink);
+                color: var(--ui-canvas);
             }
 
             .button-primary:hover {
@@ -114,8 +140,8 @@
             }
 
             .button-secondary {
-                background: #ffffff;
-                color: #000000;
+                background: var(--ui-canvas);
+                color: var(--ui-ink);
                 box-shadow: rgba(0, 0, 0, 0.16) 0px 2px 8px 0px;
             }
 
@@ -124,8 +150,8 @@
             }
 
             .button-subtle {
-                background: #efefef;
-                color: #000000;
+                background: var(--ui-soft);
+                color: var(--ui-ink);
             }
 
             .button-subtle:hover {
@@ -135,6 +161,11 @@
             .page-section {
                 padding-top: 32px;
                 padding-bottom: 32px;
+            }
+
+            .page-stack {
+                display: grid;
+                gap: 24px;
             }
 
             .hero {
@@ -155,9 +186,10 @@
             }
 
             .hero-band {
-                background: #ffffff;
+                background: var(--ui-canvas);
                 padding: 32px;
-                border: 1px solid #e2e2e2;
+                border: 1px solid var(--ui-border);
+                box-shadow: var(--ui-shadow);
             }
 
             .hero-card,
@@ -165,13 +197,14 @@
             .room-card,
             .detail-card,
             .gallery-card {
-                background: #ffffff;
-                border: 1px solid #e2e2e2;
+                background: var(--ui-canvas);
+                border: 1px solid var(--ui-border);
                 overflow: hidden;
+                box-shadow: var(--ui-shadow);
             }
 
             .hero-card {
-                background: #efefef;
+                background: var(--ui-soft);
                 padding: 24px;
             }
 
@@ -188,7 +221,7 @@
 
             .eyebrow {
                 margin: 0 0 12px;
-                color: #5e5e5e;
+                color: var(--ui-body);
                 font-size: 12px;
                 font-weight: 600;
                 letter-spacing: 0.2em;
@@ -230,7 +263,7 @@
             .room-copy,
             .detail-copy,
             .footer-copy {
-                color: #5e5e5e;
+                color: var(--ui-body);
                 line-height: 1.7;
             }
 
@@ -262,8 +295,9 @@
                 display: grid;
                 gap: 6px;
                 padding: 16px;
-                background: #ffffff;
+                background: var(--ui-canvas);
                 border-radius: 16px;
+                box-shadow: var(--ui-shadow);
             }
 
             .hero-stat-value {
@@ -273,7 +307,7 @@
             }
 
             .hero-stat-label {
-                color: #5e5e5e;
+                color: var(--ui-body);
                 font-size: 13px;
                 line-height: 1.5;
             }
@@ -285,11 +319,53 @@
                 margin-bottom: 20px;
             }
 
+            .section-header-tight {
+                margin-bottom: 0;
+            }
+
+            .section-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin-top: 18px;
+            }
+
+            .section-copy-on-dark {
+                color: #afafaf;
+            }
+
+            .section-copy-compact {
+                margin-bottom: 20px;
+            }
+
+            .section-title-tight {
+                margin-bottom: 12px;
+            }
+
+            .spaced-top-sm {
+                margin-top: 16px;
+            }
+
+            .spaced-top-md {
+                margin-top: 18px;
+            }
+
+            .spaced-top-lg {
+                margin-top: 24px;
+            }
+
+            .section-split {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                margin-bottom: 20px;
+            }
+
             .room-card-media,
             .detail-media,
             .gallery-image {
                 width: 100%;
-                background: #efefef;
+                background: var(--ui-soft);
                 object-fit: cover;
                 display: block;
             }
@@ -306,7 +382,7 @@
             .media-placeholder {
                 display: grid;
                 place-items: center;
-                color: #5e5e5e;
+                color: var(--ui-body);
                 text-align: center;
                 padding: 24px;
             }
@@ -316,6 +392,34 @@
             .feature-card-body,
             .gallery-card-body {
                 padding: 22px;
+            }
+
+            .room-card-head {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                margin-bottom: 14px;
+            }
+
+            .room-card-topbar {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .room-card-topbar-spaced {
+                margin-bottom: 16px;
+            }
+
+            .room-card-footer {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                align-items: center;
+                justify-content: space-between;
+                margin-top: 18px;
             }
 
             .status-badge,
@@ -330,7 +434,7 @@
             }
 
             .status-occupied {
-                background: #efefef;
+                background: var(--ui-soft);
                 color: #000000;
             }
 
@@ -340,7 +444,7 @@
             }
 
             .chip {
-                background: #efefef;
+                background: var(--ui-soft);
                 color: #000000;
             }
 
@@ -350,13 +454,18 @@
                 margin: 20px 0;
             }
 
+            .spec-grid {
+                display: grid;
+                gap: 14px;
+            }
+
             .detail-item {
                 display: grid;
                 gap: 6px;
             }
 
             .detail-label {
-                color: #5e5e5e;
+                color: var(--ui-body);
                 font-size: 13px;
             }
 
@@ -367,8 +476,10 @@
             }
 
             .empty-state {
-                background: #efefef;
+                background: var(--ui-soft);
                 padding: 28px;
+                border: 1px solid var(--ui-border);
+                box-shadow: var(--ui-shadow);
             }
 
             .empty-state h2 {
@@ -379,13 +490,13 @@
 
             .empty-state p {
                 margin: 0;
-                color: #5e5e5e;
+                color: var(--ui-body);
                 line-height: 1.7;
             }
 
             .footer {
-                background: #000000;
-                color: #ffffff;
+                background: var(--ui-ink);
+                color: var(--ui-canvas);
                 margin-top: 32px;
             }
 
@@ -403,8 +514,32 @@
             }
 
             .footer-links a {
-                color: #ffffff;
+                color: var(--ui-canvas);
                 font-size: 14px;
+            }
+
+            .nav-link:focus-visible,
+            .button:focus-visible {
+                outline: 2px solid var(--ui-ink);
+                outline-offset: 2px;
+            }
+
+            @media (max-width: 767px) {
+                .headline {
+                    font-size: 32px;
+                }
+
+                .hero-band,
+                .hero-card,
+                .room-card-body,
+                .detail-body,
+                .feature-card-body,
+                .gallery-card-body,
+                .contact-band,
+                .empty-state {
+                    padding-left: 18px;
+                    padding-right: 18px;
+                }
             }
 
             @media (min-width: 768px) {
@@ -417,6 +552,7 @@
                 .nav-row {
                     flex-direction: row;
                     align-items: center;
+                    justify-content: space-between;
                 }
 
                 .hero,
@@ -431,6 +567,16 @@
                 }
 
                 .feature-grid {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+
+                .section-split {
+                    flex-direction: row;
+                    align-items: end;
+                    justify-content: space-between;
+                }
+
+                .spec-grid {
                     grid-template-columns: repeat(2, minmax(0, 1fr));
                 }
             }

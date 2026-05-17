@@ -5,6 +5,11 @@
 @section('page_title', 'Dashboard Admin NATAKOS')
 @section('page_description', 'Ringkasan kondisi kamar, penghuni, pembayaran, dan masa tinggal terkini berdasarkan data nyata di database NATAKOS.')
 
+@section('page_actions')
+    <a href="{{ route('admin.payments.index') }}" class="button button-primary">Lihat pembayaran</a>
+    <a href="{{ route('admin.tenants.index') }}" class="button button-secondary">Kelola penghuni</a>
+@endsection
+
 @section('content')
     @php
         $statCards = [
@@ -69,133 +74,22 @@
         ];
     @endphp
 
-    <style>
-        .dashboard-stats {
-            display: grid;
-            gap: 16px;
-            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-            margin-bottom: 24px;
-        }
-
-        .dashboard-stat-card {
-            padding: 22px;
-        }
-
-        .dashboard-stat-label {
-            margin: 0 0 10px;
-            color: #5e5e5e;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .dashboard-stat-value {
-            margin: 0;
-            font-size: 34px;
-            line-height: 1;
-            font-weight: 700;
-        }
-
-        .dashboard-stat-hint {
-            margin: 10px 0 0;
-            color: #5e5e5e;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        .dashboard-alerts {
-            display: grid;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .dashboard-alert {
-            border-radius: 16px;
-            padding: 18px 20px;
-        }
-
-        .dashboard-alert h2 {
-            margin: 0 0 6px;
-            font-size: 18px;
-            line-height: 1.3;
-        }
-
-        .dashboard-alert p {
-            margin: 0;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .dashboard-alert-warning {
-            background: #fef3c7;
-            color: #78350f;
-        }
-
-        .dashboard-alert-danger {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .dashboard-sections {
-            display: grid;
-            gap: 20px;
-        }
-
-        .dashboard-panel {
-            padding: 0;
-        }
-
-        .dashboard-panel-head {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 20px 22px 0;
-        }
-
-        .dashboard-panel-title {
-            margin: 0;
-            font-size: 24px;
-            line-height: 1.25;
-        }
-
-        .dashboard-panel-copy {
-            margin: 0;
-            color: #5e5e5e;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .dashboard-table {
-            min-width: 0;
-        }
-
-        .dashboard-table td,
-        .dashboard-table th {
-            white-space: normal;
-        }
-
-        .dashboard-empty {
-            padding: 22px;
-            color: #5e5e5e;
-            font-size: 14px;
-            line-height: 1.7;
-        }
-    </style>
-
-    <section class="dashboard-stats">
+    <div class="content-stack">
+    <section class="metric-grid">
         @foreach ($statCards as $card)
-            <article class="card dashboard-stat-card">
-                <p class="dashboard-stat-label">{{ $card['label'] }}</p>
-                <p class="dashboard-stat-value">{{ number_format($card['value'], 0, ',', '.') }}</p>
-                <p class="dashboard-stat-hint">{{ $card['hint'] }}</p>
+            <article class="card metric-card">
+                <p class="metric-label">{{ $card['label'] }}</p>
+                <p class="metric-value">{{ number_format($card['value'], 0, ',', '.') }}</p>
+                <p class="metric-hint">{{ $card['hint'] }}</p>
             </article>
         @endforeach
     </section>
 
     @if (collect($alerts)->contains(fn (array $alert) => $alert['show']))
-        <section class="dashboard-alerts">
+        <section class="alert-stack">
             @foreach ($alerts as $alert)
                 @if ($alert['show'])
-                    <article class="dashboard-alert {{ $alert['tone'] === 'danger' ? 'dashboard-alert-danger' : 'dashboard-alert-warning' }}">
+                    <article class="alert-box {{ $alert['tone'] === 'danger' ? 'alert-box-danger' : 'alert-box-warning' }}">
                         <h2>{{ $alert['title'] }}</h2>
                         <p>{{ $alert['message'] }}</p>
                     </article>
@@ -204,18 +98,20 @@
         </section>
     @endif
 
-    <section class="dashboard-sections">
-        <article class="card dashboard-panel">
-            <div class="dashboard-panel-head">
-                <h2 class="dashboard-panel-title">Pembayaran Mendekati Tenggat</h2>
-                <p class="dashboard-panel-copy">Daftar ringkas tagihan yang jatuh tempo hari ini atau dalam lima hari ke depan.</p>
+    <section class="content-stack">
+        <article class="card">
+            <div class="card-head has-divider">
+                <h2 class="card-title">Pembayaran Mendekati Tenggat</h2>
+                <p class="card-copy">Daftar ringkas tagihan yang jatuh tempo hari ini atau dalam lima hari ke depan.</p>
             </div>
 
             @if ($paymentsDueSoon->isEmpty())
-                <div class="dashboard-empty">Belum ada tagihan yang mendekati tenggat.</div>
+                <div class="card-body">
+                    <p class="card-copy">Belum ada tagihan yang mendekati tenggat.</p>
+                </div>
             @else
                 <div class="table-wrap">
-                    <table class="dashboard-table responsive-table">
+                    <table class="responsive-table">
                         <thead>
                             <tr>
                                 <th>Penghuni</th>
@@ -253,17 +149,19 @@
             @endif
         </article>
 
-        <article class="card dashboard-panel">
-            <div class="dashboard-panel-head">
-                <h2 class="dashboard-panel-title">Pembayaran Terlambat</h2>
-                <p class="dashboard-panel-copy">Daftar ringkas tagihan yang telah melewati tenggat pembayaran dan perlu ditindaklanjuti.</p>
+        <article class="card">
+            <div class="card-head has-divider">
+                <h2 class="card-title">Pembayaran Terlambat</h2>
+                <p class="card-copy">Daftar ringkas tagihan yang telah melewati tenggat pembayaran dan perlu ditindaklanjuti.</p>
             </div>
 
             @if ($paymentsOverdue->isEmpty())
-                <div class="dashboard-empty">Belum ada tagihan yang terlambat.</div>
+                <div class="card-body">
+                    <p class="card-copy">Belum ada tagihan yang terlambat.</p>
+                </div>
             @else
                 <div class="table-wrap">
-                    <table class="dashboard-table responsive-table">
+                    <table class="responsive-table">
                         <thead>
                             <tr>
                                 <th>Penghuni</th>
@@ -295,17 +193,19 @@
             @endif
         </article>
 
-        <article class="card dashboard-panel">
-            <div class="dashboard-panel-head">
-                <h2 class="dashboard-panel-title">Masa Tinggal Perlu Perhatian</h2>
-                <p class="dashboard-panel-copy">Daftar ringkas penghuni yang masa tinggalnya hampir berakhir, berakhir hari ini, atau sudah berakhir.</p>
+        <article class="card">
+            <div class="card-head has-divider">
+                <h2 class="card-title">Masa Tinggal Perlu Perhatian</h2>
+                <p class="card-copy">Daftar ringkas penghuni yang masa tinggalnya hampir berakhir, berakhir hari ini, atau sudah berakhir.</p>
             </div>
 
             @if ($tenantEndWarnings->isEmpty())
-                <div class="dashboard-empty">Belum ada masa tinggal yang perlu perhatian khusus.</div>
+                <div class="card-body">
+                    <p class="card-copy">Belum ada masa tinggal yang perlu perhatian khusus.</p>
+                </div>
             @else
                 <div class="table-wrap">
-                    <table class="dashboard-table responsive-table">
+                    <table class="responsive-table">
                         <thead>
                             <tr>
                                 <th>Penghuni</th>
@@ -345,4 +245,5 @@
             @endif
         </article>
     </section>
+    </div>
 @endsection

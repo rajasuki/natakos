@@ -5,6 +5,10 @@
 @section('page_title', 'Tambah penghuni baru')
 @section('page_description', 'Buat akun tenant baru sekaligus data masa tinggal penghuni yang terhubung ke kamar.')
 
+@section('page_actions')
+    <a href="{{ route('admin.tenants.index') }}" class="button button-secondary">Kembali ke daftar penghuni</a>
+@endsection
+
 @section('content')
     @include('admin.tenants._form', [
         'action' => route('admin.tenants.store'),

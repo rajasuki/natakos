@@ -10,14 +10,40 @@
 @endsection
 
 @section('content')
+    @php
+        $facilityCounts = [
+            'Total' => $facilities->count(),
+            'Fasilitas Kamar' => $facilities->where('type', 'room')->count(),
+            'Fasilitas Umum' => $facilities->where('type', 'public')->count(),
+        ];
+    @endphp
+
     @if ($facilities->isEmpty())
         <section class="empty-state">
             <h2>Belum ada fasilitas</h2>
             <p>Tambahkan fasilitas pertama untuk mulai membangun katalog fasilitas kamar dan fasilitas umum di area admin.</p>
-            <a href="{{ route('admin.facilities.create') }}" class="button button-primary">Tambah fasilitas sekarang</a>
+
+            <div class="empty-state-actions">
+                <a href="{{ route('admin.facilities.create') }}" class="button button-primary">Tambah fasilitas sekarang</a>
+            </div>
         </section>
     @else
         <section class="card">
+            <div class="card-head has-divider">
+                <div class="split-actions">
+                    <div>
+                        <h2 class="card-title">Daftar fasilitas</h2>
+                        <p class="card-copy">Jaga katalog fasilitas tetap rapi agar pilihan fasilitas kamar dan fasilitas umum mudah dikelola.</p>
+                    </div>
+
+                    <div class="tag-list">
+                        @foreach ($facilityCounts as $label => $total)
+                            <span class="tag">{{ $label }}: {{ number_format($total, 0, ',', '.') }}</span>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
             <div class="table-wrap">
                 <table class="responsive-table">
                     <thead>

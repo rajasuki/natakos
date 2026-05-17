@@ -5,6 +5,10 @@
 @section('page_title', 'Edit fasilitas')
 @section('page_description', 'Perbarui data fasilitas tanpa mengubah struktur database manual yang sudah ada.')
 
+@section('page_actions')
+    <a href="{{ route('admin.facilities.index') }}" class="button button-secondary">Kembali ke daftar fasilitas</a>
+@endsection
+
 @section('content')
     @include('admin.facilities._form', [
         'action' => route('admin.facilities.update', $facility),

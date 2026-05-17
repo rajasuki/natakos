@@ -10,14 +10,42 @@
 @endsection
 
 @section('content')
+    @php
+        $paymentCounts = [
+            'Total' => $payments->count(),
+            'Belum Bayar' => $payments->where('status', 'unpaid')->count(),
+            'Menunggu Verifikasi' => $payments->where('status', 'pending_verification')->count(),
+            'Lunas' => $payments->where('status', 'paid')->count(),
+            'Ditolak' => $payments->where('status', 'rejected')->count(),
+        ];
+    @endphp
+
     @if ($payments->isEmpty())
         <section class="empty-state">
             <h2>Belum ada pembayaran</h2>
             <p>Tambahkan data tagihan pertama untuk mulai mencatat nominal, periode pembayaran, tenggat bayar, dan status verifikasi manual penghuni.</p>
-            <a href="{{ route('admin.payments.create') }}" class="button button-primary">Tambah pembayaran sekarang</a>
+
+            <div class="empty-state-actions">
+                <a href="{{ route('admin.payments.create') }}" class="button button-primary">Tambah pembayaran sekarang</a>
+            </div>
         </section>
     @else
         <section class="card">
+            <div class="card-head has-divider">
+                <div class="split-actions">
+                    <div>
+                        <h2 class="card-title">Daftar pembayaran</h2>
+                        <p class="card-copy">Tinjau tagihan, status verifikasi, dan warning tenggat agar tindak lanjut pembayaran lebih cepat.</p>
+                    </div>
+
+                    <div class="tag-list">
+                        @foreach ($paymentCounts as $label => $total)
+                            <span class="tag">{{ $label }}: {{ number_format($total, 0, ',', '.') }}</span>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
             <div class="table-wrap">
                 <table class="responsive-table">
                     <thead>
@@ -62,7 +90,7 @@
                                         <div class="tag-list">
                                             <span class="badge badge-{{ str_replace('_', '-', $deadline['status']) }}">{{ $deadline['label'] }}</span>
                                         </div>
-                                        <div class="muted" style="margin-top: 8px; line-height: 1.5;">{{ $deadline['message'] }}</div>
+                                        <div class="muted muted-note">{{ $deadline['message'] }}</div>
                                     @else
                                         <span class="muted">Belum ada data warning</span>
                                     @endif

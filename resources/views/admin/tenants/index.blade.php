@@ -10,14 +10,41 @@
 @endsection
 
 @section('content')
+    @php
+        $tenantCounts = [
+            'Total' => $tenants->count(),
+            'Aktif' => $tenants->where('status', 'active')->count(),
+            'Tidak Aktif' => $tenants->where('status', 'inactive')->count(),
+            'Sudah Keluar' => $tenants->where('status', 'moved_out')->count(),
+        ];
+    @endphp
+
     @if ($tenants->isEmpty())
         <section class="empty-state">
             <h2>Belum ada penghuni</h2>
             <p>Tambahkan penghuni pertama untuk membuat akun tenant, menghubungkannya ke kamar, dan mengatur masa tinggal secara rapi.</p>
-            <a href="{{ route('admin.tenants.create') }}" class="button button-primary">Tambah penghuni sekarang</a>
+
+            <div class="empty-state-actions">
+                <a href="{{ route('admin.tenants.create') }}" class="button button-primary">Tambah penghuni sekarang</a>
+            </div>
         </section>
     @else
         <section class="card">
+            <div class="card-head has-divider">
+                <div class="split-actions">
+                    <div>
+                        <h2 class="card-title">Daftar penghuni</h2>
+                        <p class="card-copy">Kelola akun penghuni, status tinggal, dan keterkaitan penghuni dengan kamar secara jelas.</p>
+                    </div>
+
+                    <div class="tag-list">
+                        @foreach ($tenantCounts as $label => $total)
+                            <span class="tag">{{ $label }}: {{ number_format($total, 0, ',', '.') }}</span>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
             <div class="table-wrap">
                 <table class="responsive-table">
                     <thead>
