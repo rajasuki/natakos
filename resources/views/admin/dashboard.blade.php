@@ -1,120 +1,348 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('admin.layout')
 
-        <title>Dashboard Admin NATAKOS</title>
+@section('title', 'Dashboard Admin')
+@section('eyebrow', 'Admin Dashboard')
+@section('page_title', 'Dashboard Admin NATAKOS')
+@section('page_description', 'Ringkasan kondisi kamar, penghuni, pembayaran, dan masa tinggal terkini berdasarkan data nyata di database NATAKOS.')
 
-        @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-            @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @endif
+@section('content')
+    @php
+        $statCards = [
+            ['label' => 'Total kamar', 'value' => $metrics['total_rooms'], 'hint' => 'Semua kamar yang terdaftar'],
+            ['label' => 'Kamar tersedia', 'value' => $metrics['rooms_available'], 'hint' => 'Siap ditempati penghuni baru'],
+            ['label' => 'Kamar terisi', 'value' => $metrics['rooms_occupied'], 'hint' => 'Sedang digunakan penghuni'],
+            ['label' => 'Kamar maintenance', 'value' => $metrics['rooms_maintenance'], 'hint' => 'Sedang dalam perbaikan'],
+            ['label' => 'Total penghuni aktif', 'value' => $metrics['active_tenants'], 'hint' => 'Status penghuni aktif saat ini'],
+            ['label' => 'Pembayaran belum bayar', 'value' => $metrics['payments_unpaid'], 'hint' => 'Tagihan masih belum dibayar'],
+            ['label' => 'Menunggu verifikasi', 'value' => $metrics['payments_pending_verification'], 'hint' => 'Perlu dicek admin'],
+            ['label' => 'Pembayaran lunas', 'value' => $metrics['payments_paid'], 'hint' => 'Sudah dibayar dan tercatat'],
+            ['label' => 'Mendekati tenggat', 'value' => $metrics['payments_due_soon'], 'hint' => 'Jatuh tempo dalam 1-5 hari'],
+            ['label' => 'Jatuh tempo hari ini', 'value' => $metrics['payments_due_today'], 'hint' => 'Perlu perhatian segera'],
+            ['label' => 'Pembayaran terlambat', 'value' => $metrics['payments_overdue'], 'hint' => 'Lewat dari tenggat bayar'],
+            ['label' => 'Masa tinggal hampir berakhir', 'value' => $metrics['tenants_ending_soon'], 'hint' => 'Berakhir dalam 1-5 hari'],
+            ['label' => 'Berakhir hari ini', 'value' => $metrics['tenants_end_today'], 'hint' => 'Masa tinggal selesai hari ini'],
+            ['label' => 'Masa tinggal sudah berakhir', 'value' => $metrics['tenants_ended'], 'hint' => 'Perlu tindak lanjut admin'],
+        ];
 
-        <style>
-            :root {
-                color-scheme: light;
-                font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            }
+        $paymentBadgeClasses = [
+            'paid' => 'badge-paid',
+            'safe' => 'badge-safe',
+            'due_soon' => 'badge-due-soon',
+            'due_today' => 'badge-due-today',
+            'overdue' => 'badge-overdue',
+        ];
 
-            * {
-                box-sizing: border-box;
-            }
+        $rentBadgeClasses = [
+            'inactive' => 'badge-inactive',
+            'no_end_date' => 'badge-unpaid',
+            'ended' => 'badge-overdue',
+            'ends_today' => 'badge-due-today',
+            'ending_soon' => 'badge-due-soon',
+            'safe' => 'badge-safe',
+        ];
 
-            body {
-                margin: 0;
-                min-height: 100vh;
-                background: #ffffff;
-                color: #000000;
-            }
+        $alerts = [
+            [
+                'show' => $metrics['payments_due_today'] > 0,
+                'tone' => 'today',
+                'title' => 'Pembayaran jatuh tempo hari ini',
+                'message' => 'Ada '.$metrics['payments_due_today'].' tagihan yang jatuh tempo hari ini dan perlu ditindaklanjuti sekarang.',
+            ],
+            [
+                'show' => $metrics['payments_overdue'] > 0,
+                'tone' => 'danger',
+                'title' => 'Pembayaran terlambat',
+                'message' => 'Ada '.$metrics['payments_overdue'].' tagihan yang sudah melewati tenggat pembayaran.',
+            ],
+            [
+                'show' => $metrics['tenants_end_today'] > 0,
+                'tone' => 'today',
+                'title' => 'Masa tinggal berakhir hari ini',
+                'message' => 'Ada '.$metrics['tenants_end_today'].' penghuni dengan masa tinggal yang berakhir hari ini.',
+            ],
+            [
+                'show' => $metrics['tenants_ended'] > 0,
+                'tone' => 'danger',
+                'title' => 'Masa tinggal sudah berakhir',
+                'message' => 'Ada '.$metrics['tenants_ended'].' penghuni yang masa tinggalnya sudah berakhir dan perlu tindak lanjut.',
+            ],
+        ];
+    @endphp
 
-            .page {
-                min-height: 100vh;
-                padding: 40px 24px;
-                display: flex;
-                align-items: center;
-            }
+    <style>
+        .dashboard-stats {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            margin-bottom: 24px;
+        }
 
-            .shell {
-                width: 100%;
-                max-width: 960px;
-                margin: 0 auto;
-            }
+        .dashboard-stat-card {
+            padding: 22px;
+        }
 
-            .card {
-                display: flex;
-                flex-direction: column;
-                gap: 24px;
-                background: #efefef;
-                border-radius: 16px;
-                padding: 32px;
-            }
+        .dashboard-stat-label {
+            margin: 0 0 10px;
+            color: #5e5e5e;
+            font-size: 13px;
+            line-height: 1.5;
+        }
 
-            .eyebrow {
-                margin: 0 0 8px;
-                color: #5e5e5e;
-                font-size: 12px;
-                font-weight: 600;
-                letter-spacing: 0.2em;
-                text-transform: uppercase;
-            }
+        .dashboard-stat-value {
+            margin: 0;
+            font-size: 34px;
+            line-height: 1;
+            font-weight: 700;
+        }
 
-            h1 {
-                margin: 0 0 8px;
-                font-size: 40px;
-                line-height: 1.15;
-            }
+        .dashboard-stat-hint {
+            margin: 10px 0 0;
+            color: #5e5e5e;
+            font-size: 13px;
+            line-height: 1.6;
+        }
 
-            .copy {
-                margin: 0;
-                color: #5e5e5e;
-                font-size: 14px;
-            }
+        .dashboard-alerts {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
 
-            .button {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                border: 0;
-                border-radius: 999px;
-                background: #000000;
-                color: #ffffff;
-                padding: 14px 18px;
-                font: inherit;
-                font-weight: 600;
-                cursor: pointer;
-            }
+        .dashboard-alert {
+            border-radius: 16px;
+            padding: 18px 20px;
+        }
 
-            .button:hover {
-                background: #282828;
-            }
+        .dashboard-alert h2 {
+            margin: 0 0 6px;
+            font-size: 18px;
+            line-height: 1.3;
+        }
 
-            @media (min-width: 640px) {
-                .card {
-                    flex-direction: row;
-                    align-items: center;
-                    justify-content: space-between;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <main class="page">
-            <section class="shell">
-                <div class="card">
-                    <div>
-                        <p class="eyebrow">Admin Area</p>
-                        <h1>Dashboard Admin NATAKOS</h1>
-                        <p class="copy">Login sebagai {{ auth()->user()->email }}</p>
-                    </div>
+        .dashboard-alert p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
 
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="button">
-                            Logout
-                        </button>
-                    </form>
+        .dashboard-alert-warning {
+            background: #fef3c7;
+            color: #78350f;
+        }
+
+        .dashboard-alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .dashboard-sections {
+            display: grid;
+            gap: 20px;
+        }
+
+        .dashboard-panel {
+            padding: 0;
+        }
+
+        .dashboard-panel-head {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 20px 22px 0;
+        }
+
+        .dashboard-panel-title {
+            margin: 0;
+            font-size: 24px;
+            line-height: 1.25;
+        }
+
+        .dashboard-panel-copy {
+            margin: 0;
+            color: #5e5e5e;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .dashboard-table {
+            min-width: 0;
+        }
+
+        .dashboard-table td,
+        .dashboard-table th {
+            white-space: normal;
+        }
+
+        .dashboard-empty {
+            padding: 22px;
+            color: #5e5e5e;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+    </style>
+
+    <section class="dashboard-stats">
+        @foreach ($statCards as $card)
+            <article class="card dashboard-stat-card">
+                <p class="dashboard-stat-label">{{ $card['label'] }}</p>
+                <p class="dashboard-stat-value">{{ number_format($card['value'], 0, ',', '.') }}</p>
+                <p class="dashboard-stat-hint">{{ $card['hint'] }}</p>
+            </article>
+        @endforeach
+    </section>
+
+    @if (collect($alerts)->contains(fn (array $alert) => $alert['show']))
+        <section class="dashboard-alerts">
+            @foreach ($alerts as $alert)
+                @if ($alert['show'])
+                    <article class="dashboard-alert {{ $alert['tone'] === 'danger' ? 'dashboard-alert-danger' : 'dashboard-alert-warning' }}">
+                        <h2>{{ $alert['title'] }}</h2>
+                        <p>{{ $alert['message'] }}</p>
+                    </article>
+                @endif
+            @endforeach
+        </section>
+    @endif
+
+    <section class="dashboard-sections">
+        <article class="card dashboard-panel">
+            <div class="dashboard-panel-head">
+                <h2 class="dashboard-panel-title">Pembayaran Mendekati Tenggat</h2>
+                <p class="dashboard-panel-copy">Daftar ringkas tagihan yang jatuh tempo hari ini atau dalam lima hari ke depan.</p>
+            </div>
+
+            @if ($paymentsDueSoon->isEmpty())
+                <div class="dashboard-empty">Belum ada tagihan yang mendekati tenggat.</div>
+            @else
+                <div class="table-wrap">
+                    <table class="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Penghuni</th>
+                                <th>Kamar</th>
+                                <th>Nominal</th>
+                                <th>Periode</th>
+                                <th>Tenggat</th>
+                                <th>Status Warning</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($paymentsDueSoon as $payment)
+                                <tr>
+                                    <td>{{ $payment->tenant_name }}</td>
+                                    <td>{{ $payment->room_name }}</td>
+                                    <td>Rp{{ number_format($payment->amount, 0, ',', '.') }}</td>
+                                    <td>
+                                        <div>{{ \Illuminate\Support\Carbon::parse($payment->period_start)->format('d M Y') }}</div>
+                                        <div class="muted">s/d {{ \Illuminate\Support\Carbon::parse($payment->period_end)->format('d M Y') }}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{ \Illuminate\Support\Carbon::parse($payment->due_date)->format('d M Y') }}</div>
+                                        <div class="muted">{{ $payment->deadline_status === 'due_today' ? 'Hari ini' : $payment->days_remaining.' hari lagi' }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ $paymentBadgeClasses[$payment->deadline_status] ?? 'badge-safe' }}">
+                                            {{ $deadlineStatusLabels[$payment->deadline_status] ?? $payment->deadline_status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-            </section>
-        </main>
-    </body>
-</html>
+            @endif
+        </article>
+
+        <article class="card dashboard-panel">
+            <div class="dashboard-panel-head">
+                <h2 class="dashboard-panel-title">Pembayaran Terlambat</h2>
+                <p class="dashboard-panel-copy">Daftar ringkas tagihan yang telah melewati tenggat pembayaran dan perlu ditindaklanjuti.</p>
+            </div>
+
+            @if ($paymentsOverdue->isEmpty())
+                <div class="dashboard-empty">Belum ada tagihan yang terlambat.</div>
+            @else
+                <div class="table-wrap">
+                    <table class="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Penghuni</th>
+                                <th>Kamar</th>
+                                <th>Nominal</th>
+                                <th>Tenggat</th>
+                                <th>Keterlambatan</th>
+                                <th>Status Warning</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($paymentsOverdue as $payment)
+                                <tr>
+                                    <td>{{ $payment->tenant_name }}</td>
+                                    <td>{{ $payment->room_name }}</td>
+                                    <td>Rp{{ number_format($payment->amount, 0, ',', '.') }}</td>
+                                    <td>{{ \Illuminate\Support\Carbon::parse($payment->due_date)->format('d M Y') }}</td>
+                                    <td>{{ abs((int) $payment->days_remaining) }} hari</td>
+                                    <td>
+                                        <span class="badge {{ $paymentBadgeClasses[$payment->deadline_status] ?? 'badge-overdue' }}">
+                                            {{ $deadlineStatusLabels[$payment->deadline_status] ?? $payment->deadline_status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </article>
+
+        <article class="card dashboard-panel">
+            <div class="dashboard-panel-head">
+                <h2 class="dashboard-panel-title">Masa Tinggal Perlu Perhatian</h2>
+                <p class="dashboard-panel-copy">Daftar ringkas penghuni yang masa tinggalnya hampir berakhir, berakhir hari ini, atau sudah berakhir.</p>
+            </div>
+
+            @if ($tenantEndWarnings->isEmpty())
+                <div class="dashboard-empty">Belum ada masa tinggal yang perlu perhatian khusus.</div>
+            @else
+                <div class="table-wrap">
+                    <table class="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Penghuni</th>
+                                <th>Kamar</th>
+                                <th>Tanggal masuk</th>
+                                <th>Tanggal keluar</th>
+                                <th>Sisa waktu</th>
+                                <th>Status Masa Tinggal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($tenantEndWarnings as $tenant)
+                                <tr>
+                                    <td>{{ $tenant->tenant_name }}</td>
+                                    <td>{{ $tenant->room_name }}</td>
+                                    <td>{{ \Illuminate\Support\Carbon::parse($tenant->start_date)->format('d M Y') }}</td>
+                                    <td>{{ \Illuminate\Support\Carbon::parse($tenant->end_date)->format('d M Y') }}</td>
+                                    <td>
+                                        @if ($tenant->rent_period_status === 'ended')
+                                            {{ abs((int) $tenant->days_until_end) }} hari lewat
+                                        @elseif ($tenant->rent_period_status === 'ends_today')
+                                            Berakhir hari ini
+                                        @else
+                                            {{ (int) $tenant->days_until_end }} hari lagi
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ $rentBadgeClasses[$tenant->rent_period_status] ?? 'badge-safe' }}">
+                                            {{ $rentStatusLabels[$tenant->rent_period_status] ?? $tenant->rent_period_status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </article>
+    </section>
+@endsection
