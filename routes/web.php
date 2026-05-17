@@ -6,12 +6,14 @@ use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\TenantController as AdminTenantController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Public\HomeController as PublicHomeController;
+use App\Http\Controllers\Public\RoomController as PublicRoomController;
 use App\Http\Controllers\Tenant\DashboardController as TenantDashboardController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', PublicHomeController::class)->name('home');
+Route::get('/rooms', [PublicRoomController::class, 'index'])->name('rooms.index');
+Route::get('/rooms/{room:slug}', [PublicRoomController::class, 'show'])->name('rooms.show');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
