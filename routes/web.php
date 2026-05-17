@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Public\HomeController as PublicHomeController;
 use App\Http\Controllers\Public\RoomController as PublicRoomController;
 use App\Http\Controllers\Tenant\DashboardController as TenantDashboardController;
+use App\Http\Controllers\Tenant\PaymentProofController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', PublicHomeController::class)->name('home');
@@ -44,5 +45,6 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('tenant')->name('tenant.')->middleware('tenant')->group(function () {
         Route::get('/dashboard', TenantDashboardController::class)->name('dashboard');
+        Route::post('payments/{payment}/proof', [PaymentProofController::class, 'store'])->name('payments.proof.store');
     });
 });

@@ -32,6 +32,8 @@ class DashboardController extends Controller
             return view('tenant.dashboard', [
                 'user' => $user,
                 'tenant' => null,
+                'payments' => collect(),
+                'paymentDeadlines' => collect(),
                 'featuredPayment' => null,
                 'paymentDeadline' => null,
                 'paymentWarning' => null,
@@ -68,6 +70,8 @@ class DashboardController extends Controller
         return view('tenant.dashboard', [
             'user' => $user,
             'tenant' => $tenant,
+            'payments' => $payments,
+            'paymentDeadlines' => $paymentDeadlines,
             'featuredPayment' => $featuredPayment,
             'paymentDeadline' => $paymentDeadline,
             'paymentWarning' => $this->paymentWarning($paymentDeadline),
