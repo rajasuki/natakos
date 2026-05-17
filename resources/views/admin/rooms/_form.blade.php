@@ -2,6 +2,9 @@
     $room = $room ?? null;
     $currentImage = $room?->main_image;
     $errorBag = isset($errors) ? $errors : null;
+    $selectedFacilityIds = collect(old('facility_ids', $room?->facilities?->modelKeys() ?? []))
+        ->map(fn ($id) => (string) $id)
+        ->all();
 @endphp
 
 <div class="card form-card">
@@ -66,6 +69,49 @@
             @if ($errorBag?->has('description'))
                 <div class="field-error">{{ $errorBag->first('description') }}</div>
             @endif
+        </div>
+
+        <div class="field field-full">
+            <label>Fasilitas</label>
+            @if ($errorBag?->has('facility_ids') || $errorBag?->has('facility_ids.*'))
+                <div class="field-error">{{ $errorBag->first('facility_ids') ?: $errorBag->first('facility_ids.*') }}</div>
+            @endif
+            <div class="helper">Pilih fasilitas yang tersedia untuk kamar ini. Anda bisa memilih lebih dari satu fasilitas.</div>
+
+            <div class="checkbox-sections">
+                @foreach ($facilityTypeLabels as $type => $label)
+                    @php
+                        $facilities = $facilityGroups[$type] ?? collect();
+                    @endphp
+
+                    <section class="checkbox-group">
+                        <h3 class="checkbox-group-title">{{ $label }}</h3>
+
+                        @if ($facilities->isEmpty())
+                            <div class="helper">Belum ada fasilitas pada kelompok ini.</div>
+                        @else
+                            <div class="checkbox-grid">
+                                @foreach ($facilities as $facility)
+                                    <label class="checkbox-item" for="facility_{{ $facility->id }}">
+                                        <input
+                                            id="facility_{{ $facility->id }}"
+                                            type="checkbox"
+                                            name="facility_ids[]"
+                                            value="{{ $facility->id }}"
+                                            @checked(in_array((string) $facility->id, $selectedFacilityIds, true))
+                                        >
+
+                                        <span class="checkbox-copy">
+                                            <strong>{{ $facility->name }}</strong>
+                                            <span class="muted">{{ $facility->icon ?: 'Tanpa icon' }}</span>
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @endif
+                    </section>
+                @endforeach
+            </div>
         </div>
 
         <div class="field field-full">

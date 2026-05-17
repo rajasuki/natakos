@@ -293,6 +293,16 @@
                 color: #000000;
             }
 
+            .badge-room {
+                background: #000000;
+                color: #ffffff;
+            }
+
+            .badge-public {
+                background: #efefef;
+                color: #000000;
+            }
+
             .actions {
                 display: flex;
                 flex-wrap: wrap;
@@ -403,6 +413,76 @@
                 margin-top: 8px;
             }
 
+            .checkbox-sections {
+                display: grid;
+                gap: 16px;
+            }
+
+            .checkbox-group {
+                display: grid;
+                gap: 12px;
+                padding: 20px;
+                border-radius: 16px;
+                background: #efefef;
+            }
+
+            .checkbox-group-title {
+                margin: 0;
+                font-size: 16px;
+                font-weight: 600;
+            }
+
+            .checkbox-grid {
+                display: grid;
+                gap: 10px;
+            }
+
+            .checkbox-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 12px 14px;
+                border-radius: 12px;
+                background: #ffffff;
+            }
+
+            .checkbox-item input {
+                margin-top: 2px;
+            }
+
+            .checkbox-copy {
+                display: grid;
+                gap: 4px;
+            }
+
+            .checkbox-copy strong {
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            .tag-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .tag {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 999px;
+                padding: 8px 12px;
+                background: #efefef;
+                font-size: 12px;
+                font-weight: 600;
+                line-height: 1.2;
+            }
+
+            .tag-muted {
+                background: #f3f3f3;
+                color: #5e5e5e;
+            }
+
             @media (min-width: 768px) {
                 .navbar-shell {
                     flex-direction: row;
@@ -436,6 +516,7 @@
                     <nav class="nav-links">
                         <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">Dashboard</a>
                         <a href="{{ route('admin.rooms.index') }}" class="nav-link {{ request()->routeIs('admin.rooms.*') ? 'is-active' : '' }}">Kamar</a>
+                        <a href="{{ route('admin.facilities.index') }}" class="nav-link {{ request()->routeIs('admin.facilities.*') ? 'is-active' : '' }}">Fasilitas</a>
                     </nav>
 
                     <form method="POST" action="{{ route('logout') }}">

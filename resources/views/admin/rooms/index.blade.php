@@ -28,6 +28,7 @@
                             <th>Ukuran</th>
                             <th>Lantai</th>
                             <th>Status</th>
+                            <th>Fasilitas</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -50,6 +51,21 @@
                                 <td>{{ $room->floor ?: '-' }}</td>
                                 <td>
                                     <span class="badge badge-{{ $room->status }}">{{ $statusLabels[$room->status] ?? $room->status }}</span>
+                                </td>
+                                <td>
+                                    @if ($room->facilities->isEmpty())
+                                        <span class="muted">Belum dipilih</span>
+                                    @else
+                                        <div class="tag-list">
+                                            @foreach ($room->facilities->take(4) as $facility)
+                                                <span class="tag">{{ $facility->name }}</span>
+                                            @endforeach
+
+                                            @if ($room->facilities->count() > 4)
+                                                <span class="tag tag-muted">+{{ $room->facilities->count() - 4 }} lagi</span>
+                                            @endif
+                                        </div>
+                                    @endif
                                 </td>
                                 <td>
                                     <div class="actions">

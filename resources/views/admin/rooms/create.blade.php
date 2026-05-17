@@ -10,5 +10,7 @@
         'action' => route('admin.rooms.store'),
         'submitLabel' => 'Simpan kamar',
         'statusLabels' => $statusLabels,
+        'facilityGroups' => $facilityGroups,
+        'facilityTypeLabels' => $facilityTypeLabels,
     ])
 @endsection

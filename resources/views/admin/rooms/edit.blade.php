@@ -12,5 +12,7 @@
         'room' => $room,
         'submitLabel' => 'Update kamar',
         'statusLabels' => $statusLabels,
+        'facilityGroups' => $facilityGroups,
+        'facilityTypeLabels' => $facilityTypeLabels,
     ])
 @endsection

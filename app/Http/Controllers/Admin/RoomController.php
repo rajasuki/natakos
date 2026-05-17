@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Facility;
 use App\Models\Room;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
@@ -17,7 +18,10 @@ class RoomController extends Controller
     public function index(): View
     {
         return view('admin.rooms.index', [
-            'rooms' => Room::query()->latest('id')->get(),
+            'rooms' => Room::query()
+                ->with(['facilities' => fn ($query) => $query->orderBy('type')->orderBy('name')])
+                ->latest('id')
+                ->get(),
             'statusLabels' => $this->statusLabels(),
         ]);
     }
@@ -26,15 +30,19 @@ class RoomController extends Controller
     {
         return view('admin.rooms.create', [
             'statusLabels' => $this->statusLabels(),
+            'facilityGroups' => $this->facilityGroups(),
+            'facilityTypeLabels' => $this->facilityTypeLabels(),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validatedData($request);
+        $facilityIds = $this->extractFacilityIds($data);
         $data['slug'] = $this->generateUniqueSlug($data['name']);
 
-        Room::create($data);
+        $room = Room::create($data);
+        $room->facilities()->sync($facilityIds);
 
         return redirect()
             ->route('admin.rooms.index')
@@ -44,8 +52,10 @@ class RoomController extends Controller
     public function edit(Room $room): View
     {
         return view('admin.rooms.edit', [
-            'room' => $room,
+            'room' => $room->load(['facilities' => fn ($query) => $query->orderBy('type')->orderBy('name')]),
             'statusLabels' => $this->statusLabels(),
+            'facilityGroups' => $this->facilityGroups(),
+            'facilityTypeLabels' => $this->facilityTypeLabels(),
         ]);
     }
 
@@ -53,9 +63,11 @@ class RoomController extends Controller
     {
         $oldImage = $room->main_image;
         $data = $this->validatedData($request);
+        $facilityIds = $this->extractFacilityIds($data);
         $data['slug'] = $this->generateUniqueSlug($data['name'], $room);
 
         $room->update($data);
+        $room->facilities()->sync($facilityIds);
 
         if (array_key_exists('main_image', $data) && $oldImage !== $data['main_image']) {
             $this->deleteImage($oldImage);
@@ -110,6 +122,8 @@ class RoomController extends Controller
             'description' => ['nullable', 'string'],
             'status' => ['required', Rule::in(array_keys($this->statusLabels()))],
             'main_image' => ['nullable', 'image'],
+            'facility_ids' => ['nullable', 'array'],
+            'facility_ids.*' => ['integer', 'distinct', Rule::exists('facilities', 'id')],
         ]);
 
         $image = $validated['main_image'] ?? null;
@@ -120,6 +134,18 @@ class RoomController extends Controller
         }
 
         return $validated;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<int, int>
+     */
+    private function extractFacilityIds(array &$data): array
+    {
+        $facilityIds = array_values($data['facility_ids'] ?? []);
+        unset($data['facility_ids']);
+
+        return $facilityIds;
     }
 
     private function generateUniqueSlug(string $name, ?Room $room = null): string
@@ -157,6 +183,33 @@ class RoomController extends Controller
             'occupied' => 'Terisi',
             'maintenance' => 'Perbaikan',
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function facilityTypeLabels(): array
+    {
+        return [
+            'room' => 'Fasilitas Kamar',
+            'public' => 'Fasilitas Umum',
+        ];
+    }
+
+    /**
+     * @return array<string, \Illuminate\Support\Collection<int, Facility>>
+     */
+    private function facilityGroups(): array
+    {
+        $groupedFacilities = Facility::query()
+            ->orderBy('type')
+            ->orderBy('name')
+            ->get()
+            ->groupBy('type');
+
+        return collect(array_keys($this->facilityTypeLabels()))
+            ->mapWithKeys(fn (string $type) => [$type => $groupedFacilities->get($type, collect())])
+            ->all();
     }
 
     private function deleteImage(?string $path): void
