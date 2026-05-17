@@ -50,6 +50,98 @@
             <div class="site-shell">
                 <div class="section-split">
                     <div class="section-header section-header-tight">
+                        <p class="eyebrow">Lokasi</p>
+                        <h2 class="section-title">Lokasi & sekitar kos</h2>
+                        <p class="section-copy">Calon penghuni bisa langsung lihat posisi kos dan gambaran akses cepat ke tempat yang sering dicari.</p>
+                    </div>
+
+                    <div class="section-actions">
+                        @if ($profile['google_maps_url'])
+                            <a href="{{ $profile['google_maps_url'] }}" target="_blank" rel="noopener noreferrer" class="button button-subtle">Buka di Google Maps</a>
+                        @endif
+                        <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer" class="button button-primary">Tanya lokasi</a>
+                    </div>
+                </div>
+
+                <div class="detail-grid">
+                    <article class="detail-card">
+                        @if ($profile['google_maps_embed_url'])
+                            <iframe
+                                src="{{ $profile['google_maps_embed_url'] }}"
+                                class="map-embed"
+                                loading="lazy"
+                                allowfullscreen
+                                referrerpolicy="no-referrer-when-downgrade"
+                                title="Lokasi {{ $profile['name'] }} di Google Maps"
+                            ></iframe>
+                        @else
+                            <div class="map-placeholder">
+                                <div>
+                                    <p class="eyebrow">Google Maps</p>
+                                    <h3 class="room-title">Map embed belum diatur</h3>
+                                    <p class="room-copy">Tambahkan Google Maps Embed URL dari panel admin supaya peta tampil langsung di halaman ini.</p>
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="detail-body">
+                            <div class="detail-item">
+                                <span class="detail-label">Alamat kos</span>
+                                <span class="detail-value">{{ $profile['address'] }}</span>
+                            </div>
+
+                            <p class="detail-copy">Bagian ini membantu calon penghuni lebih cepat paham posisi kos dan akses ke tempat penting di sekitar.</p>
+
+                            <div class="section-actions">
+                                @if ($profile['google_maps_url'])
+                                    <a href="{{ $profile['google_maps_url'] }}" target="_blank" rel="noopener noreferrer" class="button button-secondary">Buka peta penuh</a>
+                                @endif
+                                <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer" class="button button-subtle">Hubungi pengelola</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-card-body">
+                            <p class="eyebrow">Dekat ke mana aja</p>
+                            <h3 class="room-title">Tempat sekitar yang sering ditanya</h3>
+                            <p class="room-copy">Isi daftar ini dari panel admin untuk menonjolkan akses ke kampus, warung, laundry, tempat ibadah, atau transportasi.</p>
+
+                            <div class="nearby-list spaced-top-md">
+                                @forelse ($profile['nearby_places'] as $place)
+                                    <div class="nearby-item">
+                                        <span class="nearby-marker">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+
+                                        <div class="nearby-item-copy">
+                                            <div class="detail-item">
+                                                <span class="detail-label">Nama tempat</span>
+                                                <span class="detail-value">{{ $place['name'] }}</span>
+                                            </div>
+
+                                            @if ($place['estimate_label'] !== '')
+                                                <div class="detail-item">
+                                                    <span class="detail-label">Estimasi</span>
+                                                    <span class="nearby-estimate">{{ $place['estimate_label'] }}</span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="nearby-empty">
+                                        <p class="muted">Belum ada daftar tempat sekitar yang ditampilkan.</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-section">
+            <div class="site-shell">
+                <div class="section-split">
+                    <div class="section-header section-header-tight">
                         <p class="eyebrow">Kamar pilihan</p>
                         <h2 class="section-title">Beberapa kamar tersedia</h2>
                         <p class="section-copy">Cek kamar yang sedang tersedia dan lihat detail lengkapnya sebelum menghubungi pengelola.</p>

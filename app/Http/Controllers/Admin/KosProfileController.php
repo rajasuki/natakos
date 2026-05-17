@@ -14,8 +14,13 @@ class KosProfileController extends Controller
 {
     public function edit(): View
     {
+        $profile = $this->profile();
+
         return view('admin.settings.kos-profile', [
-            'profile' => $this->profile(),
+            'profile' => $profile,
+            'nearbyPlaces' => $profile->nearbyPlaceItems(),
+            'estimateUnitOptions' => KosProfile::estimateUnitOptions(),
+            'travelModeOptions' => KosProfile::travelModeOptions(),
         ]);
     }
 
@@ -49,6 +54,12 @@ class KosProfileController extends Controller
             'address' => ['nullable', 'string'],
             'whatsapp_number' => ['required', 'string', 'max:30'],
             'google_maps_url' => ['nullable', 'url', 'max:2048'],
+            'google_maps_embed_url' => ['nullable', 'url', 'max:2048'],
+            'nearby_places' => ['nullable', 'array'],
+            'nearby_places.*.name' => ['nullable', 'string', 'max:255'],
+            'nearby_places.*.estimate_value' => ['nullable', 'string', 'max:50'],
+            'nearby_places.*.estimate_unit' => ['nullable', 'in:minute,meter,kilometer'],
+            'nearby_places.*.travel_mode' => ['nullable', 'in:walking,motorcycle,car'],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
@@ -58,6 +69,8 @@ class KosProfileController extends Controller
         if ($logo !== null) {
             $validated['logo'] = $logo->store('kos', 'public');
         }
+
+        $validated['nearby_places'] = KosProfile::serializeNearbyPlaces($validated['nearby_places'] ?? []);
 
         return $validated;
     }

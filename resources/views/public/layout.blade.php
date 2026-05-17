@@ -475,6 +475,73 @@
                 font-weight: 600;
             }
 
+            .map-embed,
+            .map-placeholder {
+                width: 100%;
+                min-height: 340px;
+                border: 0;
+                display: block;
+                background: var(--ui-soft);
+            }
+
+            .map-placeholder {
+                display: grid;
+                align-items: center;
+                padding: 24px;
+            }
+
+            .nearby-list {
+                display: grid;
+                gap: 12px;
+            }
+
+            .nearby-item,
+            .nearby-empty {
+                display: grid;
+                gap: 14px;
+                padding: 16px;
+                background: var(--ui-soft);
+                border-radius: 16px;
+            }
+
+            .nearby-item {
+                grid-template-columns: auto 1fr;
+                align-items: start;
+            }
+
+            .nearby-item-copy {
+                display: grid;
+                gap: 10px;
+            }
+
+            .nearby-marker {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                border-radius: 999px;
+                background: var(--ui-ink);
+                color: var(--ui-canvas);
+                font-size: 12px;
+                font-weight: 700;
+                line-height: 1;
+            }
+
+            .nearby-estimate {
+                display: inline-flex;
+                align-items: center;
+                width: fit-content;
+                min-height: 36px;
+                padding: 8px 12px;
+                border-radius: 999px;
+                background: var(--ui-ink);
+                color: var(--ui-canvas);
+                font-size: 13px;
+                font-weight: 600;
+                line-height: 1.2;
+            }
+
             .empty-state {
                 background: var(--ui-soft);
                 padding: 28px;

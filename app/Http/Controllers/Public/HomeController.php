@@ -56,18 +56,28 @@ class HomeController extends Controller
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     private function profileData(): array
     {
         $profile = app()->runningUnitTests() ? null : KosProfile::query()->first();
         $whatsappNumber = WhatsappLink::normalizeNumber($profile?->whatsapp_number);
+        $nearbyPlaces = collect($profile?->nearbyPlaceItems() ?? [])
+            ->map(function (array $place): array {
+                $place['estimate_label'] = KosProfile::formatNearbyEstimate($place);
+
+                return $place;
+            })
+            ->all();
 
         return [
             'name' => $profile?->name ?: 'NATAKOS',
             'description' => $profile?->description ?: 'NATAKOS menghadirkan kamar kos yang rapi, terkelola, dan siap mendukung rutinitas harian penghuni dengan sistem manajemen yang jelas.',
             'address' => $profile?->address ?: 'Alamat kos belum diatur.',
             'whatsapp_number' => $whatsappNumber,
+            'google_maps_url' => $profile?->google_maps_url,
+            'google_maps_embed_url' => $profile?->google_maps_embed_url,
+            'nearby_places' => $nearbyPlaces,
             'whatsapp_url' => WhatsappLink::build($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di NATAKOS.'),
         ];
     }
@@ -94,5 +104,4 @@ class HomeController extends Controller
             'public' => 'Fasilitas Umum',
         ];
     }
-
 }
