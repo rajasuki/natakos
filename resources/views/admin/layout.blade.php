@@ -303,6 +303,53 @@
                 color: #000000;
             }
 
+            .badge-active {
+                background: #000000;
+                color: #ffffff;
+            }
+
+            .badge-inactive {
+                background: #efefef;
+                color: #000000;
+            }
+
+            .badge-moved-out {
+                background: #d9d9d9;
+                color: #000000;
+            }
+
+            .badge-unpaid,
+            .badge-safe {
+                background: #efefef;
+                color: #000000;
+            }
+
+            .badge-pending-verification {
+                background: #fff7ed;
+                color: #9a3412;
+            }
+
+            .badge-paid {
+                background: #d1fae5;
+                color: #065f46;
+            }
+
+            .badge-rejected,
+            .badge-overdue {
+                background: #fee2e2;
+                color: #991b1b;
+            }
+
+            .badge-due-soon {
+                background: #fef3c7;
+                color: #92400e;
+            }
+
+            .badge-due-today {
+                background: #fde68a;
+                color: #78350f;
+            }
+
             .actions {
                 display: flex;
                 flex-wrap: wrap;
@@ -517,6 +564,8 @@
                         <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">Dashboard</a>
                         <a href="{{ route('admin.rooms.index') }}" class="nav-link {{ request()->routeIs('admin.rooms.*') ? 'is-active' : '' }}">Kamar</a>
                         <a href="{{ route('admin.facilities.index') }}" class="nav-link {{ request()->routeIs('admin.facilities.*') ? 'is-active' : '' }}">Fasilitas</a>
+                        <a href="{{ route('admin.tenants.index') }}" class="nav-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}">Penghuni</a>
+                        <a href="{{ route('admin.payments.index') }}" class="nav-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}">Pembayaran</a>
                     </nav>
 
                     <form method="POST" action="{{ route('logout') }}">

@@ -1,0 +1,115 @@
+@php
+    $payment = $payment ?? null;
+    $errorBag = isset($errors) ? $errors : null;
+@endphp
+
+<div class="card form-card">
+    <form method="POST" action="{{ $action }}" enctype="multipart/form-data" class="grid grid-two">
+        @csrf
+
+        @isset($method)
+            @method($method)
+        @endisset
+
+        <div class="field field-full">
+            <label for="tenant_id">Penghuni</label>
+            <select id="tenant_id" name="tenant_id" class="select" required>
+                <option value="">Pilih penghuni</option>
+                @foreach ($tenants as $tenant)
+                    <option value="{{ $tenant->id }}" @selected((string) old('tenant_id', $payment?->tenant_id) === (string) $tenant->id)>
+                        {{ $tenant->user->name }} - {{ $tenant->room->name }} - {{ $tenantStatusLabels[$tenant->status] ?? $tenant->status }}
+                    </option>
+                @endforeach
+            </select>
+            @if ($errorBag?->has('tenant_id'))
+                <div class="field-error">{{ $errorBag->first('tenant_id') }}</div>
+            @endif
+            <div class="helper">Pilih penghuni yang akan dicatat tagihan atau pembayarannya.</div>
+        </div>
+
+        <div class="field">
+            <label for="amount">Nominal</label>
+            <input id="amount" name="amount" type="number" min="0" step="1" value="{{ old('amount', $payment?->amount) }}" class="input" required>
+            @if ($errorBag?->has('amount'))
+                <div class="field-error">{{ $errorBag->first('amount') }}</div>
+            @endif
+        </div>
+
+        <div class="field">
+            <label for="status">Status pembayaran</label>
+            <select id="status" name="status" class="select" required>
+                @foreach ($statusLabels as $value => $label)
+                    <option value="{{ $value }}" @selected(old('status', $payment?->status ?? 'unpaid') === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+            @if ($errorBag?->has('status'))
+                <div class="field-error">{{ $errorBag->first('status') }}</div>
+            @endif
+            <div class="helper">Jika status diatur ke <strong>Lunas</strong>, sistem akan mengisi verifikasi admin otomatis.</div>
+        </div>
+
+        <div class="field">
+            <label for="period_start">Periode mulai</label>
+            <input id="period_start" name="period_start" type="date" value="{{ old('period_start', $payment?->period_start?->format('Y-m-d')) }}" class="input" required>
+            @if ($errorBag?->has('period_start'))
+                <div class="field-error">{{ $errorBag->first('period_start') }}</div>
+            @endif
+        </div>
+
+        <div class="field">
+            <label for="period_end">Periode akhir</label>
+            <input id="period_end" name="period_end" type="date" value="{{ old('period_end', $payment?->period_end?->format('Y-m-d')) }}" class="input" required>
+            @if ($errorBag?->has('period_end'))
+                <div class="field-error">{{ $errorBag->first('period_end') }}</div>
+            @endif
+        </div>
+
+        <div class="field">
+            <label for="due_date">Tenggat bayar</label>
+            <input id="due_date" name="due_date" type="date" value="{{ old('due_date', $payment?->due_date?->format('Y-m-d')) }}" class="input" required>
+            @if ($errorBag?->has('due_date'))
+                <div class="field-error">{{ $errorBag->first('due_date') }}</div>
+            @endif
+        </div>
+
+        <div class="field">
+            <label for="paid_at">Waktu dibayar</label>
+            <input id="paid_at" name="paid_at" type="datetime-local" value="{{ old('paid_at', $payment?->paid_at?->format('Y-m-d\TH:i')) }}" class="input">
+            @if ($errorBag?->has('paid_at'))
+                <div class="field-error">{{ $errorBag->first('paid_at') }}</div>
+            @endif
+            <div class="helper">Opsional. Jika status diubah ke lunas dan kolom ini kosong, sistem akan mengisinya otomatis.</div>
+        </div>
+
+        <div class="field field-full">
+            <label for="proof_image">Bukti pembayaran</label>
+            <input id="proof_image" name="proof_image" type="file" accept="image/*" class="file-input">
+            @if ($errorBag?->has('proof_image'))
+                <div class="field-error">{{ $errorBag->first('proof_image') }}</div>
+            @endif
+            <div class="helper">Opsional. Jika diupload, file disimpan ke storage Laravel pada folder <code>payments</code>.</div>
+
+            @if ($payment?->proof_image)
+                <div class="preview">
+                    <img src="{{ asset('storage/'.$payment->proof_image) }}" alt="Bukti pembayaran {{ $payment->tenant?->user?->name }}">
+                    <div class="preview-meta">Path saat ini: <strong>{{ $payment->proof_image }}</strong></div>
+                </div>
+            @endif
+        </div>
+
+        <div class="field field-full">
+            <label for="notes">Catatan</label>
+            <textarea id="notes" name="notes" class="textarea" placeholder="Tulis catatan pembayaran jika diperlukan...">{{ old('notes', $payment?->notes) }}</textarea>
+            @if ($errorBag?->has('notes'))
+                <div class="field-error">{{ $errorBag->first('notes') }}</div>
+            @endif
+        </div>
+
+        <div class="field field-full">
+            <div class="form-actions">
+                <button type="submit" class="button button-primary">{{ $submitLabel }}</button>
+                <a href="{{ route('admin.payments.index') }}" class="button button-secondary">Kembali ke daftar pembayaran</a>
+            </div>
+        </div>
+    </form>
+</div>
