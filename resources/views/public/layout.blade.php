@@ -60,19 +60,19 @@
                 z-index: 30;
                 border-bottom: 1px solid var(--ui-border);
                 background: rgba(255, 255, 255, 0.96);
-                backdrop-filter: blur(8px);
+                backdrop-filter: blur(10px);
             }
 
             .header-row {
                 display: flex;
                 flex-direction: column;
-                gap: 18px;
-                padding-top: 18px;
-                padding-bottom: 18px;
+                gap: 14px;
+                padding-top: 20px;
+                padding-bottom: 20px;
             }
 
             .brand {
-                font-size: 28px;
+                font-size: 26px;
                 font-weight: 700;
                 line-height: 1;
             }
@@ -80,7 +80,17 @@
             .nav-row {
                 display: flex;
                 flex-direction: column;
-                gap: 14px;
+                gap: 12px;
+            }
+
+            .nav-links {
+                align-items: center;
+                justify-content: center;
+                gap: 14px 24px;
+            }
+
+            .button-row {
+                justify-content: center;
             }
 
             .nav-links,
@@ -107,19 +117,40 @@
             }
 
             .nav-link {
-                padding: 12px 18px;
-                min-height: 44px;
-                background: var(--ui-soft);
-                transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+                min-height: 0;
+                padding: 0 0 8px;
+                border-radius: 0;
+                border-bottom: 2px solid transparent;
+                color: var(--ui-body);
+                font-weight: 500;
+                background: transparent;
+                transition: border-color 0.2s ease, color 0.2s ease;
             }
 
             .nav-link:hover {
-                background: var(--ui-border);
+                color: var(--ui-ink);
             }
 
             .nav-link.is-active {
-                background: var(--ui-ink);
-                color: var(--ui-canvas);
+                border-color: var(--ui-ink);
+                color: var(--ui-ink);
+            }
+
+            .nav-login-link {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 0;
+                padding: 0;
+                color: var(--ui-ink);
+                font-size: 14px;
+                font-weight: 600;
+                line-height: 1.2;
+                transition: color 0.2s ease, opacity 0.2s ease;
+            }
+
+            .nav-login-link:hover {
+                opacity: 0.72;
             }
 
             .button {
@@ -586,7 +617,8 @@
             }
 
             .nav-link:focus-visible,
-            .button:focus-visible {
+            .button:focus-visible,
+            .nav-login-link:focus-visible {
                 outline: 2px solid var(--ui-ink);
                 outline-offset: 2px;
             }
@@ -611,15 +643,21 @@
 
             @media (min-width: 768px) {
                 .header-row {
-                    flex-direction: row;
+                    display: grid;
+                    grid-template-columns: auto minmax(0, 1fr) auto;
                     align-items: center;
-                    justify-content: space-between;
                 }
 
                 .nav-row {
-                    flex-direction: row;
-                    align-items: center;
-                    justify-content: space-between;
+                    display: contents;
+                }
+
+                .nav-links {
+                    gap: 18px 34px;
+                }
+
+                .button-row {
+                    justify-content: flex-end;
                 }
 
                 .hero,
@@ -671,13 +709,16 @@
                 <a href="{{ route('home') }}" class="brand">{{ $profile['name'] }}</a>
 
                 <div class="nav-row">
-                    <nav class="nav-links">
+                    <nav class="nav-links" aria-label="Navigasi publik">
                         <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'is-active' : '' }}" @if(request()->routeIs('home')) aria-current="page" @endif>Home</a>
                         <a href="{{ route('rooms.index') }}" class="nav-link {{ request()->routeIs('rooms.*') ? 'is-active' : '' }}" @if(request()->routeIs('rooms.*')) aria-current="page" @endif>Kamar</a>
+                        <a href="{{ route('home') }}#fasilitas" class="nav-link">Fasilitas</a>
+                        <a href="{{ route('home') }}#lokasi" class="nav-link">Lokasi</a>
+                        <a href="{{ route('home') }}#kontak" class="nav-link">Kontak</a>
                     </nav>
 
                     <div class="button-row">
-                        <a href="{{ route('login') }}" class="button button-primary">Login</a>
+                        <a href="{{ route('login') }}" class="nav-login-link">Login</a>
                     </div>
                 </div>
             </div>
@@ -695,6 +736,8 @@
                 <div class="footer-links">
                     <a href="{{ route('home') }}">Home</a>
                     <a href="{{ route('rooms.index') }}">Kamar</a>
+                    <a href="{{ route('home') }}#fasilitas">Fasilitas</a>
+                    <a href="{{ route('home') }}#lokasi">Lokasi</a>
                     <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
                 </div>
 
