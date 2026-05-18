@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\RoomImageController;
 use App\Http\Controllers\Admin\TenantController as AdminTenantController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Public\HomeController as PublicHomeController;
 use App\Http\Controllers\Public\RoomController as PublicRoomController;
 use App\Http\Controllers\Tenant\DashboardController as TenantDashboardController;
@@ -21,6 +22,9 @@ Route::get('/rooms/{room:slug}', [PublicRoomController::class, 'show'])->name('r
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+
+    Route::get('/register', [RegisterController::class, 'showForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register']);
 });
 
 Route::middleware('auth')->group(function () {

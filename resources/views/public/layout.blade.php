@@ -14,14 +14,16 @@
             :root {
                 color-scheme: light;
                 font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-                --ui-ink:            #000000;
-                --ui-body:           #5e5e5e;
-                --ui-canvas:         #ffffff;
-                --ui-soft:           #efefef;
-                --ui-softer:         #f3f3f3;
-                --ui-border:         #e2e2e2;
-                --ui-shadow:         rgba(0,0,0,.12) 0px 4px 16px 0px;
-                --ui-shadow-strong:  rgba(0,0,0,.16) 0px 4px 16px 0px;
+                --ui-ink:            #1C2B22;
+                --ui-body:           #5B7060;
+                --ui-canvas:         #FBF8F3;
+                --ui-soft:           #EEF5EF;
+                --ui-softer:         #F5FAF5;
+                --ui-shadow:         rgba(28,43,34,.10) 0px 4px 16px 0px;
+                --ui-shadow-strong:  rgba(28,43,34,.16) 0px 4px 16px 0px;
+                --ui-accent:         #4A7C59;
+                --ui-accent-hover:   #3D6A4A;
+                --ui-accent-soft:    #EEF5EF;
             }
 
             *, *::before, *::after { box-sizing: border-box; }
@@ -119,8 +121,8 @@
                 transition: background-color .2s ease, color .2s ease, box-shadow .2s ease;
             }
 
-            .button-primary   { background: var(--ui-ink);    color: var(--ui-canvas); }
-            .button-primary:hover { background: #282828; }
+            .button-primary   { background: var(--ui-accent);       color: #fff; }
+            .button-primary:hover { background: var(--ui-accent-hover); }
 
             .button-secondary {
                 background: var(--ui-canvas);
@@ -136,7 +138,14 @@
             .page-section { padding-top: 32px; padding-bottom: 32px; }
             .page-stack   { display: grid; gap: 24px; }
 
-            .section-dark { background: #000; color: #fff; }
+            .section-dark { background: #1C2B22; color: #fff; }
+            .section-dark .eyebrow { color: #6FAE82; }
+            .contact-band { background: #1C2B22; }
+            .nearby-marker,
+            .nearby-estimate { background: var(--ui-accent); }
+            .status-available { background: var(--ui-accent); color: #fff; }
+            .chip-accent { background: var(--ui-accent); color: #fff; }
+            
 
             /* ── Hero ──────────────────────────────── */
             .hero { display: grid; gap: 20px; align-items: stretch; }
