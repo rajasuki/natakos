@@ -6,9 +6,9 @@
 @section('page_description', 'Atur akun penghuni, kamar yang ditempati, masa tinggal, dan status penghuni dari dashboard admin.')
 
 @section('page_actions')
-    <a href="{{ route('admin.tenants.history') }}" class="button button-secondary">Riwayat penghuni</a>
-    <a href="{{ route('admin.tenants.create') }}" class="button button-primary">Penghuni baru</a>
-    <a href="{{ route('admin.tenants.create-existing') }}" class="button button-secondary">Penghuni sudah punya akun</a>
+    <a href="{{ route('admin.tenants.history') }}" class="button button-secondary">Riwayat</a>
+    <a href="{{ route('admin.tenants.create') }}" class="button button-primary">+ Penghuni baru</a>
+    <a href="{{ route('admin.tenants.create-existing') }}" class="button button-subtle">+ Assign kamar</a>
 @endsection
 
 @section('content')

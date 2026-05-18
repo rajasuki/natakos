@@ -6,9 +6,9 @@
 @section('page_description', 'Lihat penghuni yang sudah tidak aktif atau sudah check-out beserta riwayat kamar dan periode tinggalnya.')
 
 @section('page_actions')
-    <a href="{{ route('admin.tenants.index') }}" class="button button-secondary">Kembali ke penghuni aktif</a>
-    <a href="{{ route('admin.tenants.create') }}" class="button button-primary">Penghuni baru</a>
-    <a href="{{ route('admin.tenants.create-existing') }}" class="button button-secondary">Penghuni sudah punya akun</a>
+    <a href="{{ route('admin.tenants.index') }}" class="button button-secondary">← Penghuni aktif</a>
+    <a href="{{ route('admin.tenants.create') }}" class="button button-primary">+ Penghuni baru</a>
+    <a href="{{ route('admin.tenants.create-existing') }}" class="button button-subtle">Penghuni sudah punya akun</a>
 @endsection
 
 @section('content')
