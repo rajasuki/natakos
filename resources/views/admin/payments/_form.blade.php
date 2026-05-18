@@ -142,6 +142,15 @@
                             <div class="field-error">{{ $errorBag->first('notes') }}</div>
                         @endif
                     </div>
+
+                    <div class="field field-full">
+                        <label for="rejection_reason">Alasan penolakan</label>
+                        <textarea id="rejection_reason" name="rejection_reason" class="textarea" placeholder="Isi jika status pembayaran ditolak...">{{ old('rejection_reason', $payment?->rejection_reason) }}</textarea>
+                        @if ($errorBag?->has('rejection_reason'))
+                            <div class="field-error">{{ $errorBag->first('rejection_reason') }}</div>
+                        @endif
+                        <div class="helper">Wajib diisi jika status pembayaran diset ke <strong>Ditolak</strong>.</div>
+                    </div>
                 </div>
             </section>
 

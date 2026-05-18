@@ -35,11 +35,19 @@ Route::middleware('auth')->group(function () {
             Route::match(['put', 'patch'], '/kos-profile', [KosProfileController::class, 'update'])->name('kos-profile.update');
         });
         Route::get('payments/{payment}/proof', [PaymentController::class, 'proof'])->name('payments.proof');
+        Route::get('payments/export', [PaymentController::class, 'export'])->name('payments.export');
+        Route::get('payments/{payment}/review', [PaymentController::class, 'review'])->name('payments.review');
+        Route::match(['put', 'patch'], 'payments/{payment}/review', [PaymentController::class, 'updateReview'])->name('payments.review.update');
         Route::resource('payments', PaymentController::class)->except('show');
+        Route::get('rooms/export', [RoomController::class, 'export'])->name('rooms.export');
         Route::get('rooms/{room}/images', [RoomImageController::class, 'index'])->name('rooms.images.index');
         Route::post('rooms/{room}/images', [RoomImageController::class, 'store'])->name('rooms.images.store');
         Route::delete('rooms/{room}/images/{image}', [RoomImageController::class, 'destroy'])->name('rooms.images.destroy');
         Route::resource('rooms', RoomController::class)->except('show');
+        Route::get('tenants/export', [AdminTenantController::class, 'export'])->name('tenants.export');
+        Route::get('tenants/history', [AdminTenantController::class, 'history'])->name('tenants.history');
+        Route::get('tenants/{tenant}/checkout', [AdminTenantController::class, 'checkout'])->name('tenants.checkout');
+        Route::match(['put', 'patch'], 'tenants/{tenant}/checkout', [AdminTenantController::class, 'processCheckout'])->name('tenants.checkout.update');
         Route::resource('tenants', AdminTenantController::class)->except('show');
     });
 

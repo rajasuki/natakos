@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Support\RoomOccupancy;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,18 +15,77 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TenantController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $filters = $this->filters($request);
+
         return view('admin.tenants.index', [
-            'tenants' => Tenant::query()
-                ->with(['user', 'room'])
+            'tenants' => $this->tenantsQuery($filters)
                 ->latest('id')
-                ->get(),
+                ->paginate(10)
+                ->withQueryString(),
+            'tenantCounts' => $this->activeTenantCounts(),
+            'filters' => $filters,
+            'hasActiveFilters' => $this->hasActiveFilters($filters),
+            'filterRooms' => $this->rooms(),
             'statusLabels' => $this->statusLabels(),
         ]);
+    }
+
+    public function history(Request $request): View
+    {
+        $filters = $this->filters($request, true);
+
+        return view('admin.tenants.history', [
+            'tenants' => $this->tenantsQuery($filters, true)
+                ->orderByDesc('end_date')
+                ->orderByDesc('id')
+                ->paginate(10)
+                ->withQueryString(),
+            'historyCounts' => $this->historyTenantCounts(),
+            'filters' => $filters,
+            'hasActiveFilters' => $this->hasActiveFilters($filters),
+            'filterRooms' => $this->rooms(),
+            'statusLabels' => $this->statusLabels(),
+        ]);
+    }
+
+    public function export(Request $request): StreamedResponse
+    {
+        $history = $request->boolean('history');
+        $filters = $this->filters($request, $history);
+        $tenants = $this->tenantsQuery($filters, $history)
+            ->orderByDesc($history ? 'end_date' : 'id')
+            ->get();
+
+        return response()->streamDownload(function () use ($tenants): void {
+            $handle = fopen('php://output', 'w');
+
+            if ($handle === false) {
+                return;
+            }
+
+            fputcsv($handle, ['Nama penghuni', 'Email', 'Nomor HP', 'Kamar', 'Tanggal masuk', 'Tanggal keluar', 'Status', 'Catatan']);
+
+            foreach ($tenants as $tenant) {
+                fputcsv($handle, [
+                    $tenant->user?->name,
+                    $tenant->user?->email,
+                    $tenant->user?->phone,
+                    $tenant->room?->name,
+                    $tenant->start_date?->format('Y-m-d'),
+                    $tenant->end_date?->format('Y-m-d'),
+                    $tenant->status,
+                    $tenant->notes,
+                ]);
+            }
+
+            fclose($handle);
+        }, $history ? 'tenant-history-export.csv' : 'active-tenants-export.csv');
     }
 
     public function create(): View
@@ -59,7 +120,7 @@ class TenantController extends Controller
                 'notes' => $validated['notes'] ?? null,
             ]);
 
-            $this->syncRoomStatuses([$tenant->room_id]);
+            RoomOccupancy::syncStatuses([$tenant->room_id]);
         });
 
         return redirect()
@@ -74,6 +135,19 @@ class TenantController extends Controller
             'rooms' => $this->rooms(),
             'roomStatusLabels' => $this->roomStatusLabels(),
             'statusLabels' => $this->statusLabels(),
+        ]);
+    }
+
+    public function checkout(Tenant $tenant): View
+    {
+        $tenant->load(['user', 'room']);
+
+        if ($tenant->status !== 'active') {
+            abort(404);
+        }
+
+        return view('admin.tenants.checkout', [
+            'tenant' => $tenant,
         ]);
     }
 
@@ -107,7 +181,7 @@ class TenantController extends Controller
                 'notes' => $validated['notes'] ?? null,
             ]);
 
-            $this->syncRoomStatuses([$previousRoomId, $tenant->room_id]);
+            RoomOccupancy::syncStatuses([$previousRoomId, $tenant->room_id]);
         });
 
         return redirect()
@@ -132,7 +206,7 @@ class TenantController extends Controller
             DB::transaction(function () use ($tenant, $user, $roomId): void {
                 $tenant->delete();
 
-                $this->syncRoomStatuses([$roomId]);
+                RoomOccupancy::syncStatuses([$roomId]);
 
                 if ($user !== null && $user->role === 'tenant') {
                     $stillHasTenant = Tenant::query()->where('user_id', $user->id)->exists();
@@ -153,6 +227,40 @@ class TenantController extends Controller
             ->with('success', 'Penghuni berhasil dihapus.');
     }
 
+    public function processCheckout(Request $request, Tenant $tenant): RedirectResponse
+    {
+        $tenant->load(['user', 'room']);
+
+        if ($tenant->status !== 'active') {
+            return redirect()
+                ->route('admin.tenants.index')
+                ->with('error', 'Check-out hanya bisa dilakukan untuk penghuni yang masih aktif.');
+        }
+
+        $validated = $request->validate([
+            'end_date' => ['required', 'date', 'after_or_equal:'.$tenant->start_date?->format('Y-m-d')],
+            'notes' => ['nullable', 'string'],
+        ], [], [
+            'end_date' => 'tanggal check-out',
+        ]);
+
+        $roomId = $tenant->room_id;
+
+        DB::transaction(function () use ($tenant, $validated, $roomId): void {
+            $tenant->update([
+                'status' => 'moved_out',
+                'end_date' => $validated['end_date'],
+                'notes' => $validated['notes'] ?? $tenant->notes,
+            ]);
+
+            RoomOccupancy::syncStatuses([$roomId]);
+        });
+
+        return redirect()
+            ->route('admin.tenants.history')
+            ->with('success', 'Check-out penghuni berhasil diproses dan riwayat masa tinggal sudah disimpan.');
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -162,7 +270,7 @@ class TenantController extends Controller
             ? ['required', 'string', 'min:8']
             : ['nullable', 'string', 'min:8'];
 
-        return $request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($tenant?->user_id)],
             'phone' => ['nullable', 'string', 'max:30'],
@@ -173,14 +281,99 @@ class TenantController extends Controller
             'status' => ['required', Rule::in(array_keys($this->statusLabels()))],
             'notes' => ['nullable', 'string'],
         ]);
+
+        if (($validated['status'] ?? null) === 'moved_out' && empty($validated['end_date'])) {
+            throw ValidationException::withMessages([
+                'end_date' => 'Tanggal keluar wajib diisi jika status penghuni adalah Sudah Keluar.',
+            ]);
+        }
+
+        return $validated;
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection<int, Room>
+     * @return Collection<int, Room>
      */
     private function rooms()
     {
         return Room::query()->orderBy('name')->get();
+    }
+
+    /**
+     * @param  array{q:string|null,status:string|null,room_id:int|null}  $filters
+     */
+    private function tenantsQuery(array $filters, bool $history = false)
+    {
+        return Tenant::query()
+            ->with(['user', 'room'])
+            ->withCount('payments')
+            ->when($history, function ($query) use ($filters) {
+                $query
+                    ->whereIn('status', ['inactive', 'moved_out'])
+                    ->when($filters['status'] !== null, fn ($historyQuery) => $historyQuery->where('status', $filters['status']));
+            }, fn ($query) => $query->where('status', 'active'))
+            ->when($filters['q'] !== null, function ($query) use ($filters) {
+                $term = '%'.$filters['q'].'%';
+
+                $query->where(function ($nestedQuery) use ($term) {
+                    $nestedQuery
+                        ->whereHas('user', function ($userQuery) use ($term) {
+                            $userQuery
+                                ->where('name', 'like', $term)
+                                ->orWhere('email', 'like', $term)
+                                ->orWhere('phone', 'like', $term);
+                        })
+                        ->orWhereHas('room', fn ($roomQuery) => $roomQuery->where('name', 'like', $term))
+                        ->orWhere('notes', 'like', $term);
+                });
+            })
+            ->when($filters['room_id'] !== null, fn ($query) => $query->where('room_id', $filters['room_id']));
+    }
+
+    /**
+     * @return array{q:string|null,status:string|null,room_id:int|null}
+     */
+    private function filters(Request $request, bool $history = false): array
+    {
+        $status = (string) $request->query('status', '');
+        $roomId = filter_var($request->query('room_id'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        $q = trim((string) $request->query('q', ''));
+
+        return [
+            'q' => $q !== '' ? $q : null,
+            'status' => $history && in_array($status, ['inactive', 'moved_out'], true) ? $status : null,
+            'room_id' => $roomId === false ? null : (int) $roomId,
+        ];
+    }
+
+    /**
+     * @param  array{q:string|null,status:string|null,room_id:int|null}  $filters
+     */
+    private function hasActiveFilters(array $filters): bool
+    {
+        return $filters['q'] !== null || $filters['status'] !== null || $filters['room_id'] !== null;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function activeTenantCounts(): array
+    {
+        return [
+            'Penghuni aktif' => Tenant::query()->where('status', 'active')->count(),
+        ];
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function historyTenantCounts(): array
+    {
+        return [
+            'Total riwayat' => Tenant::query()->whereIn('status', ['inactive', 'moved_out'])->count(),
+            'Tidak Aktif' => Tenant::query()->where('status', 'inactive')->count(),
+            'Sudah Keluar' => Tenant::query()->where('status', 'moved_out')->count(),
+        ];
     }
 
     /**
@@ -205,39 +398,6 @@ class TenantController extends Controller
             'occupied' => 'Terisi',
             'maintenance' => 'Perbaikan',
         ];
-    }
-
-    /**
-     * @param  array<int, int|null>  $roomIds
-     */
-    private function syncRoomStatuses(array $roomIds): void
-    {
-        $roomIds = array_values(array_unique(array_filter($roomIds)));
-
-        foreach ($roomIds as $roomId) {
-            $room = Room::query()->find($roomId);
-
-            if ($room === null) {
-                continue;
-            }
-
-            $hasActiveTenant = Tenant::query()
-                ->where('room_id', $roomId)
-                ->where('status', 'active')
-                ->exists();
-
-            if ($hasActiveTenant) {
-                if ($room->status !== 'occupied') {
-                    $room->update(['status' => 'occupied']);
-                }
-
-                continue;
-            }
-
-            if ($room->status === 'occupied') {
-                $room->update(['status' => 'available']);
-            }
-        }
     }
 
     private function validateRoomAssignment(int $roomId, string $tenantStatus, ?Tenant $tenant = null): void

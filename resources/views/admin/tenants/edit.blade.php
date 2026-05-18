@@ -7,6 +7,9 @@
 
 @section('page_actions')
     <a href="{{ route('admin.tenants.index') }}" class="button button-secondary">Kembali ke daftar penghuni</a>
+    @if ($tenant->status === 'active')
+        <a href="{{ route('admin.tenants.checkout', $tenant) }}" class="button button-subtle">Proses check-out</a>
+    @endif
 @endsection
 
 @section('content')

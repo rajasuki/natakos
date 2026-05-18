@@ -5,31 +5,75 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Tenant;
+use App\Support\PaymentWorkflow;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PaymentController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $payments = Payment::query()
+        $filters = $this->filters($request);
+
+        $payments = $this->paymentsQuery($filters)
             ->with(['tenant.user', 'tenant.room', 'verifiedBy'])
+            ->orderBy('due_date')
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.payments.index', [
+            'payments' => $payments,
+            'deadlineData' => $this->deadlineData($payments->getCollection()),
+            'paymentCounts' => $this->paymentCounts(),
+            'filters' => $filters,
+            'hasActiveFilters' => $this->hasActiveFilters($filters),
+            'statusLabels' => $this->statusLabels(),
+            'deadlineStatusLabels' => $this->deadlineStatusLabels(),
+        ]);
+    }
+
+    public function export(Request $request): StreamedResponse
+    {
+        $filters = $this->filters($request);
+        $payments = $this->paymentsQuery($filters)
+            ->with(['tenant.user', 'tenant.room'])
             ->orderBy('due_date')
             ->orderByDesc('id')
             ->get();
 
-        return view('admin.payments.index', [
-            'payments' => $payments,
-            'deadlineData' => $this->deadlineData($payments),
-            'statusLabels' => $this->statusLabels(),
-            'deadlineStatusLabels' => $this->deadlineStatusLabels(),
-        ]);
+        return response()->streamDownload(function () use ($payments): void {
+            $handle = fopen('php://output', 'w');
+
+            if ($handle === false) {
+                return;
+            }
+
+            fputcsv($handle, ['Penghuni', 'Kamar', 'Nominal', 'Periode mulai', 'Periode akhir', 'Tenggat bayar', 'Status', 'Catatan', 'Alasan penolakan']);
+
+            foreach ($payments as $payment) {
+                fputcsv($handle, [
+                    $payment->tenant?->user?->name,
+                    $payment->tenant?->room?->name,
+                    $payment->amount,
+                    $payment->period_start?->format('Y-m-d'),
+                    $payment->period_end?->format('Y-m-d'),
+                    $payment->due_date?->format('Y-m-d'),
+                    $payment->status,
+                    $payment->notes,
+                    $payment->rejection_reason,
+                ]);
+            }
+
+            fclose($handle);
+        }, 'payments-export.csv');
     }
 
     public function create(): View
@@ -44,7 +88,7 @@ class PaymentController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validatedData($request);
-        $data = $this->preparePaymentData($data, null, (int) $request->user()->id);
+        $data = PaymentWorkflow::prepare($data, null, (int) $request->user()->id);
 
         Payment::create($data);
 
@@ -60,6 +104,18 @@ class PaymentController extends Controller
             'tenants' => $this->tenants(),
             'statusLabels' => $this->statusLabels(),
             'tenantStatusLabels' => $this->tenantStatusLabels(),
+        ]);
+    }
+
+    public function review(Payment $payment): View
+    {
+        $payment->load(['tenant.user', 'tenant.room', 'verifiedBy']);
+
+        return view('admin.payments.review', [
+            'payment' => $payment,
+            'deadline' => $this->deadlineData(collect([$payment]))[$payment->id] ?? null,
+            'statusLabels' => $this->statusLabels(),
+            'deadlineStatusLabels' => $this->deadlineStatusLabels(),
         ]);
     }
 
@@ -79,7 +135,7 @@ class PaymentController extends Controller
         $oldImage = $payment->proof_image;
 
         $data = $this->validatedData($request, $payment);
-        $data = $this->preparePaymentData($data, $payment, (int) $request->user()->id);
+        $data = PaymentWorkflow::prepare($data, $payment, (int) $request->user()->id);
 
         $payment->update($data);
 
@@ -90,6 +146,43 @@ class PaymentController extends Controller
         return redirect()
             ->route('admin.payments.index')
             ->with('success', 'Pembayaran berhasil diperbarui.');
+    }
+
+    public function updateReview(Request $request, Payment $payment): RedirectResponse
+    {
+        $validated = $request->validate([
+            'review_action' => ['required', Rule::in(['approve', 'reject', 'pending'])],
+            'notes' => ['nullable', 'string'],
+            'rejection_reason' => ['nullable', 'string'],
+        ]);
+
+        $status = match ($validated['review_action']) {
+            'approve' => 'paid',
+            'reject' => 'rejected',
+            default => 'pending_verification',
+        };
+
+        $data = PaymentWorkflow::prepare([
+            'tenant_id' => $payment->tenant_id,
+            'amount' => $payment->amount,
+            'period_start' => $payment->period_start,
+            'period_end' => $payment->period_end,
+            'due_date' => $payment->due_date,
+            'paid_at' => $status === 'paid' ? $payment->paid_at : null,
+            'status' => $status,
+            'notes' => $validated['notes'] ?? $payment->notes,
+            'rejection_reason' => $validated['rejection_reason'] ?? null,
+        ], $payment, (int) $request->user()->id);
+
+        $payment->update($data);
+
+        return redirect()
+            ->route('admin.payments.review', $payment)
+            ->with('success', match ($status) {
+                'paid' => 'Pembayaran berhasil disetujui dan ditandai lunas.',
+                'rejected' => 'Pembayaran berhasil ditolak dengan alasan yang tersimpan.',
+                default => 'Pembayaran dikembalikan ke status menunggu verifikasi.',
+            });
     }
 
     public function destroy(Payment $payment): RedirectResponse
@@ -129,7 +222,14 @@ class PaymentController extends Controller
             'status' => ['required', Rule::in(array_keys($this->statusLabels()))],
             'proof_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'notes' => ['nullable', 'string'],
+            'rejection_reason' => ['nullable', 'string'],
         ]);
+
+        if (($validated['status'] ?? null) === 'rejected' && trim((string) ($validated['rejection_reason'] ?? '')) === '') {
+            throw ValidationException::withMessages([
+                'rejection_reason' => 'Alasan penolakan wajib diisi jika pembayaran ditolak.',
+            ]);
+        }
 
         $image = $validated['proof_image'] ?? null;
         unset($validated['proof_image']);
@@ -139,34 +239,6 @@ class PaymentController extends Controller
         }
 
         return $validated;
-    }
-
-    /**
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
-    private function preparePaymentData(array $data, ?Payment $payment, int $adminId): array
-    {
-        $wasPaid = $payment?->status === 'paid';
-
-        if (($data['status'] ?? null) === 'paid') {
-            if (empty($data['paid_at'])) {
-                $data['paid_at'] = $payment?->paid_at ?? now();
-            }
-
-            if (! $wasPaid || $payment?->verified_at === null || $payment?->verified_by === null) {
-                $data['verified_at'] = now();
-                $data['verified_by'] = $adminId;
-            }
-
-            return $data;
-        }
-
-        $data['paid_at'] = null;
-        $data['verified_at'] = null;
-        $data['verified_by'] = null;
-
-        return $data;
     }
 
     /**
@@ -261,6 +333,77 @@ class PaymentController extends Controller
             'overdue' => $daysRemaining === null ? 'Pembayaran sudah terlambat.' : 'Pembayaran terlambat '.abs($daysRemaining).' hari.',
             default => '-',
         };
+    }
+
+    /**
+     * @param  array{q:string|null,status:string|null,deadline_status:string|null}  $filters
+     */
+    private function paymentsQuery(array $filters)
+    {
+        return Payment::query()
+            ->when($filters['q'] !== null, function ($query) use ($filters) {
+                $term = '%'.$filters['q'].'%';
+
+                $query->where(function ($nestedQuery) use ($term) {
+                    $nestedQuery
+                        ->whereHas('tenant.user', function ($userQuery) use ($term) {
+                            $userQuery
+                                ->where('name', 'like', $term)
+                                ->orWhere('email', 'like', $term)
+                                ->orWhere('phone', 'like', $term);
+                        })
+                        ->orWhereHas('tenant.room', fn ($roomQuery) => $roomQuery->where('name', 'like', $term))
+                        ->orWhere('notes', 'like', $term)
+                        ->orWhere('rejection_reason', 'like', $term);
+                });
+            })
+            ->when($filters['status'] !== null, fn ($query) => $query->where('status', $filters['status']))
+            ->when($filters['deadline_status'] !== null, function ($query) use ($filters) {
+                $query->whereIn('id', function ($deadlineQuery) use ($filters) {
+                    $deadlineQuery
+                        ->select('id')
+                        ->from('payment_deadline_view')
+                        ->where('deadline_status', $filters['deadline_status']);
+                });
+            });
+    }
+
+    /**
+     * @return array{q:string|null,status:string|null,deadline_status:string|null}
+     */
+    private function filters(Request $request): array
+    {
+        $status = (string) $request->query('status', '');
+        $deadlineStatus = (string) $request->query('deadline_status', '');
+        $q = trim((string) $request->query('q', ''));
+
+        return [
+            'q' => $q !== '' ? $q : null,
+            'status' => array_key_exists($status, $this->statusLabels()) ? $status : null,
+            'deadline_status' => array_key_exists($deadlineStatus, $this->deadlineStatusLabels()) ? $deadlineStatus : null,
+        ];
+    }
+
+    /**
+     * @param  array{q:string|null,status:string|null,deadline_status:string|null}  $filters
+     */
+    private function hasActiveFilters(array $filters): bool
+    {
+        return $filters['q'] !== null || $filters['status'] !== null || $filters['deadline_status'] !== null;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function paymentCounts(): array
+    {
+        return [
+            'Total' => Payment::query()->count(),
+            'Belum Bayar' => Payment::query()->where('status', 'unpaid')->count(),
+            'Menunggu Verifikasi' => Payment::query()->where('status', 'pending_verification')->count(),
+            'Lunas' => Payment::query()->where('status', 'paid')->count(),
+            'Ditolak' => Payment::query()->where('status', 'rejected')->count(),
+        ];
     }
 
     private function deleteProofImage(?string $path): void

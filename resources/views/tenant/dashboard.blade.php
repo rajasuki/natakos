@@ -512,6 +512,9 @@
                                                     Bukti bayar saat ini sudah tersimpan di sistem.
                                                     @if ($payment->status === 'rejected')
                                                         Upload ulang gambar baru agar admin dapat meninjau ulang pembayaran ini.
+                                                        @if ($payment->rejection_reason)
+                                                            Alasan penolakan terakhir: {{ $payment->rejection_reason }}.
+                                                        @endif
                                                     @endif
                                                 </div>
                                             @endif

@@ -126,6 +126,7 @@ class DashboardController extends Controller
                 'payment_deadlines.days_remaining',
                 'payment_deadlines.deadline_status',
                 'users.name as tenant_name',
+                'users.phone as tenant_phone',
                 'rooms.name as room_name',
             ])
             ->orderBy('payment_deadlines.due_date')

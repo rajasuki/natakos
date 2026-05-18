@@ -692,6 +692,28 @@
                 margin-top: 8px;
             }
 
+            .toolbar-form {
+                padding: 22px;
+                border-bottom: 1px solid var(--ui-border);
+            }
+
+            .toolbar-grid {
+                display: grid;
+                gap: 12px;
+            }
+
+            .toolbar-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                align-items: center;
+            }
+
+            .pagination-shell {
+                padding: 18px 22px 22px;
+                border-top: 1px solid var(--ui-border);
+            }
+
             .checkbox-sections {
                 display: grid;
                 gap: 16px;
@@ -853,6 +875,10 @@
                 .split-actions {
                     align-items: stretch;
                 }
+
+                .toolbar-actions {
+                    align-items: stretch;
+                }
             }
 
             @media (min-width: 768px) {
@@ -876,6 +902,11 @@
 
                 .grid-two {
                     grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+
+                .toolbar-grid {
+                    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                    align-items: end;
                 }
             }
         </style>

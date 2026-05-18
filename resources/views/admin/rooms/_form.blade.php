@@ -2,6 +2,7 @@
     $room = $room ?? null;
     $currentImage = $room?->main_image;
     $errorBag = isset($errors) ? $errors : null;
+    $activeTenantCount = $room?->tenants?->count() ?? 0;
     $selectedFacilityIds = collect(old('facility_ids', $room?->facilities?->modelKeys() ?? []))
         ->map(fn ($id) => (string) $id)
         ->all();
@@ -51,6 +52,12 @@
                     </select>
                     @if ($errorBag?->has('status'))
                         <div class="field-error">{{ $errorBag->first('status') }}</div>
+                    @endif
+
+                    @if ($activeTenantCount > 0)
+                        <div class="helper">Kamar ini sedang punya penghuni aktif, jadi statusnya harus tetap <strong>Terisi</strong> sampai proses check-out selesai.</div>
+                    @else
+                        <div class="helper">Status <strong>Terisi</strong> dipakai otomatis saat kamar sudah dihubungkan ke penghuni aktif.</div>
                     @endif
                 </div>
 

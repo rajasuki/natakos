@@ -10,22 +10,17 @@
 @endsection
 
 @section('content')
-    @php
-        $roomCounts = [
-            'Total' => $rooms->count(),
-            'Tersedia' => $rooms->where('status', 'available')->count(),
-            'Terisi' => $rooms->where('status', 'occupied')->count(),
-            'Perbaikan' => $rooms->where('status', 'maintenance')->count(),
-        ];
-    @endphp
-
     @if ($rooms->isEmpty())
         <section class="empty-state">
-            <h2>Belum ada kamar</h2>
-            <p>Mulai dengan menambahkan kamar pertama agar admin dapat mengelola harga, status, dan foto utama kamar dari dashboard ini.</p>
+            <h2>{{ $hasActiveFilters ? 'Tidak ada kamar yang cocok' : 'Belum ada kamar' }}</h2>
+            <p>{{ $hasActiveFilters ? 'Ubah atau reset filter untuk melihat kamar lain yang terdaftar di NATAKOS.' : 'Mulai dengan menambahkan kamar pertama agar admin dapat mengelola harga, status, dan foto utama kamar dari dashboard ini.' }}</p>
 
             <div class="empty-state-actions">
-                <a href="{{ route('admin.rooms.create') }}" class="button button-primary">Tambah kamar sekarang</a>
+                @if ($hasActiveFilters)
+                    <a href="{{ route('admin.rooms.index') }}" class="button button-secondary">Reset filter</a>
+                @else
+                    <a href="{{ route('admin.rooms.create') }}" class="button button-primary">Tambah kamar sekarang</a>
+                @endif
             </div>
         </section>
     @else
@@ -44,6 +39,31 @@
                     </div>
                 </div>
             </div>
+
+            <form method="GET" action="{{ route('admin.rooms.index') }}" class="toolbar-form">
+                <div class="toolbar-grid">
+                    <div class="field">
+                        <label for="room_q">Cari kamar</label>
+                        <input id="room_q" name="q" type="text" value="{{ $filters['q'] }}" class="input" placeholder="Nama, slug, ukuran, lantai...">
+                    </div>
+
+                    <div class="field">
+                        <label for="room_status">Status</label>
+                        <select id="room_status" name="status" class="select">
+                            <option value="">Semua status</option>
+                            @foreach ($statusLabels as $value => $label)
+                                <option value="{{ $value }}" @selected($filters['status'] === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="toolbar-actions">
+                        <button type="submit" class="button button-primary">Terapkan filter</button>
+                        <a href="{{ route('admin.rooms.index') }}" class="button button-secondary">Reset</a>
+                        <a href="{{ route('admin.rooms.export', request()->query()) }}" class="button button-subtle">Export CSV</a>
+                    </div>
+                </div>
+            </form>
 
             <div class="table-wrap">
                 <table class="responsive-table">
@@ -110,6 +130,10 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <div class="pagination-shell">
+                {{ $rooms->links() }}
             </div>
         </section>
     @endif

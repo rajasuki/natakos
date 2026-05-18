@@ -5,26 +5,69 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Facility;
 use App\Models\Room;
+use App\Support\RoomOccupancy;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class RoomController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $filters = $this->filters($request);
+
         return view('admin.rooms.index', [
-            'rooms' => Room::query()
+            'rooms' => $this->roomsQuery($filters)
                 ->with(['facilities' => fn ($query) => $query->orderBy('type')->orderBy('name')])
                 ->latest('id')
-                ->get(),
+                ->paginate(10)
+                ->withQueryString(),
+            'roomCounts' => $this->roomCounts(),
+            'filters' => $filters,
+            'hasActiveFilters' => $this->hasActiveFilters($filters),
             'statusLabels' => $this->statusLabels(),
         ]);
+    }
+
+    public function export(Request $request): StreamedResponse
+    {
+        $filters = $this->filters($request);
+
+        $rooms = $this->roomsQuery($filters)
+            ->with(['facilities' => fn ($query) => $query->orderBy('type')->orderBy('name')])
+            ->latest('id')
+            ->get();
+
+        return response()->streamDownload(function () use ($rooms): void {
+            $handle = fopen('php://output', 'w');
+
+            if ($handle === false) {
+                return;
+            }
+
+            fputcsv($handle, ['Nama kamar', 'Slug', 'Harga', 'Ukuran', 'Lantai', 'Status', 'Fasilitas']);
+
+            foreach ($rooms as $room) {
+                fputcsv($handle, [
+                    $room->name,
+                    $room->slug,
+                    $room->price,
+                    $room->size,
+                    $room->floor,
+                    $room->status,
+                    $room->facilities->pluck('name')->implode(', '),
+                ]);
+            }
+
+            fclose($handle);
+        }, 'rooms-export.csv');
     }
 
     public function create(): View
@@ -39,6 +82,7 @@ class RoomController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validatedData($request);
+        RoomOccupancy::ensureStatusIsConsistent($data['status']);
         $facilityIds = $this->extractFacilityIds($data);
         $data['slug'] = $this->generateUniqueSlug($data['name']);
 
@@ -53,7 +97,10 @@ class RoomController extends Controller
     public function edit(Room $room): View
     {
         return view('admin.rooms.edit', [
-            'room' => $room->load(['facilities' => fn ($query) => $query->orderBy('type')->orderBy('name')]),
+            'room' => $room->load([
+                'facilities' => fn ($query) => $query->orderBy('type')->orderBy('name'),
+                'tenants' => fn ($query) => $query->where('status', 'active')->latest('id'),
+            ]),
             'statusLabels' => $this->statusLabels(),
             'facilityGroups' => $this->facilityGroups(),
             'facilityTypeLabels' => $this->facilityTypeLabels(),
@@ -64,6 +111,7 @@ class RoomController extends Controller
     {
         $oldImage = $room->main_image;
         $data = $this->validatedData($request);
+        RoomOccupancy::ensureStatusIsConsistent($data['status'], $room);
         $facilityIds = $this->extractFacilityIds($data);
         $data['slug'] = $this->generateUniqueSlug($data['name'], $room);
 
@@ -203,7 +251,7 @@ class RoomController extends Controller
     }
 
     /**
-     * @return array<string, \Illuminate\Support\Collection<int, Facility>>
+     * @return array<string, Collection<int, Facility>>
      */
     private function facilityGroups(): array
     {
@@ -216,6 +264,62 @@ class RoomController extends Controller
         return collect(array_keys($this->facilityTypeLabels()))
             ->mapWithKeys(fn (string $type) => [$type => $groupedFacilities->get($type, collect())])
             ->all();
+    }
+
+    /**
+     * @param  array{q:string|null,status:string|null}  $filters
+     */
+    private function roomsQuery(array $filters)
+    {
+        return Room::query()
+            ->when($filters['q'] !== null, function ($query) use ($filters) {
+                $term = '%'.$filters['q'].'%';
+
+                $query->where(function ($nestedQuery) use ($term) {
+                    $nestedQuery
+                        ->where('name', 'like', $term)
+                        ->orWhere('slug', 'like', $term)
+                        ->orWhere('size', 'like', $term)
+                        ->orWhere('floor', 'like', $term)
+                        ->orWhere('description', 'like', $term);
+                });
+            })
+            ->when($filters['status'] !== null, fn ($query) => $query->where('status', $filters['status']));
+    }
+
+    /**
+     * @return array{q:string|null,status:string|null}
+     */
+    private function filters(Request $request): array
+    {
+        $status = (string) $request->query('status', '');
+        $q = trim((string) $request->query('q', ''));
+
+        return [
+            'q' => $q !== '' ? $q : null,
+            'status' => array_key_exists($status, $this->statusLabels()) ? $status : null,
+        ];
+    }
+
+    /**
+     * @param  array{q:string|null,status:string|null}  $filters
+     */
+    private function hasActiveFilters(array $filters): bool
+    {
+        return $filters['q'] !== null || $filters['status'] !== null;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function roomCounts(): array
+    {
+        return [
+            'Total' => Room::query()->count(),
+            'Tersedia' => Room::query()->where('status', 'available')->count(),
+            'Terisi' => Room::query()->where('status', 'occupied')->count(),
+            'Perbaikan' => Room::query()->where('status', 'maintenance')->count(),
+        ];
     }
 
     private function deleteImage(?string $path): void

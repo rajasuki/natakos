@@ -120,6 +120,7 @@
                                 <th>Periode</th>
                                 <th>Tenggat</th>
                                 <th>Status Warning</th>
+                                <th>Follow Up</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -140,6 +141,25 @@
                                         <span class="badge {{ $paymentBadgeClasses[$payment->deadline_status] ?? 'badge-safe' }}">
                                             {{ $deadlineStatusLabels[$payment->deadline_status] ?? $payment->deadline_status }}
                                         </span>
+                                    </td>
+                                    <td data-label="Follow Up">
+                                        @php
+                                            $reminderUrl = \App\Support\PaymentReminder::link(
+                                                $payment->tenant_phone,
+                                                $payment->tenant_name,
+                                                $payment->room_name,
+                                                $payment->amount,
+                                                $payment->period_start,
+                                                $payment->period_end,
+                                                $payment->due_date,
+                                            );
+                                        @endphp
+
+                                        @if ($reminderUrl)
+                                            <a href="{{ $reminderUrl }}" target="_blank" rel="noopener noreferrer" class="button button-subtle">WhatsApp</a>
+                                        @else
+                                            <span class="muted">Nomor tidak tersedia</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -170,6 +190,7 @@
                                 <th>Tenggat</th>
                                 <th>Keterlambatan</th>
                                 <th>Status Warning</th>
+                                <th>Follow Up</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -184,6 +205,25 @@
                                         <span class="badge {{ $paymentBadgeClasses[$payment->deadline_status] ?? 'badge-overdue' }}">
                                             {{ $deadlineStatusLabels[$payment->deadline_status] ?? $payment->deadline_status }}
                                         </span>
+                                    </td>
+                                    <td data-label="Follow Up">
+                                        @php
+                                            $reminderUrl = \App\Support\PaymentReminder::link(
+                                                $payment->tenant_phone,
+                                                $payment->tenant_name,
+                                                $payment->room_name,
+                                                $payment->amount,
+                                                $payment->period_start,
+                                                $payment->period_end,
+                                                $payment->due_date,
+                                            );
+                                        @endphp
+
+                                        @if ($reminderUrl)
+                                            <a href="{{ $reminderUrl }}" target="_blank" rel="noopener noreferrer" class="button button-subtle">WhatsApp</a>
+                                        @else
+                                            <span class="muted">Nomor tidak tersedia</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

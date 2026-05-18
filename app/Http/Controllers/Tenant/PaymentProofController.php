@@ -60,6 +60,7 @@ class PaymentProofController extends Controller
                 'paid_at' => null,
                 'verified_at' => null,
                 'verified_by' => null,
+                'rejection_reason' => null,
             ]);
         } catch (Throwable) {
             $this->deleteProofImage($newImage);
