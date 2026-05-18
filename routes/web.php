@@ -52,6 +52,8 @@ Route::middleware('auth')->group(function () {
         Route::get('tenants/history', [AdminTenantController::class, 'history'])->name('tenants.history');
         Route::get('tenants/{tenant}/checkout', [AdminTenantController::class, 'checkout'])->name('tenants.checkout');
         Route::match(['put', 'patch'], 'tenants/{tenant}/checkout', [AdminTenantController::class, 'processCheckout'])->name('tenants.checkout.update');
+        Route::get('tenants/assign', [AdminTenantController::class, 'createExisting'])->name('tenants.create-existing');
+        Route::post('tenants/assign', [AdminTenantController::class, 'storeExisting'])->name('tenants.store-existing');
         Route::resource('tenants', AdminTenantController::class)->except('show');
     });
 

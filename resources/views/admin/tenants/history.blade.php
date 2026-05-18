@@ -7,7 +7,8 @@
 
 @section('page_actions')
     <a href="{{ route('admin.tenants.index') }}" class="button button-secondary">Kembali ke penghuni aktif</a>
-    <a href="{{ route('admin.tenants.create') }}" class="button button-primary">Tambah penghuni</a>
+    <a href="{{ route('admin.tenants.create') }}" class="button button-primary">Penghuni baru</a>
+    <a href="{{ route('admin.tenants.create-existing') }}" class="button button-secondary">Penghuni sudah punya akun</a>
 @endsection
 
 @section('content')
