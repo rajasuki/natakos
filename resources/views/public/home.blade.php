@@ -115,11 +115,6 @@
                             <span class="detail-value">{{ $profile['address'] }}</span>
                         </div>
 
-                        <p class="detail-copy">
-                            Bagian ini membantu calon penghuni lebih cepat paham posisi kos
-                            dan akses ke tempat penting di sekitar.
-                        </p>
-
                         <div class="section-actions">
                             @if ($profile['google_maps_url'])
                                 <a href="{{ $profile['google_maps_url'] }}" target="_blank" rel="noopener noreferrer" class="button button-secondary">
@@ -138,12 +133,7 @@
                     <div class="feature-card-body">
                         <p class="eyebrow">Dekat ke mana aja</p>
                         <h3 class="room-title">Tempat sekitar yang sering ditanya</h3>
-                        <p class="room-copy">
-                            Isi daftar ini dari panel admin untuk menonjolkan akses ke kampus,
-                            warung, laundry, tempat ibadah, atau transportasi.
-                        </p>
-
-                        <div class="nearby-list spaced-top-md">
+                        <div class="nearby-list">
                             @forelse ($profile['nearby_places'] as $place)
                                 <div class="nearby-item">
                                     <span class="nearby-marker">
@@ -243,7 +233,7 @@
                                     <div>
                                         <h3 class="room-title">{{ $room->name }}</h3>
                                         <p class="room-copy">
-                                            {{ $room->description ?: 'Kamar ini sudah tercatat di NATAKOS dan siap Anda cek lebih lanjut melalui halaman detail.' }}
+                                            {{ $room->description ?: 'Kamar ini sudah tercatat di ' . $kosName . ' dan siap Anda cek lebih lanjut melalui halaman detail.' }}
                                         </p>
                                     </div>
                                 </div>
@@ -280,7 +270,7 @@
                     <p class="eyebrow">Fasilitas</p>
                     <h2 class="section-title">Fasilitas yang membuat tinggal lebih nyaman</h2>
                     <p class="section-copy section-copy-on-dark">
-                        NATAKOS mengelola kombinasi fasilitas kamar dan fasilitas umum
+                        {{ $kosName }} mengelola kombinasi fasilitas kamar dan fasilitas umum
                         agar kebutuhan harian penghuni tetap praktis.
                     </p>
                 </div>

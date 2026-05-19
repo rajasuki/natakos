@@ -3,7 +3,7 @@
 @section('title', 'Pengaturan Kos')
 @section('eyebrow', 'Admin Settings')
 @section('page_title', 'Pengaturan profil kos')
-@section('page_description', 'Atur identitas utama NATAKOS yang dipakai di halaman publik, tombol WhatsApp, dan informasi kontak penghuni.')
+@section('page_description', 'Atur identitas utama ' . $kosName . ' yang dipakai di halaman publik, tombol WhatsApp, dan informasi kontak penghuni.')
 
 @push('styles')
     <style>
@@ -74,7 +74,7 @@
                 <section class="form-section">
                     <div>
                         <h2 class="form-section-title">Informasi utama kos</h2>
-                        <p class="form-section-copy">Ubah nama kos, deskripsi singkat, dan alamat yang akan tampil di halaman publik NATAKOS.</p>
+                        <p class="form-section-copy">Ubah nama kos, deskripsi singkat, dan alamat yang akan tampil di halaman publik {{ $kosName }}.</p>
                     </div>
 
                     <div class="grid grid-two">
@@ -130,12 +130,12 @@
                         </div>
 
                         <div class="field">
-                            <label for="google_maps_embed_url">Google Maps Embed URL</label>
-                            <input id="google_maps_embed_url" name="google_maps_embed_url" type="url" value="{{ old('google_maps_embed_url', $profile->google_maps_embed_url) }}" class="input" placeholder="https://www.google.com/maps/embed?...">
+                            <label for="google_maps_embed_url">Google Maps Embed</label>
+                            <input id="google_maps_embed_url" name="google_maps_embed_url" type="text" value="{{ old('google_maps_embed_url', $profile->google_maps_embed_url) }}" class="input" placeholder="https://www.google.com/maps/embed?...">
                             @if ($errorBag?->has('google_maps_embed_url'))
                                 <div class="field-error">{{ $errorBag->first('google_maps_embed_url') }}</div>
                             @endif
-                            <div class="helper">Di Google Maps buka <code>Share</code> lalu <code>Embed a map</code>, kemudian salin nilai <code>src</code>-nya.</div>
+                            <div class="helper">Bisa paste URL <code>src</code> langsung, atau paste seluruh kode <code>&lt;iframe ...&gt;</code> dari Google Maps — sistem akan otomatis mengekstrak <code>src</code>-nya.</div>
                         </div>
 
                         <div class="field field-full">

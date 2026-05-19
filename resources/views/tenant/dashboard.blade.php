@@ -386,7 +386,7 @@
             <section class="empty-state">
                 <h2>Data penghuni belum tersedia</h2>
                 <p>
-                    Akun Anda belum terhubung ke data tenant aktif. Silakan hubungi pengelola NATAKOS agar data kamar dan masa tinggal Anda dapat ditampilkan di dashboard ini.
+                    Akun Anda belum terhubung ke data tenant aktif. Silakan hubungi pengelola {{ $kosName }} agar data kamar dan masa tinggal Anda dapat ditampilkan di dashboard ini.
                 </p>
                 <div class="empty-state-actions">
                     <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="button button-primary">Hubungi Pemilik via WhatsApp</a>

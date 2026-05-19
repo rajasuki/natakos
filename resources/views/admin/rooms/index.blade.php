@@ -3,7 +3,7 @@
 @section('title', 'Kamar')
 @section('eyebrow', 'Admin Kamar')
 @section('page_title', 'Kelola kamar')
-@section('page_description', 'Atur daftar kamar, harga sewa, status ketersediaan, dan foto utama kamar NATAKOS.')
+@section('page_description', 'Atur daftar kamar, harga sewa, status ketersediaan, dan foto utama kamar ' . $kosName . '.')
 
 @section('page_actions')
     <a href="{{ route('admin.rooms.create') }}" class="button button-primary">Tambah kamar</a>
@@ -13,7 +13,7 @@
     @if ($rooms->isEmpty())
         <section class="empty-state">
             <h2>{{ $hasActiveFilters ? 'Tidak ada kamar yang cocok' : 'Belum ada kamar' }}</h2>
-            <p>{{ $hasActiveFilters ? 'Ubah atau reset filter untuk melihat kamar lain yang terdaftar di NATAKOS.' : 'Mulai dengan menambahkan kamar pertama agar admin dapat mengelola harga, status, dan foto utama kamar dari dashboard ini.' }}</p>
+            <p>{{ $hasActiveFilters ? 'Ubah atau reset filter untuk melihat kamar lain yang terdaftar di ' . $kosName . '.' : 'Mulai dengan menambahkan kamar pertama agar admin dapat mengelola harga, status, dan foto utama kamar dari dashboard ini.' }}</p>
 
             <div class="empty-state-actions">
                 @if ($hasActiveFilters)

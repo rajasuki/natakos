@@ -54,7 +54,7 @@ class KosProfileController extends Controller
             'address' => ['nullable', 'string'],
             'whatsapp_number' => ['required', 'string', 'max:30'],
             'google_maps_url' => ['nullable', 'url', 'max:2048'],
-            'google_maps_embed_url' => ['nullable', 'url', 'max:2048'],
+            'google_maps_embed_url' => ['nullable', 'string', 'max:2048'],
             'nearby_places' => ['nullable', 'array'],
             'nearby_places.*.name' => ['nullable', 'string', 'max:255'],
             'nearby_places.*.estimate_value' => ['nullable', 'string', 'max:50'],
@@ -69,6 +69,8 @@ class KosProfileController extends Controller
         if ($logo !== null) {
             $validated['logo'] = $logo->store('kos', 'public');
         }
+
+        $validated['google_maps_embed_url'] = $this->extractEmbedSrc($validated['google_maps_embed_url'] ?? null);
 
         $validated['nearby_places'] = KosProfile::serializeNearbyPlaces($validated['nearby_places'] ?? []);
 
@@ -86,13 +88,28 @@ class KosProfileController extends Controller
     private function defaultValues(): array
     {
         return [
-            'name' => 'NATAKOS',
+            'name' => 'Ichikos',
             'description' => 'Website manajemen kos untuk mengelola kamar, penghuni, fasilitas, dan pembayaran manual.',
             'address' => 'Alamat kos belum diatur.',
             'whatsapp_number' => '6285217430009',
             'google_maps_url' => null,
             'logo' => null,
         ];
+    }
+
+    private function extractEmbedSrc(?string $value): ?string
+    {
+        if ($value === null || trim($value) === '') {
+            return null;
+        }
+
+        if (str_contains($value, '<iframe')) {
+            preg_match('/src="([^"]+)"/', $value, $matches);
+
+            return $matches[1] ?? null;
+        }
+
+        return trim($value);
     }
 
     private function deleteLogo(?string $path): void

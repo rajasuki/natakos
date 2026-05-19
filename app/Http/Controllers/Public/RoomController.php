@@ -82,7 +82,7 @@ class RoomController extends Controller
             'facilityGroups' => $room->facilities->groupBy('type'),
             'whatsappUrl' => WhatsappLink::build(
                 $profile['whatsapp_number'],
-                'Halo, saya tertarik dengan '.$room->name.' di NATAKOS. Apakah masih tersedia?'
+                'Halo, saya tertarik dengan '.$room->name.' di '.($profile['name']).'. Apakah masih tersedia?'
             ),
         ]);
     }
@@ -96,11 +96,11 @@ class RoomController extends Controller
         $whatsappNumber = WhatsappLink::normalizeNumber($profile?->whatsapp_number);
 
         return [
-            'name' => $profile?->name ?: 'NATAKOS',
-            'description' => $profile?->description ?: 'NATAKOS menghadirkan kamar kos yang rapi, terkelola, dan siap mendukung rutinitas harian penghuni dengan sistem manajemen yang jelas.',
+            'name' => $profile?->name ?: 'Ichikos',
+            'description' => $profile?->description ?: 'Ichikos menghadirkan kamar kos yang rapi, terkelola, dan siap mendukung rutinitas harian penghuni dengan sistem manajemen yang jelas.',
             'address' => $profile?->address ?: 'Alamat kos belum diatur.',
             'whatsapp_number' => $whatsappNumber,
-            'whatsapp_url' => WhatsappLink::build($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di NATAKOS.'),
+            'whatsapp_url' => WhatsappLink::build($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di ' . ($profile?->name ?: 'Ichikos') . '.'),
         ];
     }
 

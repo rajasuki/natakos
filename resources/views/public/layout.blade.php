@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>@yield('title', 'NATAKOS')</title>
+        <title>@yield('title', $kosName)</title>
 
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -24,6 +24,7 @@
                 --ui-accent:         #4A7C59;
                 --ui-accent-hover:   #3D6A4A;
                 --ui-accent-soft:    #EEF5EF;
+                --ui-border:         #E0EBE2;
             }
 
             *, *::before, *::after { box-sizing: border-box; }
@@ -31,9 +32,28 @@
             body {
                 margin: 0;
                 min-height: 100vh;
-                background: var(--ui-canvas);
+                background-color: var(--ui-canvas);
+                background-image:
+                    radial-gradient(circle at 25% 0%, rgba(74,124,89,.06) 0%, transparent 50%),
+                    radial-gradient(circle at 75% 100%, rgba(74,124,89,.05) 0%, transparent 50%),
+                    radial-gradient(circle at 50% 50%, rgba(238,245,239,.4) 0%, transparent 70%);
                 color: var(--ui-ink);
                 line-height: 1.5;
+                position: relative;
+            }
+
+            body::before {
+                content: '';
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 0;
+                background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234A7C59' fill-opacity='.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            }
+
+            .page-stack {
+                position: relative;
+                z-index: 1;
             }
 
             a { color: inherit; text-decoration: none; }

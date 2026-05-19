@@ -143,7 +143,7 @@ class DashboardController extends Controller
     {
         return WhatsappLink::build(
             WhatsappLink::normalizeNumber($number),
-            'Halo, saya ingin bertanya tentang pembayaran kos saya di NATAKOS.'
+            'Halo, saya ingin bertanya tentang pembayaran kos saya di ' . (KosProfile::query()->value('name') ?: 'Ichikos') . '.'
         );
     }
 

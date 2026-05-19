@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>@yield('title', 'Admin') - NATAKOS</title>
+        <title>@yield('title', 'Admin') - {{ $kosName }}</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -915,7 +915,7 @@
                     <div class="sidebar-brand-mark">
                         <svg viewBox="0 0 16 16"><path d="M8 1L14 4V8C14 11.3 11.3 14 8 15C4.7 14 2 11.3 2 8V4L8 1Z"/></svg>
                     </div>
-                    <span class="sidebar-brand-name">NATAKOS</span>
+                    <span class="sidebar-brand-name">{{ $kosName }}</span>
                 </div>
 
                 <nav class="sidebar-nav">
@@ -981,7 +981,7 @@
                 {{-- TOPBAR --}}
                 <div class="topbar">
                     <div class="topbar-breadcrumb">
-                        NATAKOS
+                        {{ $kosName }}
                         <span>›</span>
                         <strong>@yield('eyebrow', 'Admin')</strong>
                     </div>

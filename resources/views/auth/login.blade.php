@@ -3,38 +3,30 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Login NATAKOS</title>
+        <title>Login {{ $kosName }}</title>
 
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
 
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-
         <style>
             :root {
-                --green-50:  #f0fdf4;
-                --green-100: #dcfce7;
-                --green-200: #bbf7d0;
-                --green-400: #4ade80;
-                --green-500: #22c55e;
-                --green-600: #16a34a;
-                --green-700: #15803d;
-                --green-900: #14532d;
-                --ink:       #0f1a13;
-                --ink-muted: #4b5e52;
-                --surface:   #ffffff;
-                --surface-2: #f8fdf9;
-                --border:    #d6edd9;
-                --shadow-sm: 0 1px 3px rgba(20,83,45,.06), 0 1px 2px rgba(20,83,45,.04);
-                --shadow-md: 0 4px 20px rgba(20,83,45,.09), 0 1px 4px rgba(20,83,45,.05);
-                --shadow-lg: 0 12px 40px rgba(20,83,45,.13), 0 2px 8px rgba(20,83,45,.06);
+                color-scheme: light;
+                font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                --ui-ink:            #1C2B22;
+                --ui-body:           #5B7060;
+                --ui-canvas:         #FBF8F3;
+                --ui-soft:           #EEF5EF;
+                --ui-softer:         #F5FAF5;
+                --ui-shadow:         rgba(28,43,34,.10) 0px 4px 16px 0px;
+                --ui-shadow-strong:  rgba(28,43,34,.16) 0px 4px 16px 0px;
+                --ui-accent:         #4A7C59;
+                --ui-accent-hover:   #3D6A4A;
+                --ui-accent-soft:    #EEF5EF;
+                --ui-border:         #E0EBE2;
                 --radius-sm: 8px;
                 --radius-md: 14px;
                 --radius-lg: 22px;
-                font-family: 'DM Sans', sans-serif;
             }
 
             *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -42,10 +34,11 @@
             html, body { height: 100%; }
 
             body {
-                background: var(--surface-2);
-                color: var(--ink);
+                background: var(--ui-canvas);
+                color: var(--ui-ink);
                 line-height: 1.5;
                 min-height: 100vh;
+                font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             }
 
             a { color: inherit; text-decoration: none; }
@@ -57,7 +50,7 @@
                 z-index: 30;
                 background: rgba(255,255,255,0.92);
                 backdrop-filter: blur(12px);
-                border-bottom: 1px solid var(--border);
+                border-bottom: 1px solid var(--ui-border);
             }
 
             .header-inner {
@@ -71,10 +64,9 @@
             }
 
             .brand {
-                font-family: 'DM Serif Display', serif;
                 font-size: 22px;
-                letter-spacing: 0.04em;
-                color: var(--green-700);
+                font-weight: 700;
+                color: var(--ui-accent);
                 display: flex;
                 align-items: center;
                 gap: 8px;
@@ -84,7 +76,7 @@
                 width: 8px;
                 height: 8px;
                 border-radius: 50%;
-                background: var(--green-500);
+                background: var(--ui-accent);
                 flex-shrink: 0;
             }
 
@@ -94,21 +86,20 @@
                 gap: 6px;
                 padding: 8px 16px;
                 border-radius: 999px;
-                border: 1px solid var(--border);
-                background: var(--surface);
-                color: var(--ink-muted);
-                font-family: 'DM Sans', sans-serif;
+                border: 1px solid var(--ui-border);
+                background: #fff;
+                color: var(--ui-body);
                 font-size: 13px;
                 font-weight: 500;
                 cursor: pointer;
                 transition: border-color .18s, color .18s, box-shadow .18s;
-                box-shadow: var(--shadow-sm);
+                box-shadow: var(--ui-shadow);
             }
 
             .btn-back:hover {
-                border-color: var(--green-400);
-                color: var(--green-700);
-                box-shadow: var(--shadow-md);
+                border-color: var(--ui-accent);
+                color: var(--ui-accent-hover);
+                box-shadow: var(--ui-shadow);
             }
 
             .btn-back svg { flex-shrink: 0; }
@@ -127,16 +118,16 @@
                 display: grid;
                 grid-template-columns: 1fr 420px;
                 gap: 0;
-                background: var(--surface);
+                background: #fff;
                 border-radius: var(--radius-lg);
-                border: 1px solid var(--border);
-                box-shadow: var(--shadow-lg);
+                border: 1px solid var(--ui-border);
+                box-shadow: var(--ui-shadow-strong);
                 overflow: hidden;
             }
 
             /* ── LEFT PANEL ── */
             .info-panel {
-                background: linear-gradient(160deg, var(--green-700) 0%, var(--green-900) 100%);
+                background: linear-gradient(160deg, var(--ui-accent-hover) 0%, var(--ui-ink) 100%);
                 padding: 52px 44px;
                 display: flex;
                 flex-direction: column;
@@ -179,7 +170,7 @@
                 border-radius: 999px;
                 background: rgba(255,255,255,.12);
                 border: 1px solid rgba(255,255,255,.18);
-                color: var(--green-200);
+                color: rgba(255,255,255,.8);
                 font-size: 11px;
                 font-weight: 600;
                 letter-spacing: .12em;
@@ -191,7 +182,7 @@
                 width: 6px;
                 height: 6px;
                 border-radius: 50%;
-                background: var(--green-400);
+                background: var(--ui-accent);
                 animation: pulse-dot 2s ease-in-out infinite;
             }
 
@@ -201,8 +192,8 @@
             }
 
             .info-headline {
-                font-family: 'DM Serif Display', serif;
                 font-size: 38px;
+                font-weight: 700;
                 line-height: 1.15;
                 color: #ffffff;
                 margin-bottom: 20px;
@@ -210,7 +201,7 @@
 
             .info-headline em {
                 font-style: italic;
-                color: var(--green-300, #86efac);
+                color: #6FAE82;
             }
 
             .info-desc {
@@ -225,7 +216,7 @@
                 border-radius: 4px;
                 padding: 1px 6px;
                 font-size: 12px;
-                color: var(--green-200);
+                color: #6FAE82;
             }
 
             .info-chips {
@@ -261,8 +252,8 @@
             }
 
             .stat-value {
-                font-family: 'DM Serif Display', serif;
                 font-size: 32px;
+                font-weight: 700;
                 color: #ffffff;
                 line-height: 1;
                 margin-bottom: 6px;
@@ -280,7 +271,7 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                background: var(--surface);
+                background: #fff;
             }
 
             .form-eyebrow {
@@ -288,21 +279,21 @@
                 font-weight: 600;
                 letter-spacing: .14em;
                 text-transform: uppercase;
-                color: var(--green-600);
+                color: var(--ui-accent);
                 margin-bottom: 10px;
             }
 
             .form-title {
-                font-family: 'DM Serif Display', serif;
                 font-size: 30px;
-                color: var(--ink);
+                font-weight: 700;
+                color: var(--ui-ink);
                 line-height: 1.18;
                 margin-bottom: 6px;
             }
 
             .form-sub {
                 font-size: 13.5px;
-                color: var(--ink-muted);
+                color: var(--ui-body);
                 line-height: 1.65;
                 margin-bottom: 32px;
             }
@@ -332,7 +323,7 @@
             .field-label {
                 font-size: 13px;
                 font-weight: 600;
-                color: var(--ink);
+                color: var(--ui-ink);
             }
 
             .input-wrap { position: relative; }
@@ -342,7 +333,7 @@
                 left: 14px;
                 top: 50%;
                 transform: translateY(-50%);
-                color: #a3b8a8;
+                color: #A3B8A8;
                 pointer-events: none;
             }
 
@@ -350,22 +341,22 @@
                 width: 100%;
                 height: 48px;
                 padding: 0 16px 0 42px;
-                border: 1.5px solid var(--border);
+                border: 1.5px solid var(--ui-border);
                 border-radius: var(--radius-sm);
-                background: var(--surface-2);
-                color: var(--ink);
-                font-family: 'DM Sans', sans-serif;
+                background: var(--ui-canvas);
+                color: var(--ui-ink);
+                font-family: inherit;
                 font-size: 14px;
                 transition: border-color .18s, background .18s, box-shadow .18s;
             }
 
-            .input::placeholder { color: #b0c4b6; }
+            .input::placeholder { color: #B0C4B6; }
 
             .input:focus {
                 outline: none;
-                border-color: var(--green-500);
-                background: var(--surface);
-                box-shadow: 0 0 0 3px rgba(34,197,94,.12);
+                border-color: var(--ui-accent);
+                background: #fff;
+                box-shadow: 0 0 0 3px rgba(74,124,89,.12);
             }
 
             .remember-row {
@@ -378,9 +369,9 @@
                 appearance: none;
                 width: 18px;
                 height: 18px;
-                border: 1.5px solid var(--border);
+                border: 1.5px solid var(--ui-border);
                 border-radius: 4px;
-                background: var(--surface-2);
+                background: var(--ui-canvas);
                 cursor: pointer;
                 transition: border-color .15s, background .15s;
                 flex-shrink: 0;
@@ -388,8 +379,8 @@
             }
 
             .remember-row input[type=checkbox]:checked {
-                background: var(--green-500);
-                border-color: var(--green-500);
+                background: var(--ui-accent);
+                border-color: var(--ui-accent);
             }
 
             .remember-row input[type=checkbox]:checked::after {
@@ -407,13 +398,13 @@
 
             .remember-label {
                 font-size: 13.5px;
-                color: var(--ink-muted);
+                color: var(--ui-body);
                 cursor: pointer;
             }
 
             .divider {
                 border: none;
-                border-top: 1px solid var(--border);
+                border-top: 1px solid var(--ui-border);
                 margin: 4px 0;
             }
 
@@ -422,9 +413,9 @@
                 height: 50px;
                 border: none;
                 border-radius: var(--radius-sm);
-                background: linear-gradient(135deg, var(--green-500) 0%, var(--green-600) 100%);
+                background: var(--ui-accent);
                 color: #ffffff;
-                font-family: 'DM Sans', sans-serif;
+                font-family: inherit;
                 font-size: 15px;
                 font-weight: 600;
                 cursor: pointer;
@@ -433,19 +424,19 @@
                 justify-content: center;
                 gap: 8px;
                 letter-spacing: .01em;
-                box-shadow: 0 3px 12px rgba(22,163,74,.3);
-                transition: transform .15s, box-shadow .15s, filter .15s;
+                box-shadow: 0 3px 12px rgba(74,124,89,.3);
+                transition: transform .15s, box-shadow .15s, background .15s;
             }
 
             .btn-login:hover {
-                filter: brightness(1.06);
-                box-shadow: 0 6px 20px rgba(22,163,74,.38);
+                background: var(--ui-accent-hover);
+                box-shadow: 0 6px 20px rgba(74,124,89,.38);
                 transform: translateY(-1px);
             }
 
             .btn-login:active {
                 transform: translateY(0);
-                box-shadow: 0 2px 8px rgba(22,163,74,.25);
+                box-shadow: 0 2px 8px rgba(74,124,89,.25);
             }
 
             /* register link */
@@ -459,7 +450,7 @@
 
             .register-text {
                 font-size: 13.5px;
-                color: var(--ink-muted);
+                color: var(--ui-body);
             }
 
             .btn-register {
@@ -468,12 +459,12 @@
                 gap: 4px;
                 font-size: 13.5px;
                 font-weight: 600;
-                color: var(--green-600);
+                color: var(--ui-accent);
                 transition: color .15s, gap .15s;
             }
 
             .btn-register:hover {
-                color: var(--green-700);
+                color: var(--ui-accent-hover);
                 gap: 7px;
             }
 
@@ -510,7 +501,7 @@
             <div class="header-inner">
                 <a href="{{ route('home') }}" class="brand">
                     <span class="brand-dot"></span>
-                    NATAKOS
+                    {{ $kosName }}
                 </a>
                 <a href="{{ route('home') }}" class="btn-back">
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -566,7 +557,7 @@
                 {{-- ── RIGHT FORM PANEL ── --}}
                 <div class="form-panel">
                     <p class="form-eyebrow">Masuk ke akun</p>
-                    <h2 class="form-title">Login NATAKOS</h2>
+                    <h2 class="form-title">Login {{ $kosName }}</h2>
                     <p class="form-sub">Masukkan email dan password untuk melanjutkan ke dashboard.</p>
 
                     @if (isset($errors) && $errors->any())

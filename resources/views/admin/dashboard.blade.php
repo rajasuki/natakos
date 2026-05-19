@@ -3,7 +3,7 @@
 @section('title', 'Dashboard Admin')
 @section('eyebrow', 'Overview')
 @section('page_title', 'Dashboard Admin')
-@section('page_description', 'Ringkasan kondisi kamar, penghuni, pembayaran, dan masa tinggal terkini berdasarkan data nyata di database NATAKOS.')
+@section('page_description', 'Ringkasan kondisi kamar, penghuni, pembayaran, dan masa tinggal terkini berdasarkan data nyata di database ' . $kosName . '.')
 
 @section('page_actions')
     <a href="{{ route('admin.payments.index') }}" class="button button-primary">Lihat pembayaran</a>

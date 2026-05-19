@@ -281,7 +281,7 @@
                             $coverPath = $room->main_image ?: $room->images->first()?->image_path;
                             $roomWhatsappUrl = \App\Support\WhatsappLink::build(
                                 $profile['whatsapp_number'],
-                                'Halo, saya tertarik dengan '.$room->name.' di NATAKOS. Apakah masih tersedia?'
+                                'Halo, saya tertarik dengan '.$room->name.' di '.$kosName.'. Apakah masih tersedia?'
                             );
                         @endphp
                         <article class="room-card">
