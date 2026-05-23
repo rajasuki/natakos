@@ -11,19 +11,20 @@
         @endif
 
         <style>
-            :root {
-                color-scheme: light;
-                font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-                --ui-ink:            #1C2B22;
-                --ui-body:           #5B7060;
-                --ui-canvas:         #FBF8F3;
-                --ui-soft:           #EEF5EF;
-                --ui-softer:         #F5FAF5;
-                --ui-shadow:         rgba(28,43,34,.10) 0px 4px 16px 0px;
-                --ui-shadow-strong:  rgba(28,43,34,.16) 0px 4px 16px 0px;
-                --ui-accent:         #4A7C59;
-                --ui-accent-hover:   #3D6A4A;
-                --ui-accent-soft:    #EEF5EF;
+             :root {
+                 color-scheme: light;
+                 font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                 --ui-ink:            #1C2B22;
+                 --ui-body:           #5B7060;
+                 --ui-canvas:         #FBF8F3;
+                 --ui-soft:           #EEF5EF;
+                 --ui-softer:         #F5FAF5;
+                 --ui-border:         #DCE7DD;
+                 --ui-shadow:         rgba(28,43,34,.10) 0px 4px 16px 0px;
+                 --ui-shadow-strong:  rgba(28,43,34,.16) 0px 4px 16px 0px;
+                 --ui-accent:         #4A7C59;
+                 --ui-accent-hover:   #3D6A4A;
+                 --ui-accent-soft:    #EEF5EF;
             }
 
             *, *::before, *::after { box-sizing: border-box; }
@@ -48,121 +49,210 @@
                 padding-right: 24px;
             }
 
-            /* ── Header ────────────────────────────── */
-            .site-header {
-                position: sticky;
-                top: 0;
-                z-index: 30;
-                border-bottom: 1px solid var(--ui-border);
-<<<<<<< HEAD
-                background: rgba(255, 255, 255, 0.96);
-                backdrop-filter: blur(10px);
-=======
-                background: rgba(255,255,255,.96);
-                backdrop-filter: blur(8px);
->>>>>>> origin/ardhan
-            }
+             /* ── Header ────────────────────────────── */
+             .site-header {
+                 position: sticky;
+                 top: 0;
+                 z-index: 40;
+                 border-bottom: 1px solid var(--ui-border);
+                 background: rgba(251,248,243,.92);
+                 backdrop-filter: blur(18px);
+             }
 
-            .header-row {
-                display: flex;
-                flex-direction: column;
-                gap: 14px;
-                padding-top: 20px;
-                padding-bottom: 20px;
-            }
+             .header-row {
+                 position: relative;
+                 display: grid;
+                 grid-template-columns: minmax(0, 1fr) auto;
+                 align-items: center;
+                 gap: 16px;
+                 padding-top: 12px;
+                 padding-bottom: 12px;
+              }
 
-            /* ── Brand ─────────────────────────────── */
-            .brand {
-                font-size: 26px;
-                font-weight: 700;
-                line-height: 1;
-            }
+              /* ── Brand ─────────────────────────────── */
+              .brand {
+                  font-size: 26px;
+                  font-weight: 700;
+                  line-height: 1;
+              }
 
-            /* ── Nav ───────────────────────────────── */
-            .nav-row {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-            }
+              .brand-link {
+                 display: inline-flex;
+                 align-items: center;
+                 gap: 12px;
+                 min-width: 0;
+              }
 
-            .nav-links {
-                align-items: center;
-                justify-content: center;
-                gap: 14px 24px;
-            }
+              .brand-mark {
+                 display: inline-flex;
+                 align-items: center;
+                 justify-content: center;
+                 width: 44px;
+                 height: 44px;
+                 flex-shrink: 0;
+                 border-radius: 14px;
+                 background: var(--ui-accent);
+                 color: #fff;
+                 font-size: 18px;
+                 font-weight: 700;
+                 box-shadow: var(--ui-shadow);
+              }
 
-            .button-row {
-                justify-content: center;
-            }
+              .brand-text {
+                 min-width: 0;
+                 overflow: hidden;
+                 text-overflow: ellipsis;
+                 white-space: nowrap;
+                 font-size: 22px;
+                 font-weight: 700;
+                 line-height: 1;
+              }
 
-            .nav-links,
-            .button-row,
-            .chip-row,
-            .room-card-chips,
-            .detail-actions {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 12px;
-            }
+              /* ── Nav ───────────────────────────────── */
+              .nav-links {
+                 display: flex;
+                 flex-wrap: wrap;
+                  align-items: center;
+                  justify-content: center;
+                 gap: 8px;
+              }
 
-            .nav-link,
-            .button,
-            .chip,
-            .status-badge {
-                display: inline-flex;
-                align-items: center;
+              .desktop-nav {
+                 display: none;
+                 padding: 6px;
+                 border: 1px solid var(--ui-border);
+                 border-radius: 999px;
+                 background: rgba(238,245,239,.92);
+                 box-shadow: var(--ui-shadow);
+              }
+
+              .header-actions,
+              .button-row,
+              .chip-row,
+              .room-card-chips,
+              .detail-actions {
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 12px;
+              }
+
+              .header-actions {
+                 align-items: center;
+                 justify-content: flex-end;
+              }
+
+              .button-row {
+                 justify-content: center;
+              }
+
+              .nav-link,
+              .mobile-nav-link,
+              .nav-auth-link,
+              .button,
+              .chip,
+              .status-badge {
+                  display: inline-flex;
+                  align-items: center;
                 justify-content: center;
                 border-radius: 999px;
                 font-size: 14px;
                 font-weight: 600;
-                line-height: 1.2;
-            }
+                  line-height: 1.2;
+              }
 
-            .nav-link {
-<<<<<<< HEAD
-                min-height: 0;
-                padding: 0 0 8px;
-                border-radius: 0;
-                border-bottom: 2px solid transparent;
-                color: var(--ui-body);
-                font-weight: 500;
-                background: transparent;
-                transition: border-color 0.2s ease, color 0.2s ease;
-            }
+              .nav-link,
+              .mobile-nav-link {
+                 min-height: 42px;
+                 padding: 10px 16px;
+                 color: var(--ui-body);
+                 background: transparent;
+                 transition: background-color .2s ease, color .2s ease, box-shadow .2s ease;
+              }
 
-            .nav-link:hover {
-                color: var(--ui-ink);
-            }
+              .nav-link:hover,
+              .mobile-nav-link:hover {
+                 background: rgba(255,255,255,.82);
+                 color: var(--ui-ink);
+              }
 
-            .nav-link.is-active {
-                border-color: var(--ui-ink);
-                color: var(--ui-ink);
-            }
+              .nav-link.is-active,
+              .mobile-nav-link.is-active {
+                 background: #fff;
+                 color: var(--ui-ink);
+                 box-shadow: var(--ui-shadow);
+              }
 
-            .nav-login-link {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                min-height: 0;
-                padding: 0;
-                color: var(--ui-ink);
-                font-size: 14px;
-                font-weight: 600;
-                line-height: 1.2;
-                transition: color 0.2s ease, opacity 0.2s ease;
-            }
+              .nav-auth-link {
+                 min-height: 44px;
+                 padding: 12px 18px;
+                 background: var(--ui-accent);
+                 color: #fff;
+                 box-shadow: var(--ui-shadow);
+                 transition: background-color .2s ease, box-shadow .2s ease;
+              }
 
-            .nav-login-link:hover {
-                opacity: 0.72;
-=======
-                padding: 12px 18px;
-                min-height: 44px;
-                background: var(--ui-soft);
-                transition: background-color .2s ease, color .2s ease;
->>>>>>> origin/ardhan
-            }
-            .nav-link:hover    { background: var(--ui-border); }
-            .nav-link.is-active { background: var(--ui-ink); color: var(--ui-canvas); }
+              .nav-auth-link:hover {
+                 background: var(--ui-accent-hover);
+                 box-shadow: var(--ui-shadow-strong);
+              }
+
+              .mobile-menu {
+                 position: relative;
+              }
+
+              .mobile-menu summary {
+                 list-style: none;
+              }
+
+              .mobile-menu summary::-webkit-details-marker {
+                 display: none;
+              }
+
+              .mobile-menu-toggle {
+                 display: inline-flex;
+                 align-items: center;
+                 justify-content: center;
+                 width: 44px;
+                 height: 44px;
+                 border: 1px solid var(--ui-border);
+                 border-radius: 14px;
+                 background: rgba(255,255,255,.72);
+                 color: var(--ui-ink);
+                 cursor: pointer;
+                 transition: background-color .2s ease, color .2s ease;
+              }
+
+              .mobile-menu[open] > .mobile-menu-toggle,
+              .mobile-menu-toggle:hover {
+                 background: var(--ui-soft);
+              }
+
+              .mobile-menu-panel {
+                 display: none;
+                 position: absolute;
+                 right: 0;
+                 top: calc(100% + 12px);
+                 width: min(280px, calc(100vw - 48px));
+                 padding: 12px;
+                 border: 1px solid var(--ui-border);
+                 border-radius: 24px;
+                 background: rgba(251,248,243,.98);
+                 box-shadow: var(--ui-shadow-strong);
+              }
+
+              .mobile-menu[open] .mobile-menu-panel {
+                 display: block;
+              }
+
+              .mobile-nav-links {
+                 display: grid;
+                 gap: 6px;
+              }
+
+              .mobile-nav-link {
+                 justify-content: flex-start;
+                 width: 100%;
+              }
 
             /* ── Buttons ───────────────────────────── */
             .button {
@@ -462,12 +552,14 @@
             .footer-links a { color: var(--ui-canvas); font-size: 14px; }
 
             /* ── Focus ─────────────────────────────── */
-            .nav-link:focus-visible,
-            .button:focus-visible,
-            .nav-login-link:focus-visible {
-                outline: 2px solid var(--ui-ink);
-                outline-offset: 2px;
-            }
+             .nav-link:focus-visible,
+             .mobile-nav-link:focus-visible,
+             .nav-auth-link:focus-visible,
+             .mobile-menu-toggle:focus-visible,
+             .button:focus-visible {
+                 outline: 2px solid var(--ui-ink);
+                 outline-offset: 2px;
+             }
 
             /* ── Responsive ────────────────────────── */
             @media (max-width: 767px) {
@@ -486,24 +578,15 @@
                 }
             }
 
-            @media (min-width: 768px) {
-                .header-row {
-                    display: grid;
-                    grid-template-columns: auto minmax(0, 1fr) auto;
-                    align-items: center;
-                }
+             @media (min-width: 768px) {
+                 .nav-auth-link {
+                     padding-left: 20px;
+                     padding-right: 20px;
+                 }
 
-                .nav-row {
-                    display: contents;
-                }
-
-                .nav-links {
-                    gap: 18px 34px;
-                }
-
-                .button-row {
-                    justify-content: flex-end;
-                }
+                 .button-row {
+                     justify-content: flex-end;
+                 }
 
                 .hero,
                 .detail-grid { grid-template-columns: 1.15fr .85fr; }
@@ -522,12 +605,26 @@
                 .spec-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             }
 
-            @media (min-width: 1024px) {
-                .headline { font-size: 52px; }
+             @media (min-width: 1024px) {
+                 .header-row {
+                     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+                     padding-top: 18px;
+                     padding-bottom: 18px;
+                 }
 
-                .room-grid,
-                .gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-            }
+                 .desktop-nav {
+                     display: flex;
+                 }
+
+                 .mobile-menu {
+                     display: none;
+                 }
+
+                 .headline { font-size: 52px; }
+
+                 .room-grid,
+                 .gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+             }
         </style>
 
         @stack('styles')
@@ -535,42 +632,46 @@
     <body>
 
         {{-- ── Site Header ──────────────────────────────────────────── --}}
-        <header class="site-header">
-            <div class="site-shell header-row">
+         <header class="site-header">
+             <div class="site-shell header-row">
 
-                <a href="{{ route('home') }}" class="brand">{{ $profile['name'] }}</a>
+                <a href="{{ route('home') }}" class="brand-link">
+                    <span class="brand-mark">{{ strtoupper(mb_substr($profile['name'], 0, 1)) }}</span>
+                    <span class="brand-text">{{ $profile['name'] }}</span>
+                </a>
 
-                <div class="nav-row">
-<<<<<<< HEAD
-                    <nav class="nav-links" aria-label="Navigasi publik">
-                        <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'is-active' : '' }}" @if(request()->routeIs('home')) aria-current="page" @endif>Home</a>
-                        <a href="{{ route('rooms.index') }}" class="nav-link {{ request()->routeIs('rooms.*') ? 'is-active' : '' }}" @if(request()->routeIs('rooms.*')) aria-current="page" @endif>Kamar</a>
-                        <a href="{{ route('home') }}#fasilitas" class="nav-link">Fasilitas</a>
-                        <a href="{{ route('home') }}#lokasi" class="nav-link">Lokasi</a>
-                        <a href="{{ route('home') }}#kontak" class="nav-link">Kontak</a>
-=======
-                    <nav class="nav-links" aria-label="Navigasi utama">
-                        <a
-                            href="{{ route('home') }}"
-                            class="nav-link {{ request()->routeIs('home') ? 'is-active' : '' }}"
-                            @if(request()->routeIs('home')) aria-current="page" @endif
-                        >Home</a>
+                <nav class="nav-links desktop-nav" aria-label="Navigasi publik">
+                    <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'is-active' : '' }}" @if(request()->routeIs('home')) aria-current="page" @endif>Home</a>
+                    <a href="{{ route('rooms.index') }}" class="nav-link {{ request()->routeIs('rooms.*') ? 'is-active' : '' }}" @if(request()->routeIs('rooms.*')) aria-current="page" @endif>Kamar</a>
+                    <a href="{{ route('home') }}#fasilitas" class="nav-link">Fasilitas</a>
+                    <a href="{{ route('home') }}#lokasi" class="nav-link">Lokasi</a>
+                    <a href="{{ route('home') }}#kontak" class="nav-link">Kontak</a>
+                </nav>
 
-                        <a
-                            href="{{ route('rooms.index') }}"
-                            class="nav-link {{ request()->routeIs('rooms.*') ? 'is-active' : '' }}"
-                            @if(request()->routeIs('rooms.*')) aria-current="page" @endif
-                        >Kamar</a>
->>>>>>> origin/ardhan
-                    </nav>
+                <div class="header-actions">
+                    <a href="{{ route('login') }}" class="nav-auth-link">Masuk / Daftar</a>
 
-                    <div class="button-row">
-                        <a href="{{ route('login') }}" class="nav-login-link">Login</a>
-                    </div>
+                    <details class="mobile-menu">
+                        <summary class="mobile-menu-toggle" aria-label="Buka navigasi">
+                            <svg width="22" height="22" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </summary>
+
+                        <div class="mobile-menu-panel">
+                            <nav class="mobile-nav-links" aria-label="Navigasi publik seluler">
+                                <a href="{{ route('home') }}" class="mobile-nav-link {{ request()->routeIs('home') ? 'is-active' : '' }}" @if(request()->routeIs('home')) aria-current="page" @endif>Home</a>
+                                <a href="{{ route('rooms.index') }}" class="mobile-nav-link {{ request()->routeIs('rooms.*') ? 'is-active' : '' }}" @if(request()->routeIs('rooms.*')) aria-current="page" @endif>Kamar</a>
+                                <a href="{{ route('home') }}#fasilitas" class="mobile-nav-link">Fasilitas</a>
+                                <a href="{{ route('home') }}#lokasi" class="mobile-nav-link">Lokasi</a>
+                                <a href="{{ route('home') }}#kontak" class="mobile-nav-link">Kontak</a>
+                            </nav>
+                        </div>
+                    </details>
                 </div>
 
-            </div>
-        </header>
+             </div>
+         </header>
 
         {{-- ── Page Content ──────────────────────────────────────────── --}}
         @yield('content')
@@ -584,22 +685,14 @@
                     <p class="footer-copy">{{ $profile['description'] }}</p>
                 </div>
 
-                <nav class="footer-links" aria-label="Navigasi footer">
-                    <a href="{{ route('home') }}">Home</a>
-                    <a href="{{ route('rooms.index') }}">Kamar</a>
-<<<<<<< HEAD
-                    <a href="{{ route('home') }}#fasilitas">Fasilitas</a>
-                    <a href="{{ route('home') }}#lokasi">Lokasi</a>
-                    <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-                </div>
-=======
-                    <a
-                        href="{{ $profile['whatsapp_url'] }}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >WhatsApp</a>
-                </nav>
->>>>>>> origin/ardhan
+                 <nav class="footer-links" aria-label="Navigasi footer">
+                     <a href="{{ route('home') }}">Home</a>
+                     <a href="{{ route('rooms.index') }}">Kamar</a>
+                     <a href="{{ route('home') }}#fasilitas">Fasilitas</a>
+                     <a href="{{ route('home') }}#lokasi">Lokasi</a>
+                     <a href="{{ route('home') }}#kontak">Kontak</a>
+                     <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                 </nav>
 
                 <p class="footer-copy">{{ $profile['address'] }}</p>
 
