@@ -4,6 +4,7 @@
 
 @push('styles')
     <style>
+        /* ── HERO GRID ── */
         .tenant-hero-grid {
             display: grid;
             gap: 20px;
@@ -14,58 +15,109 @@
             gap: 16px;
         }
 
+        /* ── DARK PANEL ── */
         .tenant-hero-panel {
-            background: #000000;
+            background: var(--ui-ink);
             color: #ffffff;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: rgba(0, 0, 0, 0.16) 0px 4px 16px 0px;
+            border-radius: var(--radius-lg);
+            padding: 22px 24px;
+            box-shadow: 0 4px 20px rgba(15,31,20,0.18);
+            position: relative;
+            overflow: hidden;
         }
 
-        .tenant-hero-panel .eyebrow,
-        .tenant-hero-panel .hero-copy,
-        .tenant-hero-panel .muted {
-            color: #afafaf;
+        .tenant-hero-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -20px; right: -20px;
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            background: rgba(34,197,94,0.12);
+            pointer-events: none;
+        }
+
+        .tenant-hero-panel .eyebrow {
+            color: var(--green-400);
+        }
+
+        .tenant-hero-panel .tenant-stat-value {
+            color: #ffffff;
+        }
+
+        .tenant-hero-panel .hero-copy {
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+            margin-top: 6px;
         }
 
         .tenant-hero-panel .hero-meta-pill {
-            background: #282828;
-            border: 1px solid #282828;
-            color: #ffffff;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.9);
         }
 
+        /* ── STAT GRID ── */
         .tenant-stat-grid,
         .tenant-dashboard-grid {
             display: grid;
-            gap: 20px;
+            gap: 16px;
         }
 
         .tenant-stat-card {
-            padding: 20px;
+            padding: 18px 20px;
+            background: var(--ui-canvas);
+            border: 1px solid var(--ui-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--ui-shadow-soft);
+            transition: box-shadow 0.18s ease, transform 0.18s ease;
+        }
+
+        .tenant-stat-card:hover {
+            box-shadow: 0 4px 16px rgba(22,163,74,0.12);
+            transform: translateY(-1px);
         }
 
         .tenant-stat-value {
             margin: 0;
-            font-size: 26px;
-            font-weight: 700;
-            line-height: 1;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.3px;
+            color: var(--ui-ink);
         }
 
         .tenant-stat-label {
-            margin: 0 0 10px;
+            margin: 0 0 8px;
             color: var(--ui-body);
-            font-size: 13px;
-            line-height: 1.5;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
         }
 
+        .tenant-stat-accent {
+            display: inline-block;
+            width: 20px;
+            height: 3px;
+            background: var(--ui-accent-mid);
+            border-radius: 2px;
+            margin-top: 10px;
+        }
+
+        /* ── NOTE ── */
         .tenant-note {
-            margin-top: 20px;
-            padding: 16px;
-            border-radius: 16px;
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
             background: var(--ui-soft);
             border: 1px solid var(--ui-border);
+            font-size: 13px;
+            color: var(--ui-body);
+            line-height: 1.65;
         }
 
+        /* ── PROOF SECTION ── */
         .tenant-proof-section {
             margin-top: 24px;
             padding-top: 24px;
@@ -74,17 +126,21 @@
 
         .tenant-proof-section-title {
             margin: 0;
-            font-size: 20px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
             line-height: 1.3;
+            letter-spacing: -0.2px;
         }
 
         .tenant-proof-section-copy {
-            margin: 8px 0 0;
+            margin: 6px 0 0;
             color: var(--ui-body);
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 13px;
+            line-height: 1.65;
         }
 
+        /* ── PAYMENT STACK ── */
         .tenant-payment-stack {
             display: grid;
             gap: 16px;
@@ -94,16 +150,22 @@
         .tenant-payment-entry {
             display: grid;
             gap: 16px;
-            padding: 18px;
-            border-radius: 16px;
-            background: var(--ui-soft);
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            background: var(--ui-softer);
             border: 1px solid var(--ui-border);
             scroll-margin-top: 108px;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .tenant-payment-entry:hover {
+            border-color: var(--ui-border-mid);
+            box-shadow: var(--ui-shadow-soft);
         }
 
         .tenant-payment-entry:target {
-            border-color: var(--ui-ink);
-            box-shadow: var(--ui-shadow-soft);
+            border-color: var(--ui-accent);
+            box-shadow: 0 0 0 3px rgba(22,163,74,0.12);
         }
 
         .tenant-payment-head {
@@ -113,21 +175,33 @@
 
         .tenant-payment-title {
             margin: 0;
-            font-size: 18px;
-            line-height: 1.3;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--ui-ink);
         }
 
         .tenant-payment-meta-grid {
             display: grid;
-            gap: 14px;
+            gap: 10px;
         }
 
+        .tenant-payment-meta-item {
+            padding: 10px 12px;
+            background: var(--ui-canvas);
+            border: 1px solid var(--ui-border);
+            border-radius: var(--radius-sm);
+        }
+
+        /* ── PROOF STATE ── */
         .tenant-proof-state,
         .tenant-payment-inline-flash {
             padding: 14px 16px;
-            border-radius: 16px;
+            border-radius: var(--radius-md);
             border: 1px solid var(--ui-border);
             background: var(--ui-canvas);
+            font-size: 13px;
+            line-height: 1.65;
         }
 
         .tenant-payment-inline-flash {
@@ -136,19 +210,24 @@
 
         .tenant-payment-inline-flash-success {
             background: var(--ui-success);
-            color: #065f46;
-            border-color: #a7f3d0;
+            color: var(--green-800);
+            border-color: var(--ui-success-border);
         }
 
         .tenant-payment-inline-flash-error {
             background: var(--ui-danger);
             color: #991b1b;
-            border-color: #fecaca;
+            border-color: var(--ui-danger-border);
         }
 
+        /* ── UPLOAD FORM ── */
         .tenant-upload-form {
             display: grid;
             gap: 14px;
+            padding: 18px;
+            background: var(--ui-canvas);
+            border: 1.5px dashed var(--ui-border-mid);
+            border-radius: var(--radius-md);
         }
 
         .tenant-upload-field {
@@ -157,30 +236,37 @@
         }
 
         .tenant-upload-label {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ui-ink);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .tenant-upload-input {
             width: 100%;
-            border: 1px solid #d4d4d4;
-            background: var(--ui-canvas);
+            border: 1.5px solid var(--ui-border-mid);
+            background: var(--ui-softer);
             color: var(--ui-ink);
-            padding: 14px 16px;
-            border-radius: 8px;
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            font: inherit;
+            font-size: 14px;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
         }
 
         .tenant-upload-input:focus,
         .tenant-upload-input:focus-visible {
             outline: none;
-            border-color: var(--ui-ink);
-            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+            border-color: var(--ui-accent);
+            box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
+            background: var(--ui-canvas);
         }
 
         .tenant-upload-helper,
         .tenant-upload-error {
-            font-size: 13px;
-            line-height: 1.6;
+            font-size: 12px;
+            line-height: 1.65;
         }
 
         .tenant-upload-helper {
@@ -188,17 +274,26 @@
         }
 
         .tenant-upload-error {
-            color: #000000;
+            color: #991b1b;
             font-weight: 600;
         }
 
+        /* ── DASHBOARD CARD HOVER ── */
+        .card {
+            transition: box-shadow 0.18s ease;
+        }
+
+        /* ── RESPONSIVE ── */
         @media (min-width: 900px) {
             .tenant-hero-grid {
-                grid-template-columns: 1.15fr 0.85fr;
+                grid-template-columns: 1.2fr 0.8fr;
                 align-items: stretch;
             }
 
-            .tenant-stat-grid,
+            .tenant-stat-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
             .tenant-dashboard-grid {
                 grid-template-columns: repeat(3, minmax(0, 1fr));
             }
@@ -229,11 +324,13 @@
     @endphp
 
     <div class="content-stack">
+
+        {{-- ── HERO ── --}}
         <section class="tenant-hero-grid">
             <article class="hero-card">
                 <div>
                     <p class="eyebrow">Dashboard penghuni</p>
-                    <h1 class="page-title">Halo, {{ $user->name }}.</h1>
+                    <h1 class="page-title">Halo, {{ $user->name }} 👋</h1>
                     <p class="hero-copy">
                         Semua informasi kamar, masa tinggal, dan pembayaran Anda ditampilkan di satu tempat agar lebih mudah dipantau tanpa perlu bertanya berulang ke pengelola.
                     </p>
@@ -261,38 +358,44 @@
                 <article class="tenant-hero-panel">
                     <p class="eyebrow">Ringkasan cepat</p>
                     <p class="tenant-stat-value">{{ $tenant ? ($tenant->room?->name ?: '-') : '-' }}</p>
-                    <p class="hero-copy">{{ $tenant ? 'Kamar utama yang tercatat untuk akun Anda saat ini.' : 'Data tenant aktif belum tersedia untuk akun ini.' }}</p>
+                    <p class="hero-copy">{{ $tenant ? 'Kamar utama yang tercatat untuk akun Anda.' : 'Data tenant aktif belum tersedia.' }}</p>
                 </article>
 
                 <div class="tenant-stat-grid">
-                    <article class="card tenant-stat-card">
+                    <article class="tenant-stat-card">
                         <p class="tenant-stat-label">Status kamar</p>
                         <p class="tenant-stat-value">{{ $tenant ? ($roomStatusLabels[$roomStatus] ?? '-') : '-' }}</p>
+                        <span class="tenant-stat-accent"></span>
                     </article>
-                    <article class="card tenant-stat-card">
-                        <p class="tenant-stat-label">Status masa tinggal</p>
+                    <article class="tenant-stat-card">
+                        <p class="tenant-stat-label">Masa tinggal</p>
                         <p class="tenant-stat-value">{{ $tenant ? ($rentStatusLabels[$rentStatus] ?? '-') : '-' }}</p>
+                        <span class="tenant-stat-accent"></span>
                     </article>
-                    <article class="card tenant-stat-card">
-                        <p class="tenant-stat-label">Status pembayaran</p>
+                    <article class="tenant-stat-card">
+                        <p class="tenant-stat-label">Pembayaran</p>
                         <p class="tenant-stat-value">{{ $featuredPayment ? ($paymentStatusLabels[$paymentStatus] ?? '-') : '-' }}</p>
+                        <span class="tenant-stat-accent"></span>
                     </article>
                 </div>
             </aside>
         </section>
 
+        {{-- ── EMPTY STATE ── --}}
         @if ($tenant === null)
             <section class="empty-state">
                 <h2>Data penghuni belum tersedia</h2>
                 <p>
                     Akun Anda belum terhubung ke data tenant aktif. Silakan hubungi pengelola NATAKOS agar data kamar dan masa tinggal Anda dapat ditampilkan di dashboard ini.
                 </p>
-
                 <div class="empty-state-actions">
                     <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="button button-primary">Hubungi Pemilik via WhatsApp</a>
                 </div>
             </section>
+
         @else
+
+            {{-- ── ALERTS ── --}}
             @if ($paymentWarning || $rentWarning)
                 <section class="alert-stack">
                     @if ($paymentWarning)
@@ -311,7 +414,10 @@
                 </section>
             @endif
 
+            {{-- ── MAIN GRID ── --}}
             <section class="tenant-dashboard-grid">
+
+                {{-- Informasi Kamar --}}
                 <article class="card">
                     <div class="card-head has-divider">
                         <h2 class="card-title">Informasi kamar</h2>
@@ -340,12 +446,13 @@
                             </div>
                         </div>
 
-                        <div class="tenant-note muted">
+                        <div class="tenant-note">
                             Jika ada perubahan kamar atau harga yang belum sesuai, segera hubungi pengelola agar data Anda diperbarui.
                         </div>
                     </div>
                 </article>
 
+                {{-- Masa Tinggal --}}
                 <article class="card">
                     <div class="card-head has-divider">
                         <h2 class="card-title">Masa tinggal</h2>
@@ -362,36 +469,37 @@
                                 <div class="detail-label">Tanggal keluar</div>
                                 <div class="detail-value">{{ \App\Support\UiFormatter::date($tenant->end_date) }}</div>
                             </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Status masa tinggal</div>
-                                    <div class="detail-value">
-                                        <span class="badge badge-{{ str_replace('_', '-', $rentSummary?->rent_period_status ?? 'safe') }}">{{ $rentStatusLabels[$rentSummary?->rent_period_status ?? 'safe'] ?? 'Aman' }}</span>
-                                    </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Status masa tinggal</div>
+                                <div class="detail-value">
+                                    <span class="badge badge-{{ str_replace('_', '-', $rentSummary?->rent_period_status ?? 'safe') }}">{{ $rentStatusLabels[$rentSummary?->rent_period_status ?? 'safe'] ?? 'Aman' }}</span>
                                 </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Catatan status</div>
-                                    <div class="detail-value muted">
-                                        @if (($rentSummary?->rent_period_status ?? 'safe') === 'ending_soon')
-                                            Berakhir dalam {{ $rentSummary?->days_until_end }} hari.
-                                        @elseif (($rentSummary?->rent_period_status ?? 'safe') === 'ends_today')
-                                            Masa tinggal berakhir hari ini.
-                                        @elseif (($rentSummary?->rent_period_status ?? 'safe') === 'ended')
-                                            Sudah berakhir {{ abs((int) ($rentSummary?->days_until_end ?? 0)) }} hari yang lalu.
-                                        @elseif (($rentSummary?->rent_period_status ?? 'safe') === 'no_end_date')
-                                            Tanggal keluar belum ditentukan.
-                                        @else
-                                            Masa tinggal masih dalam kondisi aman.
-                                        @endif
-                                    </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Catatan status</div>
+                                <div class="detail-value muted">
+                                    @if (($rentSummary?->rent_period_status ?? 'safe') === 'ending_soon')
+                                        Berakhir dalam {{ $rentSummary?->days_until_end }} hari.
+                                    @elseif (($rentSummary?->rent_period_status ?? 'safe') === 'ends_today')
+                                        Masa tinggal berakhir hari ini.
+                                    @elseif (($rentSummary?->rent_period_status ?? 'safe') === 'ended')
+                                        Sudah berakhir {{ abs((int) ($rentSummary?->days_until_end ?? 0)) }} hari yang lalu.
+                                    @elseif (($rentSummary?->rent_period_status ?? 'safe') === 'no_end_date')
+                                        Tanggal keluar belum ditentukan.
+                                    @else
+                                        Masa tinggal masih dalam kondisi aman.
+                                    @endif
+                                </div>
                             </div>
                         </div>
 
-                        <div class="tenant-note muted">
+                        <div class="tenant-note">
                             Pastikan tanggal keluar selalu sesuai rencana tinggal Anda agar peringatan masa tinggal lebih akurat.
                         </div>
                     </div>
                 </article>
 
+                {{-- Pembayaran --}}
                 <article class="card tenant-span-2">
                     <div class="card-head has-divider">
                         <h2 class="card-title">Pembayaran</h2>
@@ -403,7 +511,6 @@
                             <section class="empty-state">
                                 <h2>Belum ada data pembayaran</h2>
                                 <p>Belum ada tagihan atau riwayat pembayaran yang tercatat untuk akun Anda saat ini.</p>
-
                                 <div class="empty-state-actions">
                                     <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="button button-primary">Tanya soal pembayaran</a>
                                 </div>
@@ -456,6 +563,7 @@
                                 </div>
                             </div>
 
+                            {{-- Upload Bukti Bayar --}}
                             <section class="tenant-proof-section">
                                 <h3 class="tenant-proof-section-title">Upload bukti bayar</h3>
                                 <p class="tenant-proof-section-copy">Unggah bukti bayar hanya untuk tagihan milik Anda sendiri. Setelah berhasil dikirim, status pembayaran akan berubah menjadi menunggu verifikasi admin.</p>
@@ -475,7 +583,7 @@
                                             <div class="tenant-payment-head">
                                                 <div>
                                                     <p class="eyebrow">Tagihan #{{ $payment->id }}</p>
-                                                    <h4 class="tenant-payment-title">{{ \App\Support\UiFormatter::currency($payment->amount) }} untuk periode {{ \App\Support\UiFormatter::date($payment->period_start) }} s/d {{ \App\Support\UiFormatter::date($payment->period_end) }}</h4>
+                                                    <h4 class="tenant-payment-title">{{ \App\Support\UiFormatter::currency($payment->amount) }} &mdash; Periode {{ \App\Support\UiFormatter::date($payment->period_start) }} s/d {{ \App\Support\UiFormatter::date($payment->period_end) }}</h4>
                                                 </div>
 
                                                 <div class="hero-meta">
@@ -485,15 +593,15 @@
                                             </div>
 
                                             <div class="tenant-payment-meta-grid">
-                                                <div class="detail-item">
+                                                <div class="tenant-payment-meta-item">
                                                     <div class="detail-label">Tenggat pembayaran</div>
                                                     <div class="detail-value">{{ \App\Support\UiFormatter::date($payment->due_date) }}</div>
                                                 </div>
-                                                <div class="detail-item">
+                                                <div class="tenant-payment-meta-item">
                                                     <div class="detail-label">Bukti bayar</div>
                                                     <div class="detail-value">{{ $payment->proof_image ? 'Sudah diunggah' : 'Belum diunggah' }}</div>
                                                 </div>
-                                                <div class="detail-item">
+                                                <div class="tenant-payment-meta-item">
                                                     <div class="detail-label">Waktu dibayar</div>
                                                     <div class="detail-value">{{ \App\Support\UiFormatter::date($payment->paid_at, 'd M Y H:i') }}</div>
                                                 </div>
@@ -534,9 +642,9 @@
 
                                                         <div class="tenant-upload-helper">
                                                             @if ($payment->status === 'rejected')
-                                                                Bukti sebelumnya ditolak. Unggah file gambar baru dengan ukuran maksimal 2MB untuk diverifikasi ulang.
+                                                                Bukti sebelumnya ditolak. Unggah file gambar baru (maks. 2MB) untuk diverifikasi ulang.
                                                             @else
-                                                                Gunakan file gambar JPG, JPEG, PNG, atau WEBP dengan ukuran maksimal 2MB.
+                                                                Format JPG, JPEG, PNG, atau WEBP — ukuran maksimal 2MB.
                                                             @endif
                                                         </div>
                                                     </div>
@@ -546,9 +654,9 @@
                                                     </div>
                                                 </form>
                                             @elseif ($isPendingVerification)
-                                                <div class="tenant-proof-state">Bukti bayar untuk tagihan ini sedang menunggu verifikasi admin. Upload ulang dinonaktifkan sementara.</div>
+                                                <div class="tenant-proof-state">Bukti bayar sedang menunggu verifikasi admin. Upload ulang dinonaktifkan sementara.</div>
                                             @elseif ($isPaid)
-                                                <div class="tenant-proof-state">Pembayaran ini sudah lunas. Upload ulang bukti bayar dinonaktifkan.</div>
+                                                <div class="tenant-proof-state">Pembayaran ini sudah lunas. Upload ulang dinonaktifkan.</div>
                                             @endif
                                         </article>
                                     @endforeach
@@ -561,6 +669,7 @@
                         @endif
                     </div>
                 </article>
+
             </section>
         @endif
     </div>

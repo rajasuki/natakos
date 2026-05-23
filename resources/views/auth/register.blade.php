@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Login NATAKOS</title>
+        <title>Daftar Tenant — NATAKOS</title>
 
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -38,7 +38,6 @@
             }
 
             *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
             html, body { height: 100%; }
 
             body {
@@ -86,6 +85,12 @@
                 border-radius: 50%;
                 background: var(--green-500);
                 flex-shrink: 0;
+                animation: pulse-dot 2s ease-in-out infinite;
+            }
+
+            @keyframes pulse-dot {
+                0%, 100% { opacity: 1; transform: scale(1); }
+                50%       { opacity: .5; transform: scale(1.3); }
             }
 
             .btn-back {
@@ -111,8 +116,6 @@
                 box-shadow: var(--shadow-md);
             }
 
-            .btn-back svg { flex-shrink: 0; }
-
             /* ── LAYOUT ── */
             .page-wrap {
                 min-height: calc(100vh - 64px);
@@ -125,7 +128,7 @@
                 width: 100%;
                 max-width: 980px;
                 display: grid;
-                grid-template-columns: 1fr 420px;
+                grid-template-columns: 1fr 460px;
                 gap: 0;
                 background: var(--surface);
                 border-radius: var(--radius-lg);
@@ -148,10 +151,8 @@
             .info-panel::before {
                 content: '';
                 position: absolute;
-                top: -80px;
-                right: -80px;
-                width: 280px;
-                height: 280px;
+                top: -80px; right: -80px;
+                width: 280px; height: 280px;
                 border-radius: 50%;
                 background: rgba(255,255,255,.05);
                 pointer-events: none;
@@ -160,10 +161,8 @@
             .info-panel::after {
                 content: '';
                 position: absolute;
-                bottom: -60px;
-                left: -40px;
-                width: 200px;
-                height: 200px;
+                bottom: -60px; left: -40px;
+                width: 200px; height: 200px;
                 border-radius: 50%;
                 background: rgba(255,255,255,.04);
                 pointer-events: none;
@@ -188,21 +187,15 @@
             }
 
             .info-tag-dot {
-                width: 6px;
-                height: 6px;
+                width: 6px; height: 6px;
                 border-radius: 50%;
                 background: var(--green-400);
                 animation: pulse-dot 2s ease-in-out infinite;
             }
 
-            @keyframes pulse-dot {
-                0%, 100% { opacity: 1; transform: scale(1); }
-                50%       { opacity: .5; transform: scale(1.3); }
-            }
-
             .info-headline {
                 font-family: 'DM Serif Display', serif;
-                font-size: 38px;
+                font-size: 36px;
                 line-height: 1.15;
                 color: #ffffff;
                 margin-bottom: 20px;
@@ -210,7 +203,7 @@
 
             .info-headline em {
                 font-style: italic;
-                color: var(--green-300, #86efac);
+                color: #86efac;
             }
 
             .info-desc {
@@ -220,29 +213,46 @@
                 max-width: 340px;
             }
 
-            .info-desc code {
-                background: rgba(255,255,255,.12);
-                border-radius: 4px;
-                padding: 1px 6px;
-                font-size: 12px;
-                color: var(--green-200);
-            }
-
-            .info-chips {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
+            .info-steps {
+                display: grid;
+                gap: 12px;
                 margin-top: 32px;
+                position: relative;
             }
 
-            .info-chip {
-                padding: 7px 14px;
-                border-radius: 999px;
-                background: rgba(255,255,255,.1);
-                border: 1px solid rgba(255,255,255,.15);
-                color: rgba(255,255,255,.8);
+            .info-step {
+                display: flex;
+                align-items: flex-start;
+                gap: 14px;
+            }
+
+            .step-num {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: rgba(255,255,255,.12);
+                border: 1px solid rgba(255,255,255,.2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 font-size: 12px;
-                font-weight: 500;
+                font-weight: 700;
+                color: var(--green-200);
+                flex-shrink: 0;
+                margin-top: 1px;
+            }
+
+            .step-text {
+                color: rgba(255,255,255,.7);
+                font-size: 13px;
+                line-height: 1.6;
+            }
+
+            .step-text strong {
+                color: rgba(255,255,255,.9);
+                font-weight: 600;
+                display: block;
+                margin-bottom: 2px;
             }
 
             .info-bottom {
@@ -262,7 +272,7 @@
 
             .stat-value {
                 font-family: 'DM Serif Display', serif;
-                font-size: 32px;
+                font-size: 28px;
                 color: #ffffff;
                 line-height: 1;
                 margin-bottom: 6px;
@@ -274,9 +284,9 @@
                 line-height: 1.5;
             }
 
-            /* ── RIGHT PANEL (FORM) ── */
+            /* ── RIGHT FORM PANEL ── */
             .form-panel {
-                padding: 52px 44px;
+                padding: 48px 40px;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
@@ -294,17 +304,17 @@
 
             .form-title {
                 font-family: 'DM Serif Display', serif;
-                font-size: 30px;
+                font-size: 28px;
                 color: var(--ink);
                 line-height: 1.18;
                 margin-bottom: 6px;
             }
 
             .form-sub {
-                font-size: 13.5px;
+                font-size: 13px;
                 color: var(--ink-muted);
                 line-height: 1.65;
-                margin-bottom: 32px;
+                margin-bottom: 28px;
             }
 
             /* alert */
@@ -322,10 +332,8 @@
                 margin-bottom: 20px;
             }
 
-            .alert svg { flex-shrink: 0; margin-top: 1px; }
-
             /* form */
-            .form-layout { display: grid; gap: 20px; }
+            .form-layout { display: grid; gap: 16px; }
 
             .field { display: grid; gap: 7px; }
 
@@ -333,6 +341,12 @@
                 font-size: 13px;
                 font-weight: 600;
                 color: var(--ink);
+            }
+
+            .field-hint {
+                font-size: 11.5px;
+                color: var(--ink-muted);
+                margin-top: -4px;
             }
 
             .input-wrap { position: relative; }
@@ -348,7 +362,7 @@
 
             .input {
                 width: 100%;
-                height: 48px;
+                height: 46px;
                 padding: 0 16px 0 42px;
                 border: 1.5px solid var(--border);
                 border-radius: var(--radius-sm);
@@ -368,56 +382,19 @@
                 box-shadow: 0 0 0 3px rgba(34,197,94,.12);
             }
 
-            .remember-row {
-                display: flex;
-                align-items: center;
-                gap: 10px;
+            .input.is-error {
+                border-color: #f87171;
+                background: #fff8f8;
             }
 
-            .remember-row input[type=checkbox] {
-                appearance: none;
-                width: 18px;
-                height: 18px;
-                border: 1.5px solid var(--border);
-                border-radius: 4px;
-                background: var(--surface-2);
-                cursor: pointer;
-                transition: border-color .15s, background .15s;
-                flex-shrink: 0;
-                position: relative;
+            .field-error {
+                font-size: 12px;
+                color: #dc2626;
             }
 
-            .remember-row input[type=checkbox]:checked {
-                background: var(--green-500);
-                border-color: var(--green-500);
-            }
+            .divider { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 
-            .remember-row input[type=checkbox]:checked::after {
-                content: '';
-                position: absolute;
-                left: 4px;
-                top: 1.5px;
-                width: 6px;
-                height: 10px;
-                border: 2px solid #fff;
-                border-top: 0;
-                border-left: 0;
-                transform: rotate(45deg);
-            }
-
-            .remember-label {
-                font-size: 13.5px;
-                color: var(--ink-muted);
-                cursor: pointer;
-            }
-
-            .divider {
-                border: none;
-                border-top: 1px solid var(--border);
-                margin: 4px 0;
-            }
-
-            .btn-login {
+            .btn-register {
                 width: 100%;
                 height: 50px;
                 border: none;
@@ -437,19 +414,18 @@
                 transition: transform .15s, box-shadow .15s, filter .15s;
             }
 
-            .btn-login:hover {
+            .btn-register:hover {
                 filter: brightness(1.06);
                 box-shadow: 0 6px 20px rgba(22,163,74,.38);
                 transform: translateY(-1px);
             }
 
-            .btn-login:active {
+            .btn-register:active {
                 transform: translateY(0);
                 box-shadow: 0 2px 8px rgba(22,163,74,.25);
             }
 
-            /* register link */
-            .register-row {
+            .login-row {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -457,12 +433,9 @@
                 margin-top: 20px;
             }
 
-            .register-text {
-                font-size: 13.5px;
-                color: var(--ink-muted);
-            }
+            .login-text { font-size: 13.5px; color: var(--ink-muted); }
 
-            .btn-register {
+            .btn-login-link {
                 display: inline-flex;
                 align-items: center;
                 gap: 4px;
@@ -472,10 +445,7 @@
                 transition: color .15s, gap .15s;
             }
 
-            .btn-register:hover {
-                color: var(--green-700);
-                gap: 7px;
-            }
+            .btn-login-link:hover { color: var(--green-700); gap: 7px; }
 
             /* ── RESPONSIVE ── */
             @media (max-width: 820px) {
@@ -483,24 +453,15 @@
                     grid-template-columns: 1fr;
                     max-width: 480px;
                 }
-
-                .info-panel {
-                    padding: 40px 32px;
-                }
-
-                .info-headline { font-size: 28px; }
-
+                .info-panel { padding: 36px 28px; }
+                .info-headline { font-size: 26px; }
                 .info-bottom { display: none; }
-
-                .form-panel {
-                    padding: 40px 32px;
-                }
+                .form-panel { padding: 36px 28px; }
             }
 
             @media (max-width: 480px) {
-                .page-wrap { padding: 24px 16px; }
-                .info-panel, .form-panel { padding: 32px 24px; }
-                .info-chips { gap: 6px; }
+                .page-wrap { padding: 20px 14px; }
+                .info-panel, .form-panel { padding: 28px 20px; }
             }
         </style>
     </head>
@@ -512,11 +473,11 @@
                     <span class="brand-dot"></span>
                     NATAKOS
                 </a>
-                <a href="{{ route('home') }}" class="btn-back">
+                <a href="{{ route('login') }}" class="btn-back">
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M10 12L6 8l4-4"/>
                     </svg>
-                    Kembali
+                    Kembali ke Login
                 </a>
             </div>
         </header>
@@ -529,59 +490,99 @@
                     <div class="info-top">
                         <div class="info-tag">
                             <span class="info-tag-dot"></span>
-                            Akses aplikasi
+                            Pendaftaran Tenant
                         </div>
 
                         <h1 class="info-headline">
-                            Masuk ke<br>
-                            <em>dashboard</em><br>
-                            kos Anda.
+                            Daftar sebagai<br>
+                            <em>penghuni</em><br>
+                            NATAKOS.
                         </h1>
 
                         <p class="info-desc">
-                            Gunakan akun yang sudah terdaftar di database
-                            <code>natakos</code>. Sistem akan otomatis mengarahkan Anda
-                            ke dashboard sesuai role.
+                            Buat akun tenant untuk mengakses dashboard pembayaran dan informasi kamar kos Anda secara mandiri.
                         </p>
 
-                        <div class="info-chips">
-                            <span class="info-chip">Admin &amp; Tenant</span>
-                            <span class="info-chip">Redirect Otomatis</span>
-                            <span class="info-chip">Session Aman</span>
+                        <div class="info-steps">
+                            <div class="info-step">
+                                <div class="step-num">1</div>
+                                <div class="step-text">
+                                    <strong>Isi data diri</strong>
+                                    Nama lengkap, email, nomor HP, dan password.
+                                </div>
+                            </div>
+                            <div class="info-step">
+                                <div class="step-num">2</div>
+                                <div class="step-text">
+                                    <strong>Akun dibuat otomatis</strong>
+                                    Role tenant langsung ditetapkan oleh sistem.
+                                </div>
+                            </div>
+                            <div class="info-step">
+                                <div class="step-num">3</div>
+                                <div class="step-text">
+                                    <strong>Masuk ke dashboard</strong>
+                                    Pantau tagihan dan status kamar kapan saja.
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="info-bottom">
                         <div class="stat-card">
-                            <div class="stat-value">2</div>
-                            <div class="stat-label">Role utama: admin &amp; tenant</div>
+                            <div class="stat-value">Tenant</div>
+                            <div class="stat-label">Role otomatis setelah daftar</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-value">1</div>
-                            <div class="stat-label">Sistem kos terintegrasi</div>
+                            <div class="stat-value">Free</div>
+                            <div class="stat-label">Tidak ada biaya pendaftaran</div>
                         </div>
                     </div>
                 </div>
 
                 {{-- ── RIGHT FORM PANEL ── --}}
                 <div class="form-panel">
-                    <p class="form-eyebrow">Masuk ke akun</p>
-                    <h2 class="form-title">Login NATAKOS</h2>
-                    <p class="form-sub">Masukkan email dan password untuk melanjutkan ke dashboard.</p>
+                    <p class="form-eyebrow">Buat akun baru</p>
+                    <h2 class="form-title">Daftar sebagai Tenant</h2>
+                    <p class="form-sub">Lengkapi data di bawah untuk membuat akun penghuni kos.</p>
 
                     @if (isset($errors) && $errors->any())
                         <div class="alert">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="8" cy="8" r="7"/>
-                                <path d="M8 5v3M8 11v.5"/>
+                                <circle cx="8" cy="8" r="7"/><path d="M8 5v3M8 11v.5"/>
                             </svg>
                             {{ $errors->first() }}
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('login') }}" class="form-layout">
+                    <form method="POST" action="{{ route('register') }}" class="form-layout">
                         @csrf
 
+                        {{-- Nama --}}
+                        <div class="field">
+                            <label class="field-label" for="name">Nama Lengkap</label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="8" cy="5" r="3"/>
+                                    <path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6"/>
+                                </svg>
+                                <input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    value="{{ old('name') }}"
+                                    placeholder="Nama lengkap Anda"
+                                    required
+                                    autofocus
+                                    class="input {{ $errors->has('name') ? 'is-error' : '' }}"
+                                >
+                            </div>
+                            @error('name')
+                                <span class="field-error">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        {{-- Email --}}
                         <div class="field">
                             <label class="field-label" for="email">Email</label>
                             <div class="input-wrap">
@@ -596,12 +597,38 @@
                                     value="{{ old('email') }}"
                                     placeholder="nama@email.com"
                                     required
-                                    autofocus
-                                    class="input"
+                                    class="input {{ $errors->has('email') ? 'is-error' : '' }}"
                                 >
                             </div>
+                            @error('email')
+                                <span class="field-error">{{ $message }}</span>
+                            @enderror
                         </div>
 
+                        {{-- Phone --}}
+                        <div class="field">
+                            <label class="field-label" for="phone">Nomor HP</label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="4" y="1" width="8" height="14" rx="2"/>
+                                    <circle cx="8" cy="12" r=".8" fill="currentColor" stroke="none"/>
+                                </svg>
+                                <input
+                                    id="phone"
+                                    name="phone"
+                                    type="tel"
+                                    value="{{ old('phone') }}"
+                                    placeholder="08xxxxxxxxxx"
+                                    required
+                                    class="input {{ $errors->has('phone') ? 'is-error' : '' }}"
+                                >
+                            </div>
+                            @error('phone')
+                                <span class="field-error">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        {{-- Password --}}
                         <div class="field">
                             <label class="field-label" for="password">Password</label>
                             <div class="input-wrap">
@@ -613,33 +640,50 @@
                                     id="password"
                                     name="password"
                                     type="password"
-                                    placeholder="••••••••"
+                                    placeholder="Minimal 8 karakter"
+                                    required
+                                    class="input {{ $errors->has('password') ? 'is-error' : '' }}"
+                                >
+                            </div>
+                            @error('password')
+                                <span class="field-error">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        {{-- Konfirmasi Password --}}
+                        <div class="field">
+                            <label class="field-label" for="password_confirmation">Konfirmasi Password</label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="7" width="10" height="7" rx="1.5"/>
+                                    <path d="M5 7V5a3 3 0 016 0v2"/>
+                                    <path d="M6 11l1.5 1.5L10 10" stroke-width="1.8"/>
+                                </svg>
+                                <input
+                                    id="password_confirmation"
+                                    name="password_confirmation"
+                                    type="password"
+                                    placeholder="Ulangi password"
                                     required
                                     class="input"
                                 >
                             </div>
                         </div>
 
-                        <div class="remember-row">
-                            <input id="remember" type="checkbox" name="remember" value="1">
-                            <label for="remember" class="remember-label">Ingat saya di perangkat ini</label>
-                        </div>
-
                         <hr class="divider">
 
-                        <button type="submit" class="btn-login">
+                        <button type="submit" class="btn-register">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M10 8H2M7 5l3 3-3 3"/>
-                                <path d="M6 3H13a1 1 0 011 1v8a1 1 0 01-1 1H6"/>
+                                <path d="M8 2v12M2 8h12"/>
                             </svg>
-                            Masuk Sekarang
+                            Buat Akun Tenant
                         </button>
                     </form>
 
-                    <div class="register-row">
-                        <span class="register-text">Belum punya akun?</span>
-                        <a href="{{ route('register') }}" class="btn-register">
-                            Daftar sekarang
+                    <div class="login-row">
+                        <span class="login-text">Sudah punya akun?</span>
+                        <a href="{{ route('login') }}" class="btn-login-link">
+                            Masuk sekarang
                             <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M6 4l4 4-4 4"/>
                             </svg>

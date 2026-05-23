@@ -2,6 +2,7 @@
     $tenant = $tenant ?? null;
     $tenantUser = $tenant?->user;
     $errorBag = isset($errors) ? $errors : null;
+    $isExistingUser = $isExistingUser ?? false;
 @endphp
 
 <div class="card form-card">
@@ -26,43 +27,67 @@
             <section class="form-section">
                 <div>
                     <h2 class="form-section-title">Akun penghuni</h2>
-                    <p class="form-section-copy">Isi identitas dasar akun tenant yang dipakai penghuni untuk login ke dashboard penghuni.</p>
+                    <p class="form-section-copy">
+                        {{ $isExistingUser
+                            ? 'Pilih akun penghuni yang sudah terdaftar untuk ditambahkan penempatan baru.'
+                            : 'Isi identitas dasar akun tenant yang dipakai penghuni untuk login ke dashboard penghuni.' }}
+                    </p>
                 </div>
 
-                <div class="grid grid-two">
-                    <div class="field">
-                        <label for="name">Nama penghuni</label>
-                        <input id="name" name="name" type="text" value="{{ old('name', $tenantUser?->name) }}" class="input" required>
-                        @if ($errorBag?->has('name'))
-                            <div class="field-error">{{ $errorBag->first('name') }}</div>
-                        @endif
+                @if ($isExistingUser)
+                    <div class="grid grid-two">
+                        <div class="field field-full">
+                            <label for="user_id">Pilih penghuni</label>
+                            <select id="user_id" name="user_id" class="select" required>
+                                <option value="">Cari dan pilih penghuni...</option>
+                                @foreach ($existingUsers as $user)
+                                    <option value="{{ $user->id }}" @selected(old('user_id') == $user->id)>
+                                        {{ $user->name }} — {{ $user->email }}
+                                        @if ($user->phone) ({{ $user->phone }}) @endif
+                                    </option>
+                                @endforeach
+                            </select>
+                            @if ($errorBag?->has('user_id'))
+                                <div class="field-error">{{ $errorBag->first('user_id') }}</div>
+                            @endif
+                        </div>
                     </div>
+                @else
+                    <div class="grid grid-two">
+                        <div class="field">
+                            <label for="name">Nama penghuni</label>
+                            <input id="name" name="name" type="text" value="{{ old('name', $tenantUser?->name) }}" class="input" required>
+                            @if ($errorBag?->has('name'))
+                                <div class="field-error">{{ $errorBag->first('name') }}</div>
+                            @endif
+                        </div>
 
-                    <div class="field">
-                        <label for="email">Email</label>
-                        <input id="email" name="email" type="email" value="{{ old('email', $tenantUser?->email) }}" class="input" required>
-                        @if ($errorBag?->has('email'))
-                            <div class="field-error">{{ $errorBag->first('email') }}</div>
-                        @endif
-                    </div>
+                        <div class="field">
+                            <label for="email">Email</label>
+                            <input id="email" name="email" type="email" value="{{ old('email', $tenantUser?->email) }}" class="input" required>
+                            @if ($errorBag?->has('email'))
+                                <div class="field-error">{{ $errorBag->first('email') }}</div>
+                            @endif
+                        </div>
 
-                    <div class="field">
-                        <label for="phone">Nomor HP</label>
-                        <input id="phone" name="phone" type="text" value="{{ old('phone', $tenantUser?->phone) }}" class="input" placeholder="Contoh: 0852xxxxxxxx">
-                        @if ($errorBag?->has('phone'))
-                            <div class="field-error">{{ $errorBag->first('phone') }}</div>
-                        @endif
-                    </div>
+                        <div class="field">
+                            <label for="phone">Nomor HP</label>
+                            <input id="phone" name="phone" type="text" value="{{ old('phone', $tenantUser?->phone) }}" class="input" placeholder="Contoh: 0852xxxxxxxx">
+                            @if ($errorBag?->has('phone'))
+                                <div class="field-error">{{ $errorBag->first('phone') }}</div>
+                            @endif
+                        </div>
 
-                    <div class="field">
-                        <label for="password">Password</label>
-                        <input id="password" name="password" type="password" class="input" {{ $tenant ? '' : 'required' }}>
-                        @if ($errorBag?->has('password'))
-                            <div class="field-error">{{ $errorBag->first('password') }}</div>
-                        @endif
-                        <div class="helper">{{ $tenant ? 'Kosongkan jika tidak ingin mengubah password lama.' : 'Password wajib diisi saat menambah penghuni.' }}</div>
+                        <div class="field">
+                            <label for="password">Password</label>
+                            <input id="password" name="password" type="password" class="input" {{ $tenant ? '' : 'required' }}>
+                            @if ($errorBag?->has('password'))
+                                <div class="field-error">{{ $errorBag->first('password') }}</div>
+                            @endif
+                            <div class="helper">{{ $tenant ? 'Kosongkan jika tidak ingin mengubah password lama.' : 'Password wajib diisi saat menambah penghuni.' }}</div>
+                        </div>
                     </div>
-                </div>
+                @endif
             </section>
 
             <section class="form-section">

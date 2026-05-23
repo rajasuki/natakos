@@ -97,6 +97,57 @@ class TenantController extends Controller
         ]);
     }
 
+
+
+    public function createExisting(): View
+{
+    return view('admin.tenants.create-existing', [
+        'rooms'            => $this->rooms(),
+        'roomStatusLabels' => $this->roomStatusLabels(),
+        'statusLabels'     => $this->statusLabels(),
+        'existingUsers'    => User::query()
+            ->where('role', 'tenant')
+            ->orderBy('name')
+            ->get(),
+    ]);
+}
+
+public function storeExisting(Request $request): RedirectResponse
+{
+    $validated = $request->validate([
+        'user_id'    => ['required', 'integer', Rule::exists('users', 'id')],
+        'room_id'    => ['required', 'integer', Rule::exists('rooms', 'id')],
+        'start_date' => ['required', 'date'],
+        'end_date'   => ['nullable', 'date', 'after_or_equal:start_date'],
+        'status'     => ['required', Rule::in(array_keys($this->statusLabels()))],
+        'notes'      => ['nullable', 'string'],
+    ]);
+
+    if (($validated['status'] ?? null) === 'moved_out' && empty($validated['end_date'])) {
+        throw ValidationException::withMessages([
+            'end_date' => 'Tanggal keluar wajib diisi jika status penghuni adalah Sudah Keluar.',
+        ]);
+    }
+
+    $this->validateRoomAssignment($validated['room_id'], $validated['status']);
+
+    DB::transaction(function () use ($validated): void {
+        Tenant::create([
+            'user_id'    => $validated['user_id'],
+            'room_id'    => $validated['room_id'],
+            'start_date' => $validated['start_date'],
+            'end_date'   => $validated['end_date'] ?? null,
+            'status'     => $validated['status'],
+            'notes'      => $validated['notes'] ?? null,
+        ]);
+
+        RoomOccupancy::syncStatuses([$validated['room_id']]);
+    });
+
+    return redirect()
+        ->route('admin.tenants.index')
+        ->with('success', 'Penempatan berhasil ditambahkan ke akun penghuni yang sudah ada.');
+        }
     public function store(Request $request): RedirectResponse
     {
         $validated = $this->validatedData($request);
