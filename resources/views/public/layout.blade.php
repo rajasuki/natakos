@@ -23,19 +23,21 @@
                  --ui-shadow:         rgba(28,43,34,.10) 0px 4px 16px 0px;
                  --ui-shadow-strong:  rgba(28,43,34,.16) 0px 4px 16px 0px;
                  --ui-accent:         #4A7C59;
+                 --ui-glow-1:        #4A7C59;
+                 --ui-glow-2:        #3D6A4A;
                  --ui-accent-hover:   #3D6A4A;
                  --ui-accent-soft:    #EEF5EF;
             }
 
             *, *::before, *::after { box-sizing: border-box; }
 
-            body {
-                margin: 0;
-                min-height: 100vh;
-                background: var(--ui-canvas);
-                color: var(--ui-ink);
-                line-height: 1.5;
-            }
+             body {
+                 margin: 0;
+                 min-height: 100vh;
+                 background: rgba(251,248,243,.85);
+                 color: var(--ui-ink);
+                 line-height: 1.5;
+             }
 
             a { color: inherit; text-decoration: none; }
             img { max-width: 100%; height: auto; display: block; }
@@ -50,14 +52,19 @@
             }
 
              /* ── Header ────────────────────────────── */
-             .site-header {
-                 position: sticky;
-                 top: 0;
-                 z-index: 40;
-                 border-bottom: 1px solid var(--ui-border);
-                 background: rgba(251,248,243,.92);
-                 backdrop-filter: blur(18px);
-             }
+              .site-header {
+                  position: sticky;
+                  top: 0;
+                  z-index: 40;
+                  border-bottom: 1px solid var(--ui-border);
+                  background: rgba(251,248,243,.92);
+                  backdrop-filter: blur(18px);
+                  transition: transform .35s ease, background .35s ease;
+              }
+
+              .site-header.nav-hidden {
+                  transform: translateY(-100%);
+              }
 
              .header-row {
                  position: relative;
@@ -183,18 +190,17 @@
               }
 
               .nav-auth-link {
-                 min-height: 44px;
-                 padding: 12px 18px;
-                 background: var(--ui-accent);
-                 color: #fff;
-                 box-shadow: var(--ui-shadow);
-                 transition: background-color .2s ease, box-shadow .2s ease;
-              }
+                  display: inline-flex;
+                  align-items: center;
+                  color: var(--ui-body);
+                  font-weight: 600;
+                  font-size: 14px;
+                  transition: color .2s ease;
+               }
 
               .nav-auth-link:hover {
-                 background: var(--ui-accent-hover);
-                 box-shadow: var(--ui-shadow-strong);
-              }
+                  color: var(--ui-ink);
+               }
 
               .mobile-menu {
                  position: relative;
@@ -539,7 +545,7 @@
             .empty-state p  { margin: 0; color: var(--ui-body); line-height: 1.7; }
 
             /* ── Footer ────────────────────────────── */
-            .footer { background: var(--ui-ink); color: var(--ui-canvas); margin-top: 32px; }
+             .footer { background: linear-gradient(135deg, #1C2B22 0%, #0f1f17 50%, #13211a 100%); color: var(--ui-canvas); margin-top: 32px; }
 
             .footer-shell {
                 display: grid;
@@ -551,7 +557,45 @@
             .footer-links { display: flex; flex-wrap: wrap; gap: 16px; }
             .footer-links a { color: var(--ui-canvas); font-size: 14px; }
 
-            /* ── Focus ─────────────────────────────── */
+             /* ── Decorative glow ─────────────────────── */
+             .site-glow {
+                 position: fixed;
+                 inset: 0;
+                 z-index: -1;
+                 pointer-events: none;
+                 overflow: hidden;
+             }
+
+             .glow-blob {
+                 position: absolute;
+                 border-radius: 999px;
+                 filter: blur(80px);
+                 opacity: .35;
+                 animation: glow-float 14s ease-in-out infinite alternate;
+             }
+
+             .glow-blob:nth-child(1) {
+                 width: 400px; height: 400px;
+                 top: -80px; left: -100px;
+                 background: var(--ui-glow-1);
+                 animation-duration: 16s;
+             }
+
+             .glow-blob:nth-child(2) {
+                 width: 350px; height: 350px;
+                 bottom: -60px; right: -80px;
+                 background: var(--ui-glow-2);
+                 animation-duration: 12s;
+                 animation-delay: -4s;
+             }
+
+             @keyframes glow-float {
+                 0%   { transform: translate(0, 0) scale(1); }
+                 50%  { transform: translate(30px, -20px) scale(1.08); }
+                 100% { transform: translate(-20px, 10px) scale(.92); }
+             }
+
+             /* ── Focus ─────────────────────────────── */
              .nav-link:focus-visible,
              .mobile-nav-link:focus-visible,
              .nav-auth-link:focus-visible,
@@ -579,12 +623,7 @@
             }
 
              @media (min-width: 768px) {
-                 .nav-auth-link {
-                     padding-left: 20px;
-                     padding-right: 20px;
-                 }
-
-                 .button-row {
+                  .button-row {
                      justify-content: flex-end;
                  }
 
@@ -629,7 +668,11 @@
 
         @stack('styles')
     </head>
-    <body>
+     <body>
+     <div class="site-glow" aria-hidden="true">
+         <div class="glow-blob"></div>
+         <div class="glow-blob"></div>
+     </div>
 
         {{-- ── Site Header ──────────────────────────────────────────── --}}
          <header class="site-header">
@@ -649,7 +692,7 @@
                 </nav>
 
                 <div class="header-actions">
-                    <a href="{{ route('login') }}" class="nav-auth-link">Masuk / Daftar</a>
+                     <a href="{{ route('login') }}" class="nav-auth-link">Sign</a>
 
                     <details class="mobile-menu">
                         <summary class="mobile-menu-toggle" aria-label="Buka navigasi">
@@ -699,5 +742,20 @@
             </div>
         </footer>
 
+     <script>
+         let lastScroll = 0;
+         const header = document.querySelector('.site-header');
+         const threshold = 40;
+         window.addEventListener('scroll', () => {
+             const current = window.pageYOffset;
+             if (Math.abs(current - lastScroll) < 8) return;
+             if (current > threshold && current > lastScroll) {
+                 header.classList.add('nav-hidden');
+             } else {
+                 header.classList.remove('nav-hidden');
+             }
+             lastScroll = current;
+         }, { passive: true });
+     </script>
     </body>
 </html>

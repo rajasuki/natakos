@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\KosProfile;
 use App\Models\User;
+use App\Support\WhatsappLink;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +16,9 @@ class AuthenticatedSessionController extends Controller
 {
     public function create(): View
     {
-        return view('auth.login');
+        return view('auth.login', [
+            'profile' => $this->profileData(),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -81,5 +85,22 @@ class AuthenticatedSessionController extends Controller
         return redirect()->route('login')->withErrors([
             'email' => 'Role akun tidak valid. Silakan login kembali.',
         ]);
+    }
+
+    /**
+     * @return array<string, string|null>
+     */
+    private function profileData(): array
+    {
+        $profile = app()->runningUnitTests() ? null : KosProfile::query()->first();
+        $whatsappNumber = WhatsappLink::normalizeNumber($profile?->whatsapp_number);
+
+        return [
+            'name' => $profile?->name ?: 'NATAKOS',
+            'description' => $profile?->description ?: 'NATAKOS menghadirkan kamar kos yang rapi, terkelola, dan siap mendukung rutinitas harian penghuni dengan sistem manajemen yang jelas.',
+            'address' => $profile?->address ?: 'Alamat kos belum diatur.',
+            'whatsapp_number' => $whatsappNumber,
+            'whatsapp_url' => WhatsappLink::build($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di NATAKOS.'),
+        ];
     }
 }
