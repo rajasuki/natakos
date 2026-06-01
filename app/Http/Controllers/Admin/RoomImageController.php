@@ -59,14 +59,14 @@ class RoomImageController extends Controller
             }
 
             return redirect()
-                ->route('admin.rooms.images.index', $room)
+                ->route('admin.rooms.edit', $room)
                 ->with('error', 'Foto galeri gagal diunggah. Silakan coba lagi.');
         }
 
         $uploadedCount = count($storedPaths);
 
         return redirect()
-            ->route('admin.rooms.images.index', $room)
+            ->route('admin.rooms.edit', $room)
             ->with('success', $uploadedCount === 1 ? 'Foto galeri berhasil diunggah.' : $uploadedCount.' foto galeri berhasil diunggah.');
     }
 
@@ -82,14 +82,14 @@ class RoomImageController extends Controller
             $image->delete();
         } catch (Throwable) {
             return redirect()
-                ->route('admin.rooms.images.index', $room)
+                ->route('admin.rooms.edit', $room)
                 ->with('error', 'Foto galeri gagal dihapus.');
         }
 
         $this->deleteImage($imagePath);
 
         return redirect()
-            ->route('admin.rooms.images.index', $room)
+            ->route('admin.rooms.edit', $room)
             ->with('success', 'Foto galeri berhasil dihapus.');
     }
 

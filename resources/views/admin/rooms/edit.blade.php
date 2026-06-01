@@ -2,12 +2,15 @@
 
 @section('title', 'Edit Kamar')
 @section('eyebrow', 'Admin Kamar')
-@section('page_title', 'Edit kamar')
-@section('page_description', 'Perbarui data kamar, harga, status, atau foto utama tanpa mengubah struktur database manual.')
+@section('page_title', 'Edit Kamar')
+@section('page_description', 'Perbarui informasi dan fasilitas untuk kamar ini.')
 
 @section('page_actions')
-    <a href="{{ route('admin.rooms.index') }}" class="button button-secondary">Kembali ke daftar kamar</a>
-    <a href="{{ route('admin.rooms.images.index', $room) }}" class="button button-subtle">Galeri</a>
+    <a href="{{ route('admin.rooms.index') }}" class="button button-secondary">Batal</a>
+    <button type="submit" form="room-form" class="button button-primary" style="display:inline-flex;align-items:center;gap:8px;">
+        <span class="material-symbols-outlined" style="font-size:18px;">save</span>
+        Update Kamar
+    </button>
 @endsection
 
 @section('content')
@@ -15,7 +18,7 @@
         'action' => route('admin.rooms.update', $room),
         'method' => 'PUT',
         'room' => $room,
-        'submitLabel' => 'Update kamar',
+        'submitLabel' => 'Update Kamar',
         'statusLabels' => $statusLabels,
         'facilityGroups' => $facilityGroups,
         'facilityTypeLabels' => $facilityTypeLabels,

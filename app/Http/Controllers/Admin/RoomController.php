@@ -111,6 +111,14 @@ class RoomController extends Controller
     {
         $oldImage = $room->main_image;
         $data = $this->validatedData($request);
+
+        if (! empty($data['remove_main_image']) && $room->main_image) {
+            $this->deleteImage($room->main_image);
+            $room->update(['main_image' => null]);
+        }
+
+        unset($data['remove_main_image']);
+
         RoomOccupancy::ensureStatusIsConsistent($data['status'], $room);
         $facilityIds = $this->extractFacilityIds($data);
         $data['slug'] = $this->generateUniqueSlug($data['name'], $room);
@@ -123,7 +131,7 @@ class RoomController extends Controller
         }
 
         return redirect()
-            ->route('admin.rooms.index')
+            ->route('admin.rooms.edit', $room)
             ->with('success', 'Kamar berhasil diperbarui.');
     }
 
@@ -176,6 +184,7 @@ class RoomController extends Controller
             'description' => ['nullable', 'string'],
             'status' => ['required', Rule::in(array_keys($this->statusLabels()))],
             'main_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'remove_main_image' => ['nullable', 'in:1'],
             'facility_ids' => ['nullable', 'array'],
             'facility_ids.*' => ['integer', 'distinct', Rule::exists('facilities', 'id')],
         ]);

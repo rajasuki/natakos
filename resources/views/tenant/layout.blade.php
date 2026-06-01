@@ -9,6 +9,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -414,7 +415,7 @@
 
             .page-title {
                 margin: 0;
-                font-family: 'Sora', sans-serif;
+                font-family: 'Inter', sans-serif;
                 font-size: 26px;
                 font-weight: 700;
                 line-height: 1.2;
@@ -502,7 +503,7 @@
 
             .card-title {
                 margin: 0;
-                font-family: 'Sora', sans-serif;
+                font-family: 'Inter', sans-serif;
                 font-size: 16px;
                 font-weight: 700;
                 color: var(--ui-ink);
@@ -639,7 +640,7 @@
 
             .form-section-title {
                 margin: 0;
-                font-family: 'Sora', sans-serif;
+                font-family: 'Inter', sans-serif;
                 font-size: 15px;
                 font-weight: 700;
             }
@@ -765,7 +766,7 @@
 
             .empty-state h2 {
                 margin: 0 0 8px;
-                font-family: 'Sora', sans-serif;
+                font-family: 'Inter', sans-serif;
                 font-size: 20px;
                 font-weight: 700;
             }
