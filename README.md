@@ -1,58 +1,223 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# IchiKOS — Sistem Manajemen Kos
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web manajemen kos (boarding house) berbasis **Laravel 13**, **PHP 8.3**, **Blade**, **Tailwind 4**, dan **Vite 8**.
 
-## About Laravel
+IchiKOS membantu pemilik kos mengelola kamar, penghuni, pembayaran, dan fasilitas secara terpadu. Dilengkapi halaman publik untuk menampilkan kamar yang tersedia, serta dashboard terpisah untuk admin dan penghuni.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Fitur
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Halaman Publik
+- Beranda dengan daftar kamar unggulan dan fasilitas populer.
+- Halaman daftar kamar dengan filter harga, status, fasilitas, dan pencarian.
+- Halaman detail kamar dengan galeri foto, spesifikasi, dan daftar fasilitas.
+- Tautan WhatsApp langsung ke pengelola.
 
-## Learning Laravel
+### Dashboard Admin
+- **Manajemen Kamar**: CRUD kamar dengan slug otomatis, foto utama, galeri foto, dan pemilihan fasilitas.
+- **Manajemen Fasilitas**: CRUD fasilitas dengan ikon terintegrasi Material Symbols.
+- **Manajemen Penghuni**: Catat penghuni ke kamar, proses checkout, riwayat hunian.
+- **Manajemen Pembayaran**: Catat pembayaran, verifikasi bukti transfer (approve/reject), ekspor data.
+- **Ekspor Data**: CSV untuk kamar, penghuni, dan pembayaran.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Dashboard Penghuni
+- Informasi kamar yang ditempati.
+- Status pembayaran dan tenggat waktu.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Manajemen Role
+- Role `admin` dan `tenant` dengan redirect otomatis setelah login.
+- Middleware terpisah untuk masing-masing role.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+---
 
-## Agentic Development
+## Persyaratan Sistem
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+| Komponen | Versi |
+|---|---|
+| PHP | ^8.3 |
+| Composer | ^2.0 |
+| Node.js | ^20 atau ^22 |
+| NPM | ^9 atau ^10 |
+| Database | MySQL 8.0+ atau SQLite |
+| Ekstensi PHP | BCMath, Ctype, Fileinfo, JSON, Mbstring, OpenSSL, PDO, Tokenizer, XML |
+
+---
+
+## Instalasi
+
+### 1. Clone Repository
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone <url-repository> natakos
+cd natakos
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Install Dependencies
 
-## Contributing
+```bash
+composer install
+npm install --ignore-scripts
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. Konfigurasi Environment
 
-## Code of Conduct
+Salin file environment lalu sesuaikan pengaturan database:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## Security Vulnerabilities
+Buka `.env` dan sesuaikan:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=natakos
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## License
+> **Catatan**: Untuk pengembangan lokal, Anda bisa menggunakan SQLite dengan membiarkan `DB_CONNECTION=sqlite` dan membuat file `database/database.sqlite`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 4. Buat Database
+
+Buat database MySQL:
+
+```bash
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS natakos"
+```
+
+Atau jika menggunakan SQLite:
+
+```bash
+touch database/database.sqlite
+```
+
+### 5. Setup Storage Link
+
+```bash
+php artisan storage:link
+```
+
+Symlink `public/storage` → `storage/app/public` untuk akses foto kamar dan logo.
+
+### 6. Migrasi & Seeder
+
+```bash
+php artisan migrate --seed
+```
+
+Seeder akan membuat:
+- **12 fasilitas** (Kasur, AC, WiFi, Parkir, dll.)
+- **5 akun penghuni** (Andi, Budi, Citra, Dedi, Eka — password: `password`)
+- **1 akun admin** (email: `admin@ichikos.test`, password: `password`)
+- **8 kamar** dengan pembagian fasilitas
+- **5 penempatan penghuni** dengan riwayat
+- **7 catatan pembayaran** (berbagai status)
+
+### 7. Build Frontend
+
+```bash
+npm run build
+```
+
+### 8. Setup Queue Worker
+
+IchiKOS menggunakan database queue. Jalankan migrasi tabel queue:
+
+```bash
+php artisan queue:table
+php artisan migrate
+```
+
+### 9. Jalankan Aplikasi
+
+Untuk pengembangan:
+
+```bash
+composer dev
+```
+
+Perintah ini menjalankan 4 proses sekaligus:
+- `php artisan serve` — server HTTP di `http://localhost:8000`
+- `php artisan queue:listen` — worker queue
+- `php artisan pail` — log viewer real-time
+- `npm run dev` — Vite dev server (HMR)
+
+Atau manual:
+
+```bash
+php artisan serve &
+php artisan queue:listen --tries=1 --timeout=0 &
+npm run dev
+```
+
+### 10. Buka Aplikasi
+
+Akses di browser: **http://localhost:8000**
+
+---
+
+## Setup Cepat (Satu Perintah)
+
+```bash
+composer setup
+```
+
+Perintah ini menjalankan: `composer install` → buat `.env` → `key:generate` → `migrate --force` → `npm install --ignore-scripts` → `npm run build`.
+
+Setelah itu jalankan:
+
+```bash
+php artisan storage:link
+php artisan serve
+```
+
+---
+
+## Menjalankan Test
+
+```bash
+composer test
+```
+
+Test menggunakan in-memory SQLite, tidak memengaruhi database utama. Terdapat 13+ test yang mencakup:
+
+- Workflow pembayaran
+- Workflow penghuni
+- Room occupancy
+- Fitur publik
+
+---
+
+## Route Utama
+
+| URL | Role | Deskripsi |
+|---|---|---|
+| `/` | Publik | Beranda |
+| `/rooms` | Publik | Daftar kamar |
+| `/rooms/{room:slug}` | Publik | Detail kamar |
+| `/login` | Publik | Login |
+| `/register` | Publik | Register |
+| `/dashboard` | Semua | Dashboard (redirect by role) |
+| `/admin/*` | Admin | Manajemen kamar, fasilitas, penghuni, pembayaran |
+| `/tenant/*` | Penghuni | Dashboard penghuni |
+
+---
+
+## Tech Stack
+
+- **Backend**: Laravel 13, PHP 8.3
+- **Frontend**: Blade, Tailwind 4, Vite 8, Material Symbols
+- **Database**: MySQL (runtime), SQLite (test)
+- **Queue**: Database driver
+- **Storage**: Local `public` disk untuk gambar kamar & logo
+
+---
+
+## Lisensi
+
+MIT

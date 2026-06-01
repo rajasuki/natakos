@@ -41,12 +41,36 @@
 
                 <div class="field">
                     <label for="icon">Icon</label>
-                    <input id="icon" name="icon" type="text" value="{{ old('icon', $facility?->icon) }}" class="input" placeholder="Contoh: wifi, bed, camera">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <select id="icon" name="icon" class="select" style="flex:1;">
+                            <option value="">— Default —</option>
+                            @foreach ($iconOptions as $value => $label)
+                                <option value="{{ $value }}" @selected(old('icon', $facility?->icon) === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <span id="icon-preview" class="material-symbols-outlined" style="font-size:22px;color:var(--ui-body);width:32px;text-align:center;">
+                            {{ old('icon', $facility?->icon) ?: 'check_circle' }}
+                        </span>
+                    </div>
                     @if ($errorBag?->has('icon'))
                         <div class="field-error">{{ $errorBag->first('icon') }}</div>
                     @endif
-                    <div class="helper">Opsional. Isi nama icon jika ingin dipakai pada tahap UI berikutnya.</div>
+                    <div class="helper">Pilih icon yang mewakili fasilitas ini. Icon akan tampil di kartu kamar dan halaman publik.</div>
                 </div>
+
+                @push('scripts')
+                <script>
+                    (function() {
+                        var sel = document.getElementById('icon');
+                        var preview = document.getElementById('icon-preview');
+                        if (sel && preview) {
+                            sel.addEventListener('change', function() {
+                                preview.textContent = this.value || 'check_circle';
+                            });
+                        }
+                    })();
+                </script>
+                @endpush
             </div>
         </section>
 

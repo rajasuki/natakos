@@ -11,22 +11,6 @@
         default => 'info',
     };
     $totalImages = $room->images->count();
-
-    $facilityIconMap = [
-        'Kamar Mandi Dalam' => 'shower',
-        'Kasur' => 'bed',
-        'Lemari' => 'styler',
-        'Meja Belajar' => 'desk',
-        'Spring Bed' => 'bed',
-        'AC' => 'ac_unit',
-        'Kipas Angin' => 'mode_fan',
-        'TV' => 'tv',
-        'WiFi' => 'wifi',
-        'Parkiran' => 'local_parking',
-        'Parkir Motor' => 'local_parking',
-        'Dapur Bersama' => 'countertops',
-        'CCTV 24 Jam' => 'videocam',
-    ];
 @endphp
 
 @push('styles')
@@ -513,10 +497,10 @@
                                 <div class="detail-amenities-list">
                                     @foreach ($facilities as $facility)
                                         @php
-                                            $icon = $facilityIconMap[$facility->name] ?? $facility->icon ?? 'check_circle';
+                                            $fIcon = \App\Support\FacilityIcon::resolve($facility);
                                         @endphp
                                         <div class="detail-amenities-item">
-                                            <span class="material-symbols-outlined" style="color:{{ $type === 'room' ? 'var(--ui-accent)' : 'var(--ui-body)' }};">{{ $icon }}</span>
+                                            <span class="material-symbols-outlined" style="color:{{ $type === 'room' ? 'var(--ui-accent)' : 'var(--ui-body)' }};">{{ $fIcon }}</span>
                                             <span>{{ $facility->name }}</span>
                                         </div>
                                     @endforeach

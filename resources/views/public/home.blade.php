@@ -1259,33 +1259,6 @@
                         @php
                             $coverPath = $room->main_image ?: $room->images->first()?->image_path;
 
-                            $facilityIcons = [
-                                'AC' => 'ac_unit',
-                                'Kamar Mandi Dalam' => 'shower',
-                                'Kasur' => 'king_bed',
-                                'Lemari' => 'door_sliding',
-                                'Meja Belajar' => 'desk',
-                                'WiFi' => 'wifi',
-                                'Dapur Bersama' => 'kitchen',
-                                'Area Parkir' => 'local_parking',
-                                'CCTV' => 'videocam',
-                                'Ruang Tamu' => 'living',
-                                'Tempat Cuci' => 'local_laundry_service',
-                                'Kulkas' => 'kitchen',
-                                'TV' => 'tv',
-                                'Air Panas' => 'water_heater',
-                                'Spring Bed' => 'bed',
-                            ];
-
-                            $getIcon = function($name) use ($facilityIcons) {
-                                foreach ($facilityIcons as $key => $icon) {
-                                    if (str_contains(strtolower($name), strtolower($key))) {
-                                        return $icon;
-                                    }
-                                }
-                                return 'check_circle';
-                            };
-
                             $badgeClass = match ($room->status) {
                                 'available' => 'kamar-card-badge-success',
                                 'maintenance' => 'kamar-card-badge-warning',
@@ -1348,7 +1321,7 @@
                                     </span>
                                     @foreach ($room->facilities->take(3) as $facility)
                                         <span class="kamar-chip @if ($isOccupied) kamar-chip-muted @endif">
-                                            <span class="material-symbols-outlined">{{ $getIcon($facility->name) }}</span>
+                                            <span class="material-symbols-outlined">{{ \App\Support\FacilityIcon::resolve($facility) }}</span>
                                             {{ $facility->name }}
                                         </span>
                                     @endforeach
@@ -1381,38 +1354,6 @@
                 <p>IchiKOS mengelola kombinasi fasilitas kamar dan fasilitas umum agar kebutuhan harian penghuni tetap praktis.</p>
             </div>
 
-            @php
-                $facilityIcons = [
-                    'AC' => 'ac_unit',
-                    'Kamar Mandi Dalam' => 'shower',
-                    'Kasur' => 'king_bed',
-                    'Lemari' => 'door_sliding',
-                    'Meja Belajar' => 'desk',
-                    'WiFi' => 'wifi',
-                    'Dapur Bersama' => 'kitchen',
-                    'Area Parkir' => 'local_parking',
-                    'CCTV' => 'videocam',
-                    'Ruang Tamu' => 'living',
-                    'Tempat Cuci' => 'local_laundry_service',
-                    'Kulkas' => 'kitchen',
-                    'Kompor' => 'cooking',
-                    'TV' => 'tv',
-                    'AC' => 'ac_unit',
-                    'Air Panas' => 'water_heater',
-                    'Spring Bed' => 'bed',
-                    'Bantal' => 'pillow',
-                ];
-
-                $getIcon = function($name) use ($facilityIcons) {
-                    foreach ($facilityIcons as $key => $icon) {
-                        if (str_contains(strtolower($name), strtolower($key))) {
-                            return $icon;
-                        }
-                    }
-                    return 'check_circle';
-                };
-            @endphp
-
             <div class="fasilitas-grid">
                 @foreach ($facilityTypeLabels as $type => $label)
                     <div class="fasilitas-card">
@@ -1424,7 +1365,7 @@
                         <div class="fasilitas-list">
                             @forelse (($facilityGroups[$type] ?? collect()) as $facility)
                                 <div class="fasilitas-item">
-                                    <span class="material-symbols-outlined">{{ $getIcon($facility->name) }}</span>
+                                    <span class="material-symbols-outlined">{{ \App\Support\FacilityIcon::resolve($facility) }}</span>
                                     {{ $facility->name }}
                                 </div>
                             @empty

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Facility;
+use App\Support\FacilityIcon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ class FacilityController extends Controller
     {
         return view('admin.facilities.create', [
             'typeLabels' => $this->typeLabels(),
+            'iconOptions' => FacilityIcon::options(),
         ]);
     }
 
@@ -41,6 +43,7 @@ class FacilityController extends Controller
         return view('admin.facilities.edit', [
             'facility' => $facility,
             'typeLabels' => $this->typeLabels(),
+            'iconOptions' => FacilityIcon::options(),
         ]);
     }
 
@@ -73,6 +76,8 @@ class FacilityController extends Controller
      */
     private function validatedData(Request $request, ?Facility $facility = null): array
     {
+        $iconWhitelist = FacilityIcon::whitelist();
+
         return $request->validate([
             'name' => [
                 'required',
@@ -83,7 +88,7 @@ class FacilityController extends Controller
                     ->where(fn ($query) => $query->where('type', $request->string('type')->toString())),
             ],
             'type' => ['required', Rule::in(array_keys($this->typeLabels()))],
-            'icon' => ['nullable', 'string', 'max:100'],
+            'icon' => ['nullable', 'string', Rule::in($iconWhitelist)],
         ]);
     }
 

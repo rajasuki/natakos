@@ -784,27 +784,6 @@
                     @endif
 
                     @php
-                        $facilityIconMap = [
-                            'ac' => 'ac_unit',
-                            'kipas angin' => 'mode_fan',
-                            'lemari' => 'inventory_2',
-                            'tv' => 'tv',
-                            'wi-fi' => 'wifi',
-                            'wifi' => 'wifi',
-                            'kamar mandi dalam' => 'shower',
-                            'kamar mandi luar' => 'wc',
-                            'kasur' => 'king_bed',
-                            'meja' => 'table_restaurant',
-                            'kursi' => 'chair',
-                            'cctv' => 'videocam',
-                            'parkir' => 'local_parking',
-                            'dapur' => 'countertops',
-                            'air' => 'water_drop',
-                            'listrik' => 'bolt',
-                            'tamasy' => 'nest_eco',
-                            'taman' => 'nest_eco',
-                        ];
-
                         function facilityShortLabel($name) {
                             $lower = strtolower($name);
                             if (str_contains($lower, 'kamar mandi dalam')) return 'KM Dalam';
@@ -899,12 +878,8 @@
                                         @if ($displayFacilities->isNotEmpty())
                                             <div class="room-card-facilities">
                                                 @foreach ($displayFacilities as $facility)
-                                                    @php
-                                                        $fLower = strtolower($facility->name);
-                                                        $icon = $facilityIconMap[$fLower] ?? $facilityIconMap[explode(' ', $fLower)[0]] ?? 'check_circle';
-                                                    @endphp
                                                     <span class="room-card-facility">
-                                                        <span class="material-symbols-outlined">{{ $icon }}</span>
+                                                        <span class="material-symbols-outlined">{{ \App\Support\FacilityIcon::resolve($facility) }}</span>
                                                         {{ facilityShortLabel($facility->name) }}
                                                     </span>
                                                 @endforeach

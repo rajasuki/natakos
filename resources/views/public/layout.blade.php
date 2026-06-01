@@ -847,6 +847,27 @@
                  .room-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
                  .gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
              }
+
+             .facility-icon {
+                 width: 32px;
+                 height: 32px;
+                 display: inline-flex;
+                 align-items: center;
+                 justify-content: center;
+                 border-radius: 8px;
+                 font-size: 18px;
+                 background: var(--ui-soft);
+                 border: 1px solid var(--ui-border);
+                 color: var(--ui-body);
+                 flex-shrink: 0;
+             }
+
+             .facility-icon-sm {
+                 width: 22px;
+                 height: 22px;
+                 border-radius: 6px;
+                 font-size: 14px;
+             }
         </style>
 
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">

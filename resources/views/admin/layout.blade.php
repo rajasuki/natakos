@@ -891,6 +891,28 @@
                 background: var(--gray-50);
             }
 
+            /* ── FACILITY ICON ── */
+            .facility-icon {
+                width: 32px;
+                height: 32px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 8px;
+                font-size: 18px;
+                background: var(--gray-50);
+                border: 1px solid var(--ui-border);
+                color: var(--ui-body);
+                flex-shrink: 0;
+            }
+
+            .facility-icon-sm {
+                width: 22px;
+                height: 22px;
+                border-radius: 6px;
+                font-size: 14px;
+            }
+
             /* ── MISC ── */
             .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 

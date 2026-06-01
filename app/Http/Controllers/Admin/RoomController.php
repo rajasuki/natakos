@@ -112,12 +112,10 @@ class RoomController extends Controller
         $oldImage = $room->main_image;
         $data = $this->validatedData($request);
 
-        if (! empty($data['remove_main_image']) && $room->main_image) {
+        if ($request->boolean('remove_main_image') && $room->main_image) {
             $this->deleteImage($room->main_image);
             $room->update(['main_image' => null]);
         }
-
-        unset($data['remove_main_image']);
 
         RoomOccupancy::ensureStatusIsConsistent($data['status'], $room);
         $facilityIds = $this->extractFacilityIds($data);
@@ -128,6 +126,10 @@ class RoomController extends Controller
 
         if (array_key_exists('main_image', $data) && $oldImage !== $data['main_image']) {
             $this->deleteImage($oldImage);
+        }
+
+        if ($request->hasFile('gallery_photos')) {
+            $this->storeGalleryImages($request->file('gallery_photos'), $room);
         }
 
         return redirect()
@@ -184,7 +186,6 @@ class RoomController extends Controller
             'description' => ['nullable', 'string'],
             'status' => ['required', Rule::in(array_keys($this->statusLabels()))],
             'main_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'remove_main_image' => ['nullable', 'in:1'],
             'facility_ids' => ['nullable', 'array'],
             'facility_ids.*' => ['integer', 'distinct', Rule::exists('facilities', 'id')],
         ]);
@@ -329,6 +330,24 @@ class RoomController extends Controller
             'Terisi' => Room::query()->where('status', 'occupied')->count(),
             'Perbaikan' => Room::query()->where('status', 'maintenance')->count(),
         ];
+    }
+
+    /**
+     * @param  array<int, \Illuminate\Http\UploadedFile>  $photos
+     */
+    private function storeGalleryImages(array $photos, Room $room): void
+    {
+        $nextSortOrder = (int) ($room->images()->max('sort_order') ?? 0);
+
+        foreach ($photos as $photo) {
+            $path = $photo->store('room-images', 'public');
+            $nextSortOrder++;
+
+            $room->images()->create([
+                'image_path' => $path,
+                'sort_order' => $nextSortOrder,
+            ]);
+        }
     }
 
     private function deleteImage(?string $path): void

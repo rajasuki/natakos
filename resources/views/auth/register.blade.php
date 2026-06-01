@@ -152,8 +152,9 @@
             color: #111827;
         }
 
-        .password-icon[hidden] {
-            display: none;
+        .password-icon {
+            font-size: 22px;
+            line-height: 1;
         }
 
         .confirm-indicator {
@@ -386,17 +387,8 @@
                                         data-password-toggle
                                         data-target="password"
                                         aria-label="Tampilkan password"
-                                        aria-pressed="false"
                                     >
-                                        <svg data-icon="hidden" class="password-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                            <path d="M12 5C7.27273 5 3.25616 7.74026 1.5 12C3.25616 16.2597 7.27273 19 12 19C16.7273 19 20.7438 16.2597 22.5 12C20.7438 7.74026 16.7273 5 12 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                            <circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                        </svg>
-                                        <svg data-icon="shown" class="password-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" hidden>
-                                            <path d="M3 3L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                                            <path d="M12 5C7.27273 5 3.25616 7.74026 1.5 12C3.25616 16.2597 7.27273 19 12 19C16.7273 19 20.7438 16.2597 22.5 12C20.7438 7.74026 16.7273 5 12 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                            <circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                        </svg>
+                                        <span class="material-symbols-outlined password-icon">visibility</span>
                                     </button>
                                 </div>
                                 <div class="password-reqs" id="passwordReqs">
@@ -428,17 +420,8 @@
                                         data-password-toggle
                                         data-target="password_confirmation"
                                         aria-label="Tampilkan password"
-                                        aria-pressed="false"
                                     >
-                                        <svg data-icon="hidden" class="password-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                            <path d="M12 5C7.27273 5 3.25616 7.74026 1.5 12C3.25616 16.2597 7.27273 19 12 19C16.7273 19 20.7438 16.2597 22.5 12C20.7438 7.74026 16.7273 5 12 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                            <circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                        </svg>
-                                        <svg data-icon="shown" class="password-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" hidden>
-                                            <path d="M3 3L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                                            <path d="M12 5C7.27273 5 3.25616 7.74026 1.5 12C3.25616 16.2597 7.27273 19 12 19C16.7273 19 20.7438 16.2597 22.5 12C20.7438 7.74026 16.7273 5 12 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                            <circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                        </svg>
+                                        <span class="material-symbols-outlined password-icon">visibility</span>
                                     </button>
                                 </div>
                                 <div class="confirm-indicator" id="confirmIndicator"></div>
@@ -470,18 +453,14 @@
                     return;
                 }
 
-                const shouldShow = input.type === 'password';
-                input.type = shouldShow ? 'text' : 'password';
+                const isHidden = input.type === 'password';
+                input.type = isHidden ? 'text' : 'password';
 
-                button.setAttribute('aria-pressed', shouldShow ? 'true' : 'false');
-                button.setAttribute('aria-label', shouldShow ? 'Sembunyikan password' : 'Tampilkan password');
+                button.setAttribute('aria-label', isHidden ? 'Sembunyikan password' : 'Tampilkan password');
 
-                const hiddenIcon = button.querySelector('[data-icon="hidden"]');
-                const shownIcon = button.querySelector('[data-icon="shown"]');
-
-                if (hiddenIcon && shownIcon) {
-                    hiddenIcon.hidden = shouldShow;
-                    shownIcon.hidden = !shouldShow;
+                const icon = button.querySelector('.password-icon');
+                if (icon) {
+                    icon.textContent = isHidden ? 'visibility_off' : 'visibility';
                 }
             });
 
