@@ -135,6 +135,7 @@
         gap: 8px;
         color: var(--ui-body);
         font-size: 13px;
+        cursor: pointer;
     }
 
     .media-main-placeholder .material-symbols-outlined {
@@ -286,6 +287,27 @@
 
     .media-gallery-add .material-symbols-outlined {
         font-size: 24px;
+    }
+
+    .media-gallery-preview-new {
+        border-color: var(--ui-accent);
+        border-style: dashed;
+    }
+
+    .media-gallery-preview-new.is-uploading {
+        opacity: .6;
+        pointer-events: none;
+    }
+
+    .media-gallery-preview-new.is-uploading::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 8px;
+        background: rgba(74,124,89,.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>
 @endpush
@@ -449,25 +471,21 @@
                             <div class="media-main">
                                 @if ($currentImage)
                                     <img src="{{ asset('storage/'.$currentImage) }}" alt="{{ $room->name }}">
+                                    <div class="media-main-overlay">
+                                        <button type="button" class="media-main-btn media-main-btn-ubah" onclick="document.getElementById('main_image').click();">
+                                            <span class="material-symbols-outlined">folder</span>
+                                            Ubah
+                                        </button>
+                                        <button type="button" class="media-main-btn media-main-btn-hapus" onclick="if(confirm('Hapus foto utama ini?')){ document.getElementById('remove_main_image_flag').value='1'; document.getElementById('room-form').submit(); }">
+                                            <span class="material-symbols-outlined">close</span>
+                                        </button>
+                                    </div>
                                 @else
-                                    <div class="media-main-placeholder">
+                                    <div class="media-main-placeholder" onclick="document.getElementById('main_image').click();">
                                         <span class="material-symbols-outlined">image</span>
                                         <span>Belum ada foto utama</span>
                                     </div>
                                 @endif
-
-                                <div class="media-main-overlay">
-                                    <button type="button" class="media-main-btn media-main-btn-ubah" onclick="document.getElementById('main_image').click();">
-                                        <span class="material-symbols-outlined">folder</span>
-                                        Ubah
-                                    </button>
-
-                                    @if ($currentImage)
-                                        <button type="button" class="media-main-btn media-main-btn-hapus" onclick="if(confirm('Hapus foto utama ini?')){ document.getElementById('remove_main_image_flag').value='1'; document.getElementById('room-form').submit(); }">
-                                            <span class="material-symbols-outlined">close</span>
-                                        </button>
-                                    @endif
-                                </div>
                             </div>
 
                             <input id="main_image" name="main_image" type="file" accept="image/*" style="display:none;">
@@ -490,13 +508,13 @@
                                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
                                     <label style="font-size:13px;font-weight:600;color:var(--ui-ink);margin:0;">Galeri Foto</label>
                                     @if ($galleryImages->isNotEmpty())
-                                        <span class="muted" style="font-size:12px;">{{ $galleryImages->count() }} foto</span>
+                                        <span class="muted" style="font-size:12px;" id="gallery-count">{{ $galleryImages->count() }} foto</span>
                                     @endif
                                 </div>
 
-                                <div class="media-gallery-grid">
+                                <div class="media-gallery-grid" id="gallery-grid">
                                     @foreach ($galleryImages as $image)
-                                        <div class="media-gallery-item">
+                                        <div class="media-gallery-item" data-image-id="{{ $image->id }}">
                                             <img src="{{ asset('storage/'.$image->image_path) }}" alt="{{ $image->caption ?: 'Foto galeri' }}">
                                             <div class="media-gallery-item-overlay">
                                                 <form method="POST" action="{{ route('admin.rooms.images.destroy', [$room, $image]) }}" onsubmit="return confirm('Hapus foto galeri ini?');">
@@ -510,18 +528,17 @@
                                         </div>
                                     @endforeach
 
-                                    {{-- Add box --}}
-                                    <div class="media-gallery-add" onclick="document.getElementById('gallery_file_input').click();">
+                                    <div id="gallery-previews"></div>
+
+                                    <div class="media-gallery-add" id="gallery-add-box" onclick="document.getElementById('gallery_file_input').click();">
                                         <span class="material-symbols-outlined">add_photo_alternate</span>
                                         <span>Tambah Foto</span>
                                     </div>
                                 </div>
 
-                                <form method="POST" action="{{ route('admin.rooms.images.store', $room) }}" enctype="multipart/form-data" style="display:none;">
-                                    @csrf
-                                    <input type="file" name="images[]" accept="image/*" multiple id="gallery_file_input" onchange="this.closest('form').submit();">
-                                </form>
+                                <input type="file" accept="image/*" multiple id="gallery_file_input" hidden>
 
+                                <div id="gallery-upload-error" class="field-error" style="display:none;margin-top:8px;"></div>
                                 <div class="helper" style="margin-top:8px;">Format: JPG, JPEG, PNG, WEBP. Maks. 2MB per file.</div>
                             </div>
                         @endif
@@ -546,3 +563,193 @@
         </div>
     </form>
 </div>
+
+@push('scripts')
+<script>
+(function() {
+    /* ── Main image preview on file selection ── */
+    var mainInput = document.getElementById('main_image');
+    var mainContainer = document.querySelector('.media-main');
+    var mainPlaceholderHtml = mainContainer ? mainContainer.innerHTML : '';
+
+    if (mainInput && mainContainer) {
+        var hadImage = mainContainer.querySelector('img') !== null;
+
+        mainInput.addEventListener('change', function() {
+            var file = this.files[0];
+            if (!file) return;
+
+            if (['image/jpeg','image/png','image/webp'].indexOf(file.type) === -1) {
+                alert('Format tidak didukung. Hanya JPG, JPEG, PNG, WEBP.');
+                this.value = '';
+                return;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+                alert('File terlalu besar. Maksimal 2MB.');
+                this.value = '';
+                return;
+            }
+
+            var url = URL.createObjectURL(file);
+            var existingImg = mainContainer.querySelector('img');
+
+            if (existingImg) {
+                existingImg.src = url;
+            } else {
+                var img = document.createElement('img');
+                img.src = url;
+                img.alt = 'Preview';
+                var overlay = document.createElement('div');
+                overlay.className = 'media-main-overlay';
+                overlay.innerHTML = '' +
+                    '<button type="button" class="media-main-btn media-main-btn-ubah" onclick="document.getElementById(\'main_image\').click();">' +
+                    '<span class="material-symbols-outlined">folder</span> Ubah</button>' +
+                    '<button type="button" class="media-main-btn media-main-btn-hapus" onclick="if(confirm(\'Hapus foto utama ini?\')){ document.getElementById(\'remove_main_image_flag\').value=\'1\'; document.getElementById(\'room-form\').submit(); }">' +
+                    '<span class="material-symbols-outlined">close</span></button>';
+                mainContainer.innerHTML = '';
+                mainContainer.appendChild(img);
+                mainContainer.appendChild(overlay);
+            }
+        });
+    }
+
+    /* ── Gallery upload with preview ── */
+    var galleryInput = document.getElementById('gallery_file_input');
+    var previewContainer = document.getElementById('gallery-previews');
+    var errorEl = document.getElementById('gallery-upload-error');
+    var countEl = document.getElementById('gallery-count');
+    var grid = document.getElementById('gallery-grid');
+
+    if (!galleryInput || !previewContainer) return;
+
+    galleryInput.addEventListener('change', function() {
+        var files = Array.from(this.files);
+        if (files.length === 0) return;
+
+        errorEl.style.display = 'none';
+        errorEl.textContent = '';
+
+        /* Validate */
+        var validFiles = [];
+        var allowedTypes = ['image/jpeg','image/png','image/webp'];
+        var maxSize = 2 * 1024 * 1024;
+
+        for (var i = 0; i < files.length; i++) {
+            var f = files[i];
+            if (allowedTypes.indexOf(f.type) === -1) {
+                showError('Format tidak didukung: ' + f.name + '. Hanya JPG, JPEG, PNG, WEBP.');
+                continue;
+            }
+            if (f.size > maxSize) {
+                showError(f.name + ' melebihi batas 2MB.');
+                continue;
+            }
+            validFiles.push(f);
+        }
+
+        if (validFiles.length === 0) {
+            this.value = '';
+            return;
+        }
+
+        /* Show previews */
+        for (var j = 0; j < validFiles.length; j++) {
+            (function(file) {
+                var url = URL.createObjectURL(file);
+                var div = document.createElement('div');
+                div.className = 'media-gallery-item media-gallery-preview-new';
+                div.innerHTML = '<img src="'+url+'" alt="Preview">' +
+                    '<div class="media-gallery-item-overlay">' +
+                    '<button type="button" class="media-gallery-delete gallery-preview-remove" title="Hapus">' +
+                    '<span class="material-symbols-outlined">close</span></button></div>';
+                div.querySelector('.gallery-preview-remove').addEventListener('click', function() {
+                    URL.revokeObjectURL(url);
+                    div.remove();
+                });
+                previewContainer.appendChild(div);
+            })(validFiles[j]);
+        }
+
+        var firstPreview = previewContainer.querySelector('.media-gallery-preview-new');
+        if (firstPreview) firstPreview.classList.add('is-uploading');
+
+        /* Upload via fetch */
+        var formData = new FormData();
+        for (var k = 0; k < validFiles.length; k++) {
+            formData.append('images[]', validFiles[k]);
+        }
+        formData.append('_token', '{{ csrf_token() }}');
+
+        fetch('{{ route('admin.rooms.images.store', $room) }}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+            },
+            body: formData,
+        })
+        .then(function(res) {
+            if (!res.ok) {
+                return res.json().then(function(err) {
+                    throw new Error(err.message || 'Upload gagal');
+                });
+            }
+            return res.json();
+        })
+        .then(function(data) {
+            if (data.success) {
+                previewContainer.innerHTML = '';
+                for (var m = 0; m < data.images.length; m++) {
+                    var img = data.images[m];
+                    var item = document.createElement('div');
+                    item.className = 'media-gallery-item';
+                    item.dataset.imageId = img.id;
+                    item.innerHTML = '<img src="'+img.image_path+'" alt="Foto galeri">' +
+                        '<div class="media-gallery-item-overlay">' +
+                        '<form method="POST" action="'+img.delete_url+'" onsubmit="return confirm(\'Hapus foto galeri ini?\');" style="display:inline;">' +
+                        '<input type="hidden" name="_token" value="{{ csrf_token() }}">' +
+                        '<input type="hidden" name="_method" value="DELETE">' +
+                        '<button type="submit" class="media-gallery-delete" title="Hapus">' +
+                        '<span class="material-symbols-outlined">close</span></button></form></div>';
+                    previewContainer.appendChild(item);
+                }
+                updateCount();
+            } else {
+                showError(data.message || 'Upload gagal.');
+                previewContainer.innerHTML = '';
+            }
+        })
+        .catch(function(err) {
+            showError(err.message || 'Upload gagal. Silakan coba lagi.');
+            previewContainer.innerHTML = '';
+        });
+
+        this.value = '';
+    });
+
+    function showError(msg) {
+        errorEl.textContent = msg;
+        errorEl.style.display = 'block';
+    }
+
+    function updateCount() {
+        var items = grid ? grid.querySelectorAll('.media-gallery-item[data-image-id]') : [];
+        var total = items.length + (previewContainer ? previewContainer.querySelectorAll('[data-image-id]').length : 0);
+        if (countEl) {
+            countEl.textContent = total + ' foto';
+        } else if (total > 0) {
+            var header = document.querySelector('#gallery-grid').previousElementSibling;
+            if (header) {
+                var span = document.createElement('span');
+                span.className = 'muted';
+                span.id = 'gallery-count';
+                span.style.fontSize = '12px';
+                span.textContent = total + ' foto';
+                header.appendChild(span);
+                countEl = span;
+            }
+        }
+    }
+})();
+</script>
+@endpush

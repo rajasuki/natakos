@@ -24,7 +24,7 @@ class RoomImageController extends Controller
         ]);
     }
 
-    public function store(Request $request, Room $room): RedirectResponse
+    public function store(Request $request, Room $room): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
             'images' => ['required', 'array', 'min:1'],
@@ -36,21 +36,23 @@ class RoomImageController extends Controller
         $caption = trim((string) ($data['caption'] ?? ''));
         $caption = $caption !== '' ? $caption : null;
         $nextSortOrder = (int) ($room->images()->max('sort_order') ?? 0);
+        $newImageIds = [];
 
         try {
             foreach ($data['images'] as $uploadedImage) {
                 $storedPaths[] = $uploadedImage->store('room-images', 'public');
             }
 
-            DB::transaction(function () use ($room, $storedPaths, $caption, &$nextSortOrder) {
+            DB::transaction(function () use ($room, $storedPaths, $caption, &$nextSortOrder, &$newImageIds) {
                 foreach ($storedPaths as $path) {
                     $nextSortOrder++;
 
-                    $room->images()->create([
+                    $image = $room->images()->create([
                         'image_path' => $path,
                         'caption' => $caption,
                         'sort_order' => $nextSortOrder,
                     ]);
+                    $newImageIds[] = $image->id;
                 }
             });
         } catch (Throwable) {
@@ -58,9 +60,25 @@ class RoomImageController extends Controller
                 $this->deleteImage($path);
             }
 
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Foto galeri gagal diunggah. Silakan coba lagi.'], 500);
+            }
+
             return redirect()
                 ->route('admin.rooms.edit', $room)
                 ->with('error', 'Foto galeri gagal diunggah. Silakan coba lagi.');
+        }
+
+        if ($request->ajax()) {
+            $newImages = RoomImage::whereIn('id', $newImageIds)
+                ->get()
+                ->map(fn ($img) => [
+                    'id' => $img->id,
+                    'image_path' => asset('storage/'.$img->image_path),
+                    'delete_url' => route('admin.rooms.images.destroy', [$room, $img]),
+                ]);
+
+            return response()->json(['success' => true, 'images' => $newImages]);
         }
 
         $uploadedCount = count($storedPaths);
