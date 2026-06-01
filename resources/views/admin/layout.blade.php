@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>@yield('title', 'Admin') - NATAKOS</title>
+        <title>@yield('title', 'Admin') - IchiKOS</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -129,8 +129,12 @@
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 font-size: 22px;
-                font-weight: 700;
+                font-weight: 400;
                 line-height: 1;
+            }
+
+            .brand-text strong {
+                font-weight: 700;
             }
 
             .nav-links {

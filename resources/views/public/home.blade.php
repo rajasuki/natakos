@@ -548,7 +548,7 @@
                                         <div>
                                             <h3 class="room-title">{{ $room->name }}</h3>
                                             <p class="room-copy">
-                                                {{ $room->description ?: 'Kamar ini sudah tercatat di NATAKOS dan siap Anda cek lebih lanjut melalui halaman detail.' }}
+                                                {{ $room->description ?: 'Kamar ini sudah tercatat di IchiKOS dan siap Anda cek lebih lanjut melalui halaman detail.' }}
                                             </p>
                                         </div>
                                     </div>
@@ -584,7 +584,7 @@
                         <p class="eyebrow">Fasilitas</p>
                         <h2 class="section-title">Fasilitas yang membuat tinggal lebih nyaman</h2>
                         <p class="section-copy section-copy-on-dark">
-                            NATAKOS mengelola kombinasi fasilitas kamar dan fasilitas umum
+                            IchiKOS mengelola kombinasi fasilitas kamar dan fasilitas umum
                             agar kebutuhan harian penghuni tetap praktis.
                         </p>
                     </div>

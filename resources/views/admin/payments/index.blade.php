@@ -3,7 +3,7 @@
 @section('title', 'Pembayaran')
 @section('eyebrow', 'Admin Pembayaran')
 @section('page_title', 'Kelola pembayaran manual')
-@section('page_description', 'Catat tagihan, atur tenggat bayar, dan verifikasi pembayaran manual penghuni NATAKOS dari dashboard admin.')
+@section('page_description', 'Catat tagihan, atur tenggat bayar, dan verifikasi pembayaran manual penghuni IchiKOS dari dashboard admin.')
 
 @section('page_actions')
     <a href="{{ route('admin.payments.create') }}" class="button button-primary">Tambah pembayaran</a>

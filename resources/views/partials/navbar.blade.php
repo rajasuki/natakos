@@ -3,8 +3,13 @@
     <div class="site-shell header-row">
 
         <a href="{{ route('home') }}" class="brand-link">
-            <span class="brand-mark">{{ strtoupper(mb_substr($profile['name'] ?? 'N', 0, 1)) }}</span>
-            <span class="brand-text">{{ $profile['name'] ?? 'NATAKOS' }}</span>
+            <span class="brand-mark">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9.5L12 3l9 6.5V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/>
+                    <path d="M9 21V12h6v9"/>
+                </svg>
+            </span>
+            <span class="brand-text">Ichi<strong>KOS</strong></span>
         </a>
 
         <nav class="nav-links desktop-nav" aria-label="Navigasi">

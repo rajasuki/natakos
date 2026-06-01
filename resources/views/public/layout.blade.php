@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>@yield('title', 'NATAKOS')</title>
+        <title>@yield('title', 'IchiKOS')</title>
 
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -104,14 +104,18 @@
               }
 
               .brand-text {
-                 min-width: 0;
-                 overflow: hidden;
-                 text-overflow: ellipsis;
-                 white-space: nowrap;
-                 font-size: 22px;
-                 font-weight: 700;
-                 line-height: 1;
-              }
+                  min-width: 0;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                  font-size: 22px;
+                  font-weight: 400;
+                  line-height: 1;
+               }
+
+              .brand-text strong {
+                  font-weight: 700;
+               }
 
               /* ── Nav ───────────────────────────────── */
               .nav-links {

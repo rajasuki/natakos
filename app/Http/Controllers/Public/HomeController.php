@@ -71,14 +71,14 @@ class HomeController extends Controller
             ->all();
 
         return [
-            'name' => $profile?->name ?: 'NATAKOS',
-            'description' => $profile?->description ?: 'NATAKOS menghadirkan kamar kos yang rapi, terkelola, dan siap mendukung rutinitas harian penghuni dengan sistem manajemen yang jelas.',
+            'name' => $profile?->name ?: 'IchiKOS',
+            'description' => $profile?->description ?: 'IchiKOS menghadirkan kamar kos yang rapi, terkelola, dan siap mendukung rutinitas harian penghuni dengan sistem manajemen yang jelas.',
             'address' => $profile?->address ?: 'Alamat kos belum diatur.',
             'whatsapp_number' => $whatsappNumber,
             'google_maps_url' => $profile?->google_maps_url,
             'google_maps_embed_url' => $profile?->google_maps_embed_url,
             'nearby_places' => $nearbyPlaces,
-            'whatsapp_url' => WhatsappLink::build($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di NATAKOS.'),
+            'whatsapp_url' => WhatsappLink::build($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di IchiKOS.'),
         ];
     }
 

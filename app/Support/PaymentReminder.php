@@ -25,7 +25,7 @@ class PaymentReminder
             .' sebesar '.UiFormatter::currency($amount)
             .' untuk periode '.UiFormatter::date($periodStart).' s/d '.UiFormatter::date($periodEnd)
             .'. Tenggat pembayaran: '.UiFormatter::date($dueDate)
-            .'. Mohon konfirmasi pembayaran kepada pengelola NATAKOS. Terima kasih.'
+            .'. Mohon konfirmasi pembayaran kepada pengelola IchiKOS. Terima kasih.'
         );
     }
 }

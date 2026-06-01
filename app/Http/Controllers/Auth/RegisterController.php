@@ -68,11 +68,11 @@ class RegisterController extends Controller
         $whatsappNumber = WhatsappLink::normalizeNumber($profile?->whatsapp_number);
 
         return [
-            'name' => $profile?->name ?: 'NATAKOS',
-            'description' => $profile?->description ?: 'NATAKOS menghadirkan kamar kos yang rapi, terkelola, dan siap mendukung rutinitas harian penghuni dengan sistem manajemen yang jelas.',
+            'name' => $profile?->name ?: 'IchiKOS',
+            'description' => $profile?->description ?: 'IchiKOS menghadirkan kamar kos yang rapi, terkelola, dan siap mendukung rutinitas harian penghuni dengan sistem manajemen yang jelas.',
             'address' => $profile?->address ?: 'Alamat kos belum diatur.',
             'whatsapp_number' => $whatsappNumber,
-            'whatsapp_url' => WhatsappLink::build($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di NATAKOS.'),
+            'whatsapp_url' => WhatsappLink::build($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di IchiKOS.'),
         ];
     }
 }

@@ -3,7 +3,7 @@
 @section('title', 'Fasilitas')
 @section('eyebrow', 'Admin Fasilitas')
 @section('page_title', 'Kelola fasilitas')
-@section('page_description', 'Atur daftar fasilitas kamar dan fasilitas umum yang tersedia di NATAKOS.')
+@section('page_description', 'Atur daftar fasilitas kamar dan fasilitas umum yang tersedia di IchiKOS.')
 
 @section('page_actions')
     <a href="{{ route('admin.facilities.create') }}" class="button button-primary">Tambah fasilitas</a>
