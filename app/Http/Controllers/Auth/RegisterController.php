@@ -73,6 +73,8 @@ class RegisterController extends Controller
             'address' => $profile?->address ?: 'Alamat kos belum diatur.',
             'whatsapp_number' => $whatsappNumber,
             'whatsapp_url' => WhatsappLink::build($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di IchiKOS.'),
+            'email' => 'shyannuar24@gmail.com',
+            'owner_name' => 'Ibu Icih',
         ];
     }
 }

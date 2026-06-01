@@ -191,151 +191,856 @@
         }
 
         /* ── Map section redesign ──────────────── */
-        #lokasi .detail-grid {
-            max-width: 640px;
-            margin: 0 auto;
+        .lokasi-grid {
+            display: grid;
             grid-template-columns: 1fr;
-            gap: 20px;
+            gap: 24px;
+            align-items: stretch;
         }
 
-        #lokasi .detail-card {
-            background: var(--ui-canvas);
+        @media (min-width: 1024px) {
+            .lokasi-grid {
+                grid-template-columns: 8fr 4fr;
+            }
+        }
+
+        .lokasi-card {
+            background: #fff;
             border: 1px solid var(--ui-border);
-            border-radius: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Map card ── */
+        .lokasi-map-frame {
+            width: 100%;
+            min-height: 400px;
+            background: var(--ui-soft);
+            position: relative;
             overflow: hidden;
         }
 
-        #lokasi .map-embed,
-        #lokasi .map-placeholder {
+        .lokasi-map-frame iframe,
+        .lokasi-map-frame .map-placeholder {
             width: 100%;
-            min-height: 320px;
+            height: 100%;
+            min-height: 400px;
             border: 0;
             display: block;
+        }
+
+        .lokasi-map-frame .map-placeholder {
+            display: grid;
+            align-items: center;
+            justify-items: center;
+            padding: 32px;
+            text-align: center;
+        }
+
+        .lokasi-map-actions {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .lokasi-map-actions button {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border: 1px solid var(--ui-border);
+            border-radius: 6px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--ui-ink);
+            transition: background .15s;
+        }
+
+        .lokasi-map-actions button:hover {
             background: var(--ui-soft);
         }
 
-        #lokasi .map-placeholder {
-            display: grid;
-            align-items: center;
-            padding: 32px;
+        .lokasi-map-actions button .material-symbols-outlined {
+            font-size: 20px;
         }
 
-        #lokasi .detail-body {
-            padding: 20px 24px;
-        }
-
-        #lokasi .detail-address {
+        .lokasi-map-info {
+            padding: 24px;
+            border-top: 1px solid var(--ui-border);
             display: flex;
-            gap: 10px;
             align-items: flex-start;
+            gap: 16px;
         }
 
-        #lokasi .detail-address svg {
+        .lokasi-map-pin {
             flex-shrink: 0;
-            width: 18px;
-            height: 18px;
-            margin-top: 3px;
-            color: var(--ui-accent);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--ui-accent);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
         }
 
-        #lokasi .detail-address-text {
+        .lokasi-map-pin .material-symbols-outlined {
+            font-size: 22px;
+            font-variation-settings: 'FILL' 1;
+        }
+
+        .lokasi-map-address h3 {
+            margin: 0 0 4px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--ui-ink);
+        }
+
+        .lokasi-map-address p {
+            margin: 0;
             font-size: 14px;
-            line-height: 1.7;
+            line-height: 1.6;
             color: var(--ui-body);
         }
 
-        #lokasi .feature-card {
-            background: var(--ui-canvas);
-            border: 1px solid var(--ui-border);
-            border-radius: 20px;
-            padding: 24px;
+        .lokasi-map-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
         }
 
-        #lokasi .feature-card .eyebrow {
-            margin-bottom: 6px;
+        .lokasi-map-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--ui-soft);
+            color: var(--ui-body);
         }
 
-        #lokasi .feature-card .room-title {
-            font-size: 18px;
-            margin-bottom: 0;
-        }
-
-        #lokasi .nearby-list {
-            display: grid;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        #lokasi .nearby-item {
+        /* ── Nearby card ── */
+        .lokasi-nearby-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            padding: 12px 16px;
+            padding: 16px;
             background: var(--ui-soft);
-            border-radius: 12px;
+            border-bottom: 1px solid var(--ui-border);
         }
 
-        #lokasi .nearby-item-left {
+        .lokasi-nearby-header h3 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ui-ink);
+        }
+
+        .lokasi-nearby-header .material-symbols-outlined {
+            font-size: 20px;
+            color: var(--ui-body);
+        }
+
+        .lokasi-nearby-list {
+            padding: 16px;
             display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 0;
+            flex-direction: column;
+            gap: 8px;
             flex: 1;
         }
 
-        #lokasi .nearby-marker {
+        .lokasi-nearby-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 6px;
+            background: var(--ui-softer);
+            transition: background .15s, border-color .15s;
+            border: 1px solid transparent;
+        }
+
+        .lokasi-nearby-item:hover {
+            background: #e6e8ea;
+            border-color: var(--ui-border);
+        }
+
+        .lokasi-nearby-icon {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: #fff;
+            border: 1px solid var(--ui-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lokasi-nearby-icon .material-symbols-outlined {
+            font-size: 24px;
+        }
+
+        .lokasi-nearby-icon.icon-primary .material-symbols-outlined { color: var(--ui-accent); }
+        .lokasi-nearby-icon.icon-tertiary .material-symbols-outlined { color: #4A7C59; }
+        .lokasi-nearby-icon.icon-error .material-symbols-outlined { color: #dc2626; }
+        .lokasi-nearby-icon.icon-warning .material-symbols-outlined { color: #d97706; }
+        .lokasi-nearby-icon.icon-secondary .material-symbols-outlined { color: var(--ui-body); }
+
+        .lokasi-nearby-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .lokasi-nearby-name {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ui-ink);
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+
+        .lokasi-nearby-category {
+            display: block;
+            font-size: 12px;
+            color: var(--ui-body);
+        }
+
+        .lokasi-nearby-distance {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            text-align: right;
+        }
+
+        .lokasi-nearby-distance .material-symbols-outlined {
+            font-size: 16px;
+            color: #059669;
+        }
+
+        .lokasi-nearby-distance span {
+            font-size: 12px;
+            font-weight: 500;
+            color: #059669;
+        }
+
+        .lokasi-nearby-empty {
+            padding: 32px;
+            text-align: center;
+            color: var(--ui-body);
+            font-size: 13px;
+        }
+
+        /* ── Fasilitas cards ──────────────────────── */
+        .fasilitas-section {
+            padding: 48px 16px;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .fasilitas-section { padding: 48px 24px; }
+        }
+
+        .fasilitas-header {
+            max-width: 896px;
+            margin: 0 auto 32px;
+            text-align: center;
+        }
+
+        .fasilitas-header h2 {
+            margin: 0 0 8px;
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--ui-ink);
+        }
+
+        .fasilitas-header p {
+            margin: 0;
+            font-size: 16px;
+            color: var(--ui-body);
+            line-height: 1.6;
+        }
+
+        .fasilitas-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            max-width: 1024px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .fasilitas-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .fasilitas-card {
+            background: #fff;
+            border: 1px solid var(--ui-border);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,.05);
+            transition: box-shadow .2s;
+        }
+
+        .fasilitas-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -2px rgba(0,0,0,.1);
+        }
+
+        .fasilitas-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--ui-border);
+        }
+
+        .fasilitas-card-header .material-symbols-outlined {
+            color: var(--ui-accent);
+            font-size: 24px;
+            font-variation-settings: 'FILL' 1;
+        }
+
+        .fasilitas-card-header h3 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--ui-ink);
+        }
+
+        .fasilitas-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 640px) {
+            .fasilitas-list { grid-template-columns: 1fr 1fr; }
+        }
+
+        .fasilitas-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--ui-body);
+            font-size: 14px;
+        }
+
+        .fasilitas-item .material-symbols-outlined {
+            color: var(--ui-accent);
+            opacity: .8;
+            font-size: 20px;
+        }
+
+        /* ── Kontak CTA ──────────────────────────── */
+        .kontak-cta {
+            background: var(--ui-ink);
+            padding: 48px 16px;
+            margin-top: 0;
+        }
+
+        @media (min-width: 768px) {
+            .kontak-cta { padding: 48px 24px; }
+        }
+
+        .kontak-cta-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 32px;
+        }
+
+        @media (min-width: 768px) {
+            .kontak-cta-inner { flex-direction: row; }
+        }
+
+        .kontak-cta-text {
+            text-align: center;
+            flex: 1;
+        }
+
+        @media (min-width: 768px) {
+            .kontak-cta-text { text-align: left; }
+        }
+
+        .kontak-cta-text h2 {
+            margin: 0 0 8px;
+            font-size: 28px;
+            font-weight: 400;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        .kontak-cta-text p {
+            margin: 0;
+            font-size: 16px;
+            color: rgba(255,255,255,.8);
+            line-height: 1.6;
+            max-width: 540px;
+        }
+
+        .kontak-cta-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex-shrink: 0;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .kontak-cta-actions { flex-direction: row; width: auto; }
+        }
+
+        .kontak-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 999px;
+            gap: 8px;
+            padding: 16px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all .15s;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .kontak-btn-primary {
             background: var(--ui-accent);
             color: #fff;
+            border: 0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -2px rgba(0,0,0,.1);
+        }
+
+        .kontak-btn-primary:hover {
+            background: var(--ui-accent-hover);
+        }
+
+        .kontak-btn-outline {
+            background: transparent;
+            color: rgba(255,255,255,.8);
+            border: 2px solid rgba(255,255,255,.3);
+        }
+
+        .kontak-btn-outline:hover {
+            background: rgba(255,255,255,.1);
+            border-color: rgba(255,255,255,.5);
+        }
+
+        .kontak-btn .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        /* ── Kamar section ──────────────────────── */
+        .kamar-section {
+            padding: 48px 16px;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .kamar-section { padding: 48px 24px; }
+        }
+
+        .kamar-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .kamar-header-left {
+            max-width: 640px;
+        }
+
+        .kamar-eyebrow {
+            display: block;
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 500;
+            color: var(--ui-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .kamar-title {
+            margin: 0 0 8px;
+            font-size: 32px;
+            font-weight: 400;
+            color: var(--ui-ink);
+        }
+
+        .kamar-desc {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--ui-body);
+        }
+
+        .kamar-header-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+            background: var(--ui-accent);
+            border: 0;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background .15s;
             flex-shrink: 0;
         }
 
-        #lokasi .nearby-name {
-            font-size: 14px;
-            font-weight: 600;
-            line-height: 1.3;
-            color: var(--ui-ink);
+        .kamar-header-btn:hover {
+            background: var(--ui-accent-hover);
+        }
+
+        .kamar-header-btn .material-symbols-outlined {
+            font-size: 18px;
+        }
+
+        .kamar-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 768px) {
+            .kamar-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (min-width: 1024px) {
+            .kamar-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .kamar-card {
+            background: #fff;
+            border: 1px solid var(--ui-border);
+            border-radius: 6px;
             overflow: hidden;
-            text-overflow: ellipsis;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow .3s;
+        }
+
+        .kamar-card:hover {
+            box-shadow: 0 4px 20px rgba(26,28,30,.08);
+        }
+
+        .kamar-card-img-wrap {
+            position: relative;
+            height: 192px;
+            overflow: hidden;
+            background: #e1e3e6;
+        }
+
+        .kamar-card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .5s;
+        }
+
+        .kamar-card:hover .kamar-card-img {
+            transform: scale(1.05);
+        }
+
+        .kamar-card-img-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: var(--ui-body);
+            background: var(--ui-soft);
+        }
+
+        .kamar-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,.12);
+            mix-blend-mode: multiply;
+        }
+
+        .kamar-card-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .kamar-card-badge .material-symbols-outlined {
+            font-size: 14px;
+        }
+
+        .kamar-card-badge-success {
+            background: #d1fae5;
+            color: #064e3b;
+        }
+
+        .kamar-card-badge-warning {
+            background: #fef3c7;
+            color: #78350f;
+        }
+
+        .kamar-card-badge-default {
+            background: #eceef0;
+            color: var(--ui-body);
+            border: 1px solid var(--ui-border);
+        }
+
+        .kamar-card-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .kamar-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .kamar-card-name {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--ui-ink);
+            line-height: 1.27;
+        }
+
+        .kamar-card-name-muted {
+            color: var(--ui-body);
+        }
+
+        .kamar-card-price {
+            text-align: right;
+        }
+
+        .kamar-card-price-value {
+            display: block;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--ui-accent);
+            white-space: nowrap;
+        }
+
+        .kamar-card-price-period {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--ui-body);
+        }
+
+        .kamar-card-desc {
+            margin: 0 0 16px;
+            font-size: 14px;
+            line-height: 1.43;
+            color: var(--ui-body);
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        #lokasi .nearby-estimate {
+        .kamar-card-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: auto;
+            margin-bottom: 16px;
+        }
+
+        .kamar-chip {
             display: inline-flex;
             align-items: center;
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: var(--ui-ink);
-            color: var(--ui-canvas);
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 4px;
             font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        #lokasi .nearby-empty {
-            padding: 24px;
-            text-align: center;
+            font-weight: 500;
+            color: var(--ui-body);
             background: var(--ui-soft);
-            border-radius: 12px;
+            border: 1px solid var(--ui-border);
         }
 
-        #lokasi .nearby-empty .muted {
-            margin: 0;
+        .kamar-chip .material-symbols-outlined {
+            font-size: 14px;
         }
 
-        #lokasi .detail-copy {
-            display: none;
+        .kamar-chip-muted {
+            opacity: .8;
+            background: #fff;
+        }
+
+        .kamar-card-footer {
+            border-top: 1px solid var(--ui-border);
+            padding-top: 16px;
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .kamar-btn-detail {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            width: 100%;
+            padding: 8px 16px;
+            border: 1px solid var(--ui-border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ui-accent);
+            background: var(--ui-soft);
+            cursor: pointer;
+            text-decoration: none;
+            transition: background .15s;
+        }
+
+        .kamar-btn-detail:hover {
+            background: #eceef0;
+        }
+
+        .kamar-btn-disabled {
+            background: #eceef0;
+            color: var(--ui-body);
+            border: 1px solid var(--ui-border);
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .kamar-card-footer-note {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            color: #73777f;
+            text-align: center;
+        }
+
+        .kamar-card-footer-note-invisible {
+            visibility: hidden;
+        }
+
+        /* ── Kamar empty state ──────────────────── */
+        .kamar-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+            text-align: center;
+            background: #fff;
+            border: 1px solid var(--ui-border);
+            border-radius: 6px;
+            margin-top: 32px;
+        }
+
+        .kamar-empty-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--ui-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .kamar-empty-icon .material-symbols-outlined {
+            font-size: 48px;
+            color: var(--ui-body);
+        }
+
+        .kamar-empty h3 {
+            margin: 0 0 8px;
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--ui-ink);
+        }
+
+        .kamar-empty p {
+            margin: 0 0 24px;
+            font-size: 16px;
+            color: var(--ui-body);
+            line-height: 1.6;
+            max-width: 480px;
+        }
+
+        .kamar-empty-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        @media (min-width: 640px) {
+            .kamar-empty-actions { flex-direction: row; }
+        }
+
+        .kamar-empty-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .kamar-empty-btn-primary {
+            background: var(--ui-accent);
+            color: #fff;
+            border: 0;
+        }
+
+        .kamar-empty-btn-primary:hover {
+            background: var(--ui-accent-hover);
+        }
+
+        .kamar-empty-btn-secondary {
+            background: var(--ui-soft);
+            color: var(--ui-body);
+            border: 1px solid var(--ui-border);
+        }
+
+        .kamar-empty-btn-secondary:hover {
+            background: #d4e3d6;
         }
     </style>
 @endpush
@@ -417,235 +1122,343 @@
                     </div>
                 </div>
 
-                <div class="detail-grid">
+                <div class="lokasi-grid">
 
-                    <article class="detail-card">
-                        @if ($profile['google_maps_embed_url'])
-                            <iframe
-                                src="{{ $profile['google_maps_embed_url'] }}"
-                                class="map-embed"
-                                loading="lazy"
-                                allowfullscreen
-                                referrerpolicy="no-referrer-when-downgrade"
-                                title="Lokasi {{ $profile['name'] }} di Google Maps"
-                            ></iframe>
-                        @else
-                            <div class="map-placeholder">
-                                <div>
-                                    <p class="eyebrow">Google Maps</p>
-                                    <h3 class="room-title">Map embed belum diatur</h3>
-                                    <p class="room-copy">
-                                        Tambahkan Google Maps Embed URL lewat file
-                                        supaya peta tampil langsung di halaman ini.
-                                    </p>
+                    {{-- ── Map Card ── --}}
+                    <div class="lokasi-card">
+                        <div class="lokasi-map-frame">
+                            @if ($profile['google_maps_embed_url'])
+                                <iframe
+                                    src="{{ $profile['google_maps_embed_url'] }}"
+                                    loading="lazy"
+                                    allowfullscreen
+                                    referrerpolicy="no-referrer-when-downgrade"
+                                    title="Lokasi {{ $profile['name'] }} di Google Maps"
+                                ></iframe>
+                            @else
+                                <div class="map-placeholder">
+                                    <div>
+                                        <p class="eyebrow">Google Maps</p>
+                                        <h3 class="room-title">Map embed belum diatur</h3>
+                                        <p class="room-copy">
+                                            Tambahkan Google Maps Embed URL lewat file
+                                            supaya peta tampil langsung di halaman ini.
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        @endif
+                            @endif
 
-                        <div class="detail-body">
-                            <div class="detail-address">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                <span class="detail-address-text">{{ $profile['address'] }}</span>
+                            <div class="lokasi-map-actions">
+                                <button type="button" aria-label="Perbesar peta">
+                                    <span class="material-symbols-outlined">add</span>
+                                </button>
+                                <button type="button" aria-label="Perkecil peta">
+                                    <span class="material-symbols-outlined">remove</span>
+                                </button>
                             </div>
                         </div>
-                    </article>
 
-                    <article class="feature-card">
-                        <p class="eyebrow">Dekat ke mana aja</p>
-                        <h3 class="room-title">Tempat sekitar</h3>
+                        <div class="lokasi-map-info">
+                            <div class="lokasi-map-pin">
+                                <span class="material-symbols-outlined">location_on</span>
+                            </div>
+                            <div class="lokasi-map-address">
+                                <h3>{{ $profile['name'] }}</h3>
+                                <p>{{ $profile['address'] }}</p>
+                                <div class="lokasi-map-tags">
+                                    <span class="lokasi-map-tag">Pusat Kota</span>
+                                    <span class="lokasi-map-tag">Akses Mudah</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                        <div class="nearby-list">
+                    {{-- ── Nearby Places Card ── --}}
+                    <div class="lokasi-card">
+                        <div class="lokasi-nearby-header">
+                            <h3>Fasilitas Terdekat</h3>
+                            <span class="material-symbols-outlined">explore</span>
+                        </div>
+
+                        <div class="lokasi-nearby-list">
+                            @php
+                                $categories = [
+                                    'Institut Teknologi Nasional' => ['icon' => 'school', 'class' => 'icon-primary', 'cat' => 'Universitas'],
+                                    'Masjid Al-Muawanah' => ['icon' => 'mosque', 'class' => 'icon-tertiary', 'cat' => 'Tempat Ibadah'],
+                                    'Rumah Sakit Kartini Bandung' => ['icon' => 'local_hospital', 'class' => 'icon-error', 'cat' => 'Kesehatan'],
+                                    'Gedung Sate' => ['icon' => 'account_balance', 'class' => 'icon-warning', 'cat' => 'Wisata & Budaya'],
+                                    'Bandung Electronics Center' => ['icon' => 'shopping_bag', 'class' => 'icon-secondary', 'cat' => 'Perbelanjaan'],
+                                ];
+                            @endphp
+
                             @forelse ($profile['nearby_places'] as $place)
-                                <div class="nearby-item">
-                                    <div class="nearby-item-left">
-                                        <span class="nearby-marker">
-                                            {{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}
-                                        </span>
-                                        <span class="nearby-name">{{ $place['name'] }}</span>
+                                @php
+                                    $meta = $categories[$place['name']] ?? ['icon' => 'place', 'class' => 'icon-primary', 'cat' => 'Lokasi'];
+                                    $distanceIcon = ($place['travel_mode'] ?? '') === 'motorcycle' ? 'two_wheeler' : 'directions_walk';
+                                    $distanceLabel = $place['estimate_label'] ?? '';
+                                @endphp
+                                <div class="lokasi-nearby-item">
+                                    <div class="lokasi-nearby-icon {{ $meta['class'] }}">
+                                        <span class="material-symbols-outlined">{{ $meta['icon'] }}</span>
                                     </div>
-
-                                    @if ($place['estimate_label'] !== '')
-                                        <span class="nearby-estimate">{{ $place['estimate_label'] }}</span>
-                                    @endif
+                                    <div class="lokasi-nearby-info">
+                                        <span class="lokasi-nearby-name">{{ $place['name'] }}</span>
+                                        <span class="lokasi-nearby-category">{{ $meta['cat'] }}</span>
+                                    </div>
+                                    <div class="lokasi-nearby-distance">
+                                        <span class="material-symbols-outlined">{{ $distanceIcon }}</span>
+                                        <span>{{ $distanceLabel ? explode(' ', $distanceLabel)[0] . ' min' : '' }}</span>
+                                    </div>
                                 </div>
                             @empty
-                                <div class="nearby-empty">
-                                    <p class="muted">Belum ada daftar tempat sekitar yang ditampilkan.</p>
+                                <div class="lokasi-nearby-empty">
+                                    Belum ada daftar tempat sekitar yang ditampilkan.
                                 </div>
                             @endforelse
                         </div>
-                    </article>
+                    </div>
 
                 </div>
             </div>
         </section>
 
-        <section class="page-section" id="kamar">
-            <div class="site-shell">
+        {{-- ── Kamar ──────────────────────────────── --}}
+        <section id="kamar" class="kamar-section">
+            <div class="kamar-header">
+                <div class="kamar-header-left">
+                    <span class="kamar-eyebrow">Kamar pilihan</span>
+                    <h2 class="kamar-title">Beberapa kamar tersedia</h2>
+                    <p class="kamar-desc">Silakan cek detail kamar yang saat ini kosong dan siap untuk dihuni. Hubungi pemilik untuk informasi lebih lanjut mengenai pemesanan.</p>
+                </div>
+                <a href="{{ route('rooms.index') }}" class="kamar-header-btn">
+                    <span>Lihat semua kamar</span>
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
+            </div>
 
-                <div class="section-split">
-                    <div class="section-header section-header-tight">
-                        <p class="eyebrow">Kamar pilihan</p>
-                        <h2 class="section-title">Beberapa kamar tersedia</h2>
-                        <p class="section-copy">
-                            Cek kamar yang sedang tersedia dan lihat detail lengkapnya
-                            sebelum menghubungi pengelola.
-                        </p>
+            @if ($featuredRooms->isEmpty())
+                <div class="kamar-empty">
+                    <div class="kamar-empty-icon">
+                        <span class="material-symbols-outlined">bed</span>
                     </div>
-
-                    <div class="section-actions">
-                        <a href="{{ route('rooms.index') }}" class="button button-subtle">Lihat semua kamar</a>
+                    <h3>Belum ada kamar tersedia</h3>
+                    <p>Saat ini semua kamar dalam daftar pilihan sedang terisi. Silakan hubungi pengelola untuk masuk ke daftar tunggu.</p>
+                    <div class="kamar-empty-actions">
+                        <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer" class="kamar-empty-btn kamar-empty-btn-primary">
+                            <span class="material-symbols-outlined">chat</span>
+                            Tanya via WhatsApp
+                        </a>
+                        <a href="{{ route('rooms.index') }}" class="kamar-empty-btn kamar-empty-btn-secondary">
+                            Lihat semua kamar
+                        </a>
                     </div>
                 </div>
+            @else
+                <div class="kamar-grid">
+                    @foreach ($featuredRooms as $room)
+                        @php
+                            $coverPath = $room->main_image ?: $room->images->first()?->image_path;
 
-                @if ($featuredRooms->isEmpty())
-                    <section class="empty-state">
-                        <h2>Belum ada kamar tersedia</h2>
-                        <p>
-                            Saat ini belum ada kamar berstatus tersedia. Anda tetap bisa
-                            menghubungi pengelola untuk update ketersediaan terbaru.
-                        </p>
+                            $facilityIcons = [
+                                'AC' => 'ac_unit',
+                                'Kamar Mandi Dalam' => 'shower',
+                                'Kasur' => 'king_bed',
+                                'Lemari' => 'door_sliding',
+                                'Meja Belajar' => 'desk',
+                                'WiFi' => 'wifi',
+                                'Dapur Bersama' => 'kitchen',
+                                'Area Parkir' => 'local_parking',
+                                'CCTV' => 'videocam',
+                                'Ruang Tamu' => 'living',
+                                'Tempat Cuci' => 'local_laundry_service',
+                                'Kulkas' => 'kitchen',
+                                'TV' => 'tv',
+                                'Air Panas' => 'water_heater',
+                                'Spring Bed' => 'bed',
+                            ];
 
-                        <div class="section-actions">
-                            <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer" class="button button-primary">
-                                Tanya via WhatsApp
-                            </a>
-                            <a href="{{ route('rooms.index') }}" class="button button-subtle">Lihat semua kamar</a>
-                        </div>
-                    </section>
-                @else
-                    <div class="room-grid">
-                        @foreach ($featuredRooms as $room)
-                            @php
-                                $coverPath = $room->main_image ?: $room->images->first()?->image_path;
-                            @endphp
+                            $getIcon = function($name) use ($facilityIcons) {
+                                foreach ($facilityIcons as $key => $icon) {
+                                    if (str_contains(strtolower($name), strtolower($key))) {
+                                        return $icon;
+                                    }
+                                }
+                                return 'check_circle';
+                            };
 
-                            <article class="room-card">
+                            $badgeClass = match ($room->status) {
+                                'available' => 'kamar-card-badge-success',
+                                'maintenance' => 'kamar-card-badge-warning',
+                                default => 'kamar-card-badge-default',
+                            };
+
+                            $badgeIcon = match ($room->status) {
+                                'available' => 'check_circle',
+                                'maintenance' => 'build',
+                                default => 'block',
+                            };
+
+                            $isOccupied = $room->status === 'occupied';
+                        @endphp
+
+                        <article class="kamar-card">
+                            <div class="kamar-card-img-wrap">
                                 @if ($coverPath)
                                     <img
                                         src="{{ asset('storage/' . $coverPath) }}"
                                         alt="{{ $room->name }}"
-                                        class="room-card-media"
+                                        class="kamar-card-img"
+                                        @if ($isOccupied) style="filter: grayscale(30%)" @endif
                                     >
                                 @else
-                                    <div class="room-card-media media-placeholder">Foto kamar belum tersedia</div>
+                                    <div class="kamar-card-img-placeholder">Foto kamar belum tersedia</div>
                                 @endif
 
-                                <div class="room-card-body">
-                                    <div class="room-card-head">
-                                        <div class="room-card-topbar">
-                                            <span class="status-badge status-{{ $room->status }}">
-                                                {{ $roomStatusLabels[$room->status] ?? $room->status }}
-                                            </span>
-                                            <span class="detail-value">
-                                                {{ \App\Support\UiFormatter::currency($room->price) }}
-                                            </span>
-                                        </div>
+                                @if ($isOccupied)
+                                    <div class="kamar-card-overlay"></div>
+                                @endif
 
-                                        <div>
-                                            <h3 class="room-title">{{ $room->name }}</h3>
-                                            <p class="room-copy">
-                                                {{ $room->description ?: 'Kamar ini sudah tercatat di IchiKOS dan siap Anda cek lebih lanjut melalui halaman detail.' }}
-                                            </p>
-                                        </div>
-                                    </div>
+                                <span class="kamar-card-badge {{ $badgeClass }}">
+                                    <span class="material-symbols-outlined">{{ $badgeIcon }}</span>
+                                    {{ $roomStatusLabels[$room->status] ?? $room->status }}
+                                </span>
+                            </div>
 
-                                    <div class="room-card-chips">
-                                        <span class="chip">Ukuran {{ $room->size ?: '-' }}</span>
-                                        <span class="chip">Lantai {{ $room->floor ?: '-' }}</span>
-                                        @foreach ($room->facilities->take(2) as $facility)
-                                            <span class="chip">{{ $facility->name }}</span>
-                                        @endforeach
-                                    </div>
-
-                                    <div class="room-card-footer">
-                                        <span class="muted">Cek detail sebelum menghubungi pemilik.</span>
-                                        <a href="{{ route('rooms.show', $room) }}" class="button button-subtle">
-                                            Lihat detail kamar
-                                        </a>
+                            <div class="kamar-card-body">
+                                <div class="kamar-card-top">
+                                    <h3 class="kamar-card-name @if ($isOccupied) kamar-card-name-muted @endif">{{ $room->name }}</h3>
+                                    <div class="kamar-card-price">
+                                        <span class="kamar-card-price-value @if ($isOccupied) kamar-card-name-muted @endif">
+                                            {{ \App\Support\UiFormatter::currency($room->price) }}
+                                        </span>
+                                        <span class="kamar-card-price-period">/bln</span>
                                     </div>
                                 </div>
-                            </article>
-                        @endforeach
-                    </div>
-                @endif
 
-            </div>
-        </section>
+                                <p class="kamar-card-desc">{{ $room->description ?: 'Kamar ini sudah tercatat di IchiKOS dan siap Anda cek lebih lanjut melalui halaman detail.' }}</p>
 
-        <section class="page-section section-dark" id="fasilitas">
-            <div class="site-shell">
+                                <div class="kamar-card-chips">
+                                    <span class="kamar-chip @if ($isOccupied) kamar-chip-muted @endif">
+                                        <span class="material-symbols-outlined">straighten</span>
+                                        Ukuran {{ $room->size ?: '-' }}
+                                    </span>
+                                    <span class="kamar-chip @if ($isOccupied) kamar-chip-muted @endif">
+                                        <span class="material-symbols-outlined">stairs</span>
+                                        Lt. {{ $room->floor ?: '-' }}
+                                    </span>
+                                    @foreach ($room->facilities->take(3) as $facility)
+                                        <span class="kamar-chip @if ($isOccupied) kamar-chip-muted @endif">
+                                            <span class="material-symbols-outlined">{{ $getIcon($facility->name) }}</span>
+                                            {{ $facility->name }}
+                                        </span>
+                                    @endforeach
+                                </div>
 
-                <div class="section-split">
-                    <div class="section-header section-header-tight">
-                        <p class="eyebrow">Fasilitas</p>
-                        <h2 class="section-title">Fasilitas yang membuat tinggal lebih nyaman</h2>
-                        <p class="section-copy section-copy-on-dark">
-                            IchiKOS mengelola kombinasi fasilitas kamar dan fasilitas umum
-                            agar kebutuhan harian penghuni tetap praktis.
-                        </p>
-                    </div>
-
-                    <div class="section-actions">
-                        <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer" class="button button-secondary">
-                            Tanyakan fasilitas
-                        </a>
-                    </div>
-                </div>
-
-                <div class="feature-grid">
-                    @foreach ($facilityTypeLabels as $type => $label)
-                        <article class="feature-card">
-                            <div class="feature-card-body">
-                                <p class="eyebrow">
-                                    {{ $type === 'room' ? 'Di dalam kamar' : 'Area bersama' }}
-                                </p>
-                                <h3 class="room-title">{{ $label }}</h3>
-                                <p class="room-copy">
-                                    {{ $type === 'room'
-                                        ? 'Perlengkapan yang melekat langsung di kamar.'
-                                        : 'Fasilitas bersama yang mendukung aktivitas sehari-hari.' }}
-                                </p>
-
-                                <div class="chip-row spaced-top-md">
-                                    @forelse (($facilityGroups[$type] ?? collect()) as $facility)
-                                        <span class="chip">{{ $facility->name }}</span>
-                                    @empty
-                                        <span class="muted">Belum ada data fasilitas.</span>
-                                    @endforelse
+                                <div class="kamar-card-footer">
+                                    @if ($isOccupied)
+                                        <span class="kamar-btn-detail kamar-btn-disabled">
+                                            Kamar Penuh
+                                        </span>
+                                        <span class="kamar-card-footer-note kamar-card-footer-note-invisible">Cek detail sebelum menghubungi pemilik</span>
+                                    @else
+                                        <a href="{{ route('rooms.show', $room) }}" class="kamar-btn-detail">
+                                            Lihat detail kamar
+                                        </a>
+                                        <span class="kamar-card-footer-note">Cek detail sebelum menghubungi pemilik</span>
+                                    @endif
                                 </div>
                             </div>
                         </article>
                     @endforeach
                 </div>
-
-            </div>
+            @endif
         </section>
 
-        <section class="page-section" id="kontak">
-            <div class="site-shell">
-                <section class="contact-band">
-                    <p class="eyebrow">Kontak cepat</p>
-                    <h2 class="section-title section-title-tight">Butuh informasi kamar lebih cepat?</h2>
-                    <p class="section-copy section-copy-on-dark section-copy-compact">
-                        Hubungi pengelola langsung melalui WhatsApp untuk menanyakan
-                        detail kamar, fasilitas, dan ketersediaan terbaru.
-                    </p>
+        {{-- ── Fasilitas ──────────────────────────────── --}}
+        <section id="fasilitas" class="fasilitas-section">
+            <div class="fasilitas-header">
+                <h2>Fasilitas yang membuat tinggal lebih nyaman</h2>
+                <p>IchiKOS mengelola kombinasi fasilitas kamar dan fasilitas umum agar kebutuhan harian penghuni tetap praktis.</p>
+            </div>
 
-                    <div class="button-row">
-                        <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer" class="button button-secondary">
-                            Hubungi via WhatsApp
-                        </a>
-                        <a href="{{ route('rooms.index') }}" class="button button-subtle">Lihat semua kamar</a>
+            @php
+                $facilityIcons = [
+                    'AC' => 'ac_unit',
+                    'Kamar Mandi Dalam' => 'shower',
+                    'Kasur' => 'king_bed',
+                    'Lemari' => 'door_sliding',
+                    'Meja Belajar' => 'desk',
+                    'WiFi' => 'wifi',
+                    'Dapur Bersama' => 'kitchen',
+                    'Area Parkir' => 'local_parking',
+                    'CCTV' => 'videocam',
+                    'Ruang Tamu' => 'living',
+                    'Tempat Cuci' => 'local_laundry_service',
+                    'Kulkas' => 'kitchen',
+                    'Kompor' => 'cooking',
+                    'TV' => 'tv',
+                    'AC' => 'ac_unit',
+                    'Air Panas' => 'water_heater',
+                    'Spring Bed' => 'bed',
+                    'Bantal' => 'pillow',
+                ];
+
+                $getIcon = function($name) use ($facilityIcons) {
+                    foreach ($facilityIcons as $key => $icon) {
+                        if (str_contains(strtolower($name), strtolower($key))) {
+                            return $icon;
+                        }
+                    }
+                    return 'check_circle';
+                };
+            @endphp
+
+            <div class="fasilitas-grid">
+                @foreach ($facilityTypeLabels as $type => $label)
+                    <div class="fasilitas-card">
+                        <div class="fasilitas-card-header">
+                            <span class="material-symbols-outlined">{{ $type === 'room' ? 'bed' : 'meeting_room' }}</span>
+                            <h3>{{ $type === 'room' ? 'Di Dalam Kamar' : 'Area Bersama' }}</h3>
+                        </div>
+
+                        <div class="fasilitas-list">
+                            @forelse (($facilityGroups[$type] ?? collect()) as $facility)
+                                <div class="fasilitas-item">
+                                    <span class="material-symbols-outlined">{{ $getIcon($facility->name) }}</span>
+                                    {{ $facility->name }}
+                                </div>
+                            @empty
+                                <div class="fasilitas-item">
+                                    <span class="material-symbols-outlined">info</span>
+                                    Belum ada data fasilitas.
+                                </div>
+                            @endforelse
+                        </div>
                     </div>
-                </section>
+                @endforeach
             </div>
         </section>
 
     </div>
+
+    {{-- ── Kontak CTA ──────────────────────────────── --}}
+    <section class="kontak-cta" id="kontak">
+        <div class="kontak-cta-inner">
+            <div class="kontak-cta-text">
+                <h2>Butuh informasi kamar lebih cepat?</h2>
+                <p>Hubungi pengelola langsung melalui WhatsApp untuk menanyakan detail kamar, fasilitas, dan ketersediaan terbaru.</p>
+            </div>
+            <div class="kontak-cta-actions">
+                <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer" class="kontak-btn kontak-btn-primary">
+                    <span class="material-symbols-outlined">chat</span>
+                    Hubungi via WhatsApp
+                </a>
+                <a href="{{ route('rooms.index') }}" class="kontak-btn kontak-btn-outline">
+                    Lihat Semua Kamar
+                </a>
+            </div>
+        </div>
+    </section>
 @endsection
 
 

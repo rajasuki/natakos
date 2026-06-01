@@ -54,7 +54,8 @@ class RoomController extends Controller
             ->when($filters['sort'] === 'price_asc', fn ($query) => $query->orderBy('price'))
             ->when($filters['sort'] === 'price_desc', fn ($query) => $query->orderBy('price', 'desc'))
             ->when($filters['sort'] === null, fn ($query) => $query->latest('id'))
-            ->get();
+            ->paginate(9)
+            ->withQueryString();
 
         return view('public.rooms.index', [
             'profile' => $this->profileData(),
@@ -103,6 +104,8 @@ class RoomController extends Controller
             'address' => $profile?->address ?: 'Alamat kos belum diatur.',
             'whatsapp_number' => $whatsappNumber,
             'whatsapp_url' => WhatsappLink::build($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di IchiKOS.'),
+            'email' => 'shyannuar24@gmail.com',
+            'owner_name' => 'Ibu Icih',
         ];
     }
 

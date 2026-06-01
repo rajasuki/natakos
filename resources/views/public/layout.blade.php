@@ -622,17 +622,85 @@
             .empty-state p  { margin: 0; color: var(--ui-body); line-height: 1.7; }
 
             /* ── Footer ────────────────────────────── */
-             .footer { background: linear-gradient(135deg, #1C2B22 0%, #0f1f17 50%, #13211a 100%); color: var(--ui-canvas); margin-top: 32px; }
+             .footer { background: linear-gradient(135deg, #1C2B22 0%, #0f1f17 50%, #13211a 100%); color: var(--ui-canvas); }
 
             .footer-shell {
                 display: grid;
-                gap: 16px;
-                padding-top: 32px;
-                padding-bottom: 32px;
+                grid-template-columns: 1fr;
+                gap: 32px;
+                padding-top: 40px;
+                padding-bottom: 0;
             }
 
-            .footer-links { display: flex; flex-wrap: wrap; gap: 16px; }
-            .footer-links a { color: var(--ui-canvas); font-size: 14px; }
+            @media (min-width: 768px) {
+                .footer-shell { grid-template-columns: 1.5fr 1fr 1.2fr; }
+            }
+
+            .footer-section h3 {
+                font-size: 13px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin: 0 0 16px;
+                color: rgba(255,255,255,.6);
+            }
+
+            .footer-section p,
+            .footer-section .text-sm {
+                font-size: 13px;
+                line-height: 1.7;
+                margin: 0 0 8px;
+                color: rgba(255,255,255,.8);
+            }
+
+            .footer-section a {
+                display: inline-block;
+                font-size: 13px;
+                color: rgba(255,255,255,.8);
+                text-decoration: none;
+                padding: 3px 0;
+                transition: color .15s;
+            }
+            .footer-section a:hover { color: #fff; }
+
+            .footer-links-col { display: flex; flex-direction: column; gap: 2px; }
+
+            .footer-contact-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                font-size: 13px;
+                line-height: 1.6;
+                color: rgba(255,255,255,.8);
+                margin-bottom: 10px;
+            }
+            .footer-contact-item svg {
+                flex-shrink: 0;
+                width: 18px;
+                height: 18px;
+                margin-top: 2px;
+                opacity: .7;
+            }
+
+            .footer-contact-item a {
+                color: rgba(255,255,255,.8);
+                text-decoration: none;
+                padding: 0;
+                transition: color .15s;
+            }
+            .footer-contact-item a:hover { color: #fff; }
+
+            .footer-bottom {
+                border-top: 1px solid rgba(255,255,255,.1);
+                margin-top: 32px;
+                padding: 20px 0 32px;
+                font-size: 12px;
+                color: rgba(255,255,255,.5);
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 8px;
+            }
 
              /* ── Decorative glow ─────────────────────── */
              .site-glow {
@@ -781,6 +849,7 @@
              }
         </style>
 
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
         @stack('styles')
     </head>
      <body>
@@ -800,22 +869,53 @@
         <footer class="footer">
             <div class="site-shell footer-shell">
 
-                <div>
-                    <div class="brand">{{ $profile['name'] }}</div>
-                    <p class="footer-copy">{{ $profile['description'] }}</p>
+                <div class="footer-section">
+                    <h3>{{ $profile['name'] }}</h3>
+                    <p>{{ $profile['description'] }}</p>
+                    <p class="text-sm" style="margin-top:12px;">Pemilik: {{ $profile['owner_name'] }}</p>
                 </div>
 
-                 <nav class="footer-links" aria-label="Navigasi footer">
-                     <a href="{{ route('home') }}">Home</a>
-                     <a href="{{ route('rooms.index') }}">Kamar</a>
-                     <a href="{{ route('home') }}#fasilitas">Fasilitas</a>
-                     <a href="{{ route('home') }}#lokasi">Lokasi</a>
-                     <a href="{{ route('home') }}#kontak">Kontak</a>
-                     <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-                 </nav>
+                <div class="footer-section">
+                    <h3>Jelajahi</h3>
+                    <nav class="footer-links-col" aria-label="Navigasi footer">
+                        <a href="{{ route('home') }}">Home</a>
+                        <a href="{{ route('rooms.index') }}">Kamar</a>
+                        <a href="{{ route('home') }}#fasilitas">Fasilitas</a>
+                        <a href="{{ route('home') }}#lokasi">Lokasi</a>
+                        <a href="{{ route('home') }}#kontak">Kontak</a>
+                    </nav>
+                </div>
 
-                <p class="footer-copy">{{ $profile['address'] }}</p>
+                <div class="footer-section">
+                    <h3>Hubungi Kami</h3>
 
+                    <div class="footer-contact-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer">{{ preg_replace('/^62/', '0', $profile['whatsapp_number']) }}</a>
+                    </div>
+
+                    <div class="footer-contact-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        <a href="mailto:{{ $profile['email'] }}">{{ $profile['email'] }}</a>
+                    </div>
+
+                    <div class="footer-contact-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <span>{{ $profile['address'] }}</span>
+                    </div>
+
+                    <div style="margin-top:12px;">
+                        <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer" style="font-size:13px;color:rgba(255,255,255,.8);text-decoration:underline;text-underline-offset:3px;">Laporkan Masalah</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="site-shell">
+                <div class="footer-bottom">
+                    <span>&copy; {{ date('Y') }} {{ $profile['name'] }}.</span>
+                    <span>Hak cipta dilindungi undang-undang.</span>
+                </div>
             </div>
         </footer>
 
