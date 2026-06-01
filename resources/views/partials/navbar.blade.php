@@ -29,6 +29,8 @@
                         <a href="{{ route('admin.payments.index') }}" class="dropdown-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}">Pembayaran</a>
                     </div>
                 </div>
+                @elseif(Auth::user()->role === 'tenant')
+                <a href="{{ route('tenant.dashboard') }}" class="nav-link {{ request()->routeIs('tenant.dashboard') ? 'is-active' : '' }}" @if(request()->routeIs('tenant.dashboard')) aria-current="page" @endif>Dashboard</a>
                 @endif
             @endauth
         </nav>
@@ -68,6 +70,8 @@
                             <a href="{{ route('admin.facilities.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.facilities.*') ? 'is-active' : '' }}">Fasilitas</a>
                             <a href="{{ route('admin.tenants.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}">Penghuni</a>
                             <a href="{{ route('admin.payments.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}">Pembayaran</a>
+                            @elseif(Auth::user()->role === 'tenant')
+                            <a href="{{ route('tenant.dashboard') }}" class="mobile-nav-link {{ request()->routeIs('tenant.dashboard') ? 'is-active' : '' }}" @if(request()->routeIs('tenant.dashboard')) aria-current="page" @endif>Dashboard</a>
                             @endif
                             <div class="mobile-nav-divider"></div>
                             <form method="POST" action="{{ route('logout') }}">

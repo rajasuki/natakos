@@ -1,6 +1,7 @@
 @extends('tenant.layout')
 
 @section('title', 'Dashboard Penghuni')
+@section('eyebrow', 'Penghuni')
 
 @push('styles')
     <style>
@@ -32,12 +33,12 @@
             bottom: -20px; right: -20px;
             width: 100px; height: 100px;
             border-radius: 50%;
-            background: rgba(34,197,94,0.12);
+            background: rgba(74,124,89,0.12);
             pointer-events: none;
         }
 
         .tenant-hero-panel .eyebrow {
-            color: var(--green-400);
+            color: #6FAE82;
         }
 
         .tenant-hero-panel .tenant-stat-value {
@@ -65,21 +66,21 @@
 
         .tenant-stat-card {
             padding: 18px 20px;
-            background: var(--ui-canvas);
+            background: #fff;
             border: 1px solid var(--ui-border);
             border-radius: var(--radius-md);
-            box-shadow: var(--ui-shadow-soft);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
             transition: box-shadow 0.18s ease, transform 0.18s ease;
         }
 
         .tenant-stat-card:hover {
-            box-shadow: 0 4px 16px rgba(22,163,74,0.12);
+            box-shadow: 0 4px 16px rgba(74,124,89,0.10);
             transform: translateY(-1px);
         }
 
         .tenant-stat-value {
             margin: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Sora', sans-serif;
             font-size: 22px;
             font-weight: 800;
             line-height: 1.15;
@@ -100,7 +101,7 @@
             display: inline-block;
             width: 20px;
             height: 3px;
-            background: var(--ui-accent-mid);
+            background: var(--ui-accent);
             border-radius: 2px;
             margin-top: 10px;
         }
@@ -110,7 +111,7 @@
             margin-top: 18px;
             padding: 14px 16px;
             border-radius: var(--radius-md);
-            background: var(--ui-soft);
+            background: var(--gray-50);
             border: 1px solid var(--ui-border);
             font-size: 13px;
             color: var(--ui-body);
@@ -126,7 +127,7 @@
 
         .tenant-proof-section-title {
             margin: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Sora', sans-serif;
             font-size: 18px;
             font-weight: 700;
             line-height: 1.3;
@@ -152,20 +153,20 @@
             gap: 16px;
             padding: 20px;
             border-radius: var(--radius-lg);
-            background: var(--ui-softer);
+            background: var(--gray-50);
             border: 1px solid var(--ui-border);
             scroll-margin-top: 108px;
             transition: border-color 0.18s ease, box-shadow 0.18s ease;
         }
 
         .tenant-payment-entry:hover {
-            border-color: var(--ui-border-mid);
-            box-shadow: var(--ui-shadow-soft);
+            border-color: var(--gray-300);
+            box-shadow: var(--ui-shadow);
         }
 
         .tenant-payment-entry:target {
             border-color: var(--ui-accent);
-            box-shadow: 0 0 0 3px rgba(22,163,74,0.12);
+            box-shadow: 0 0 0 3px rgba(74,124,89,0.12);
         }
 
         .tenant-payment-head {
@@ -188,7 +189,7 @@
 
         .tenant-payment-meta-item {
             padding: 10px 12px;
-            background: var(--ui-canvas);
+            background: #fff;
             border: 1px solid var(--ui-border);
             border-radius: var(--radius-sm);
         }
@@ -199,18 +200,18 @@
             padding: 14px 16px;
             border-radius: var(--radius-md);
             border: 1px solid var(--ui-border);
-            background: var(--ui-canvas);
+            background: #fff;
             font-size: 13px;
             line-height: 1.65;
         }
 
         .tenant-payment-inline-flash {
-            box-shadow: var(--ui-shadow-soft);
+            box-shadow: var(--ui-shadow);
         }
 
         .tenant-payment-inline-flash-success {
             background: var(--ui-success);
-            color: var(--green-800);
+            color: #166534;
             border-color: var(--ui-success-border);
         }
 
@@ -225,8 +226,8 @@
             display: grid;
             gap: 14px;
             padding: 18px;
-            background: var(--ui-canvas);
-            border: 1.5px dashed var(--ui-border-mid);
+            background: #fff;
+            border: 1.5px dashed var(--gray-300);
             border-radius: var(--radius-md);
         }
 
@@ -245,8 +246,8 @@
 
         .tenant-upload-input {
             width: 100%;
-            border: 1.5px solid var(--ui-border-mid);
-            background: var(--ui-softer);
+            border: 1.5px solid var(--ui-border);
+            background: var(--gray-50);
             color: var(--ui-ink);
             padding: 12px 14px;
             border-radius: var(--radius-md);
@@ -259,8 +260,8 @@
         .tenant-upload-input:focus-visible {
             outline: none;
             border-color: var(--ui-accent);
-            box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
-            background: var(--ui-canvas);
+            box-shadow: 0 0 0 3px rgba(74,124,89,0.1);
+            background: #fff;
         }
 
         .tenant-upload-helper,
@@ -329,10 +330,10 @@
         <section class="tenant-hero-grid">
             <article class="hero-card">
                 <div>
-                    <p class="eyebrow">Dashboard penghuni</p>
-                    <h1 class="page-title">Halo, {{ $user->name }} 👋</h1>
+                    <p class="eyebrow">Ringkasan</p>
+                    <h1 style="margin:0;font-family:'Sora',sans-serif;font-size:26px;font-weight:700;letter-spacing:-0.3px;color:var(--ui-ink)">Halo, {{ $user->name }}</h1>
                     <p class="hero-copy">
-                        Semua informasi kamar, masa tinggal, dan pembayaran Anda ditampilkan di satu tempat agar lebih mudah dipantau tanpa perlu bertanya berulang ke pengelola.
+                        Berikut informasi kamar, masa tinggal, dan status pembayaran Anda.
                     </p>
                 </div>
 
@@ -397,7 +398,7 @@
 
             {{-- ── ALERTS ── --}}
             @if ($paymentWarning || $rentWarning)
-                <section class="alert-stack">
+                <section class="alert-stack content-stack">
                     @if ($paymentWarning)
                         <article class="alert {{ $paymentWarning['tone'] === 'danger' ? 'alert-danger' : 'alert-warning' }}">
                             <h2>{{ $paymentWarning['title'] }}</h2>
