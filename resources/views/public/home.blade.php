@@ -4,19 +4,338 @@
 
 @push('styles')
     <style>
-        .hero-stat-grid {
-            display: grid;
-            gap: 16px;
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            padding-top: 32px;
+            padding-bottom: 32px;
+            text-align: center;
         }
 
-        .hero-stat-wide {
-            grid-column: 1 / -1;
+        .hero-content {
+            max-width: 720px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
         }
 
-        @media (min-width: 640px) {
-            .hero-stat-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border: 1px solid var(--ui-border);
+            border-radius: 999px;
+            background: var(--ui-soft);
+            color: var(--ui-body);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .hero-badge svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .hero-heading {
+            margin: 0;
+            font-size: clamp(36px, 6vw, 60px);
+            font-weight: 800;
+            line-height: 1.12;
+            color: var(--ui-ink);
+        }
+
+        .hero-desc {
+            margin: 0;
+            font-size: 16px;
+            color: var(--ui-body);
+            line-height: 1.7;
+            max-width: 560px;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .hero-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 14px 28px;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all .2s ease;
+            cursor: pointer;
+        }
+
+        .hero-btn-primary {
+            background: var(--ui-accent);
+            color: #fff;
+            border: 0;
+            box-shadow: 0 0 24px rgba(74, 124, 89, .35);
+        }
+
+        .hero-btn-primary:hover {
+            background: var(--ui-accent-hover);
+            box-shadow: 0 0 36px rgba(74, 124, 89, .5);
+        }
+
+        .hero-btn-secondary {
+            background: transparent;
+            color: var(--ui-ink);
+            border: 1.5px solid var(--ui-border);
+            box-shadow: 0 0 20px rgba(74, 124, 89, .12);
+        }
+
+        .hero-btn-secondary:hover {
+            background: var(--ui-soft);
+            border-color: var(--ui-body);
+            box-shadow: 0 0 28px rgba(74, 124, 89, .28);
+        }
+
+        .section-dark {
+            background: var(--ui-canvas) !important;
+            color: var(--ui-ink);
+        }
+
+        .section-dark .eyebrow,
+        .section-dark .section-copy-on-dark {
+            color: var(--ui-body) !important;
+        }
+
+        .contact-band {
+            background: var(--ui-soft) !important;
+            color: var(--ui-ink);
+        }
+
+        .contact-band .eyebrow {
+            color: var(--ui-body) !important;
+        }
+
+        /* ── Floating testimonial cards ── */
+        .hero-floating {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .float-card {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: #fff;
+            border: 1px solid var(--ui-border);
+            border-radius: 999px;
+            box-shadow: var(--ui-shadow);
+            opacity: 0;
+            white-space: nowrap;
+            font-size: 13px;
+            animation: floatCard 18s ease-in-out var(--delay) infinite;
+            transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(.88);
+        }
+
+        .float-avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1;
+            flex-shrink: 0;
+            color: #fff;
+        }
+
+        .float-card:nth-child(1) .float-avatar { background: var(--ui-accent); }
+        .float-card:nth-child(2) .float-avatar { background: var(--ui-ink); }
+        .float-card:nth-child(3) .float-avatar { background: #C8D8C9; color: var(--ui-ink); }
+        .float-card:nth-child(4) .float-avatar { background: var(--ui-accent); }
+        .float-card:nth-child(5) .float-avatar { background: var(--ui-ink); }
+        .float-card:nth-child(6) .float-avatar { background: #C8D8C9; color: var(--ui-ink); }
+
+        .float-text {
+            color: var(--ui-ink);
+            font-weight: 500;
+        }
+
+        @keyframes floatCard {
+            0%, 3%   { opacity: 0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(.88); }
+            6%       { opacity: 1; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1.05); }
+            9%, 20%  { opacity: 1; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1); }
+            23%, 25% { opacity: 0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y) - 12px)) scale(.88); }
+            100%     { opacity: 0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y) - 12px)) scale(.88); }
+        }
+
+        @media (max-width: 1023px) {
+            .hero-floating {
+                display: none;
             }
+        }
+
+        /* ── Map section redesign ──────────────── */
+        #lokasi .detail-grid {
+            max-width: 640px;
+            margin: 0 auto;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        #lokasi .detail-card {
+            background: var(--ui-canvas);
+            border: 1px solid var(--ui-border);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        #lokasi .map-embed,
+        #lokasi .map-placeholder {
+            width: 100%;
+            min-height: 320px;
+            border: 0;
+            display: block;
+            background: var(--ui-soft);
+        }
+
+        #lokasi .map-placeholder {
+            display: grid;
+            align-items: center;
+            padding: 32px;
+        }
+
+        #lokasi .detail-body {
+            padding: 20px 24px;
+        }
+
+        #lokasi .detail-address {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        #lokasi .detail-address svg {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            margin-top: 3px;
+            color: var(--ui-accent);
+        }
+
+        #lokasi .detail-address-text {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--ui-body);
+        }
+
+        #lokasi .feature-card {
+            background: var(--ui-canvas);
+            border: 1px solid var(--ui-border);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        #lokasi .feature-card .eyebrow {
+            margin-bottom: 6px;
+        }
+
+        #lokasi .feature-card .room-title {
+            font-size: 18px;
+            margin-bottom: 0;
+        }
+
+        #lokasi .nearby-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        #lokasi .nearby-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--ui-soft);
+            border-radius: 12px;
+        }
+
+        #lokasi .nearby-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        #lokasi .nearby-marker {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            background: var(--ui-accent);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        #lokasi .nearby-name {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--ui-ink);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        #lokasi .nearby-estimate {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: var(--ui-ink);
+            color: var(--ui-canvas);
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        #lokasi .nearby-empty {
+            padding: 24px;
+            text-align: center;
+            background: var(--ui-soft);
+            border-radius: 12px;
+        }
+
+        #lokasi .nearby-empty .muted {
+            margin: 0;
+        }
+
+        #lokasi .detail-copy {
+            display: none;
         }
     </style>
 @endpush
@@ -24,56 +343,52 @@
 @section('content')
     <div class="page-stack">
 
-        <section class="page-section">
-            <div class="site-shell hero">
+        <section class="hero-section">
+            <div class="hero-content">
+                <span class="hero-badge">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    Hunian terkelola
+                </span>
 
-                <div class="hero-band">
-                    <p class="eyebrow">Hunian terkelola</p>
-                    <h1 class="headline">
-                        Tinggal lebih tenang dengan kamar yang rapi, jelas statusnya,
-                        dan mudah dicek sebelum datang.
-                    </h1>
-                    <p class="lead">{{ $profile['description'] }}</p>
+                <h1 class="hero-heading">
+                    Tinggal lebih tenang<br>dengan kamar yang rapi
+                </h1>
 
-                    <div class="chip-row spaced-top-lg">
-                        <span class="chip chip-accent">{{ $stats['available_rooms'] }} kamar tersedia</span>
-                        <span class="chip">{{ $stats['facility_total'] }} fasilitas</span>
-                        <span class="chip">Alamat: {{ $profile['address'] }}</span>
-                    </div>
+                <p class="hero-desc">{{ $profile['description'] }}</p>
 
-                    <div class="section-actions">
-                        <a href="{{ route('rooms.index') }}" class="button button-primary">Lihat kamar</a>
-                        <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer" class="button button-secondary">
-                            Tanya via WhatsApp
-                        </a>
-                    </div>
+                <div class="hero-actions">
+                    <a href="{{ route('rooms.index') }}" class="hero-btn hero-btn-primary">Lihat kamar</a>
+                    <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer" class="hero-btn hero-btn-secondary">Tanya via WhatsApp</a>
                 </div>
 
-                <aside class="hero-card">
-                    <p class="eyebrow">Ringkasan cepat</p>
-
-                    <div class="hero-stats">
-                        <div class="hero-stat hero-stat-wide">
-                            <div class="hero-stat-value">{{ number_format($stats['available_rooms'], 0, ',', '.') }}</div>
-                            <div class="hero-stat-label">Kamar tersedia saat ini</div>
-                        </div>
-
-                        <div class="hero-stat-grid">
-                            <div class="hero-stat">
-                                <div class="hero-stat-value">{{ number_format($stats['total_rooms'], 0, ',', '.') }}</div>
-                                <div class="hero-stat-label">Total kamar</div>
-                            </div>
-
-                            <div class="hero-stat">
-                                <div class="hero-stat-value">{{ number_format($stats['facility_total'], 0, ',', '.') }}</div>
-                                <div class="hero-stat-label">Fasilitas dikelola</div>
-                            </div>
-                        </div>
+                <div class="hero-floating" aria-hidden="true">
+                    <div class="float-card" style="--delay: 0s; --x: -600px; --y: -80px;">
+                        <span class="float-avatar">A</span>
+                        <span class="float-text">"Kosnya nyaman banget!"</span>
                     </div>
-
-                    <p class="muted">Hubungi pengelola untuk menanyakan kamar yang paling sesuai kebutuhan Anda.</p>
-                </aside>
-
+                    <div class="float-card" style="--delay: 3s; --x: 600px; --y: -40px;">
+                        <span class="float-avatar">R</span>
+                        <span class="float-text">"Lokasi strategis 👍"</span>
+                    </div>
+                    <div class="float-card" style="--delay: 6s; --x: -680px; --y: 60px;">
+                        <span class="float-avatar">D</span>
+                        <span class="float-text">"Kamarnya bersih rapi"</span>
+                    </div>
+                    <div class="float-card" style="--delay: 9s; --x: 680px; --y: 80px;">
+                        <span class="float-avatar">S</span>
+                        <span class="float-text">"Murah meriah!"</span>
+                    </div>
+                    <div class="float-card" style="--delay: 12s; --x: -540px; --y: 140px;">
+                        <span class="float-avatar">F</span>
+                        <span class="float-text">"Suasananya adem"</span>
+                    </div>
+                    <div class="float-card" style="--delay: 15s; --x: 540px; --y: 130px;">
+                        <span class="float-avatar">T</span>
+                        <span class="float-text">"Fasilitas lengkap"</span>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -120,7 +435,7 @@
                                     <p class="eyebrow">Google Maps</p>
                                     <h3 class="room-title">Map embed belum diatur</h3>
                                     <p class="room-copy">
-                                        Tambahkan Google Maps Embed URL dari panel admin
+                                        Tambahkan Google Maps Embed URL lewat file
                                         supaya peta tampil langsung di halaman ini.
                                     </p>
                                 </div>
@@ -128,65 +443,39 @@
                         @endif
 
                         <div class="detail-body">
-                            <div class="detail-item">
-                                <span class="detail-label">Alamat kos</span>
-                                <span class="detail-value">{{ $profile['address'] }}</span>
-                            </div>
-
-                            <p class="detail-copy">
-                                Bagian ini membantu calon penghuni lebih cepat paham posisi kos
-                                dan akses ke tempat penting di sekitar.
-                            </p>
-
-                            <div class="section-actions">
-                                @if ($profile['google_maps_url'])
-                                    <a href="{{ $profile['google_maps_url'] }}" target="_blank" rel="noopener noreferrer" class="button button-secondary">
-                                        Buka peta penuh
-                                    </a>
-                                @endif
-                                <a href="{{ $profile['whatsapp_url'] }}" target="_blank" rel="noopener noreferrer" class="button button-subtle">
-                                    Hubungi pengelola
-                                </a>
+                            <div class="detail-address">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <span class="detail-address-text">{{ $profile['address'] }}</span>
                             </div>
                         </div>
                     </article>
 
                     <article class="feature-card">
-                        <div class="feature-card-body">
-                            <p class="eyebrow">Dekat ke mana aja</p>
-                            <h3 class="room-title">Tempat sekitar yang sering ditanya</h3>
-                            <p class="room-copy">
-                                Isi daftar ini dari panel admin untuk menonjolkan akses ke kampus,
-                                warung, laundry, tempat ibadah, atau transportasi.
-                            </p>
+                        <p class="eyebrow">Dekat ke mana aja</p>
+                        <h3 class="room-title">Tempat sekitar</h3>
 
-                            <div class="nearby-list spaced-top-md">
-                                @forelse ($profile['nearby_places'] as $place)
-                                    <div class="nearby-item">
+                        <div class="nearby-list">
+                            @forelse ($profile['nearby_places'] as $place)
+                                <div class="nearby-item">
+                                    <div class="nearby-item-left">
                                         <span class="nearby-marker">
                                             {{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}
                                         </span>
-
-                                        <div class="nearby-item-copy">
-                                            <div class="detail-item">
-                                                <span class="detail-label">Nama tempat</span>
-                                                <span class="detail-value">{{ $place['name'] }}</span>
-                                            </div>
-
-                                            @if ($place['estimate_label'] !== '')
-                                                <div class="detail-item">
-                                                    <span class="detail-label">Estimasi</span>
-                                                    <span class="nearby-estimate">{{ $place['estimate_label'] }}</span>
-                                                </div>
-                                            @endif
-                                        </div>
+                                        <span class="nearby-name">{{ $place['name'] }}</span>
                                     </div>
-                                @empty
-                                    <div class="nearby-empty">
-                                        <p class="muted">Belum ada daftar tempat sekitar yang ditampilkan.</p>
-                                    </div>
-                                @endforelse
-                            </div>
+
+                                    @if ($place['estimate_label'] !== '')
+                                        <span class="nearby-estimate">{{ $place['estimate_label'] }}</span>
+                                    @endif
+                                </div>
+                            @empty
+                                <div class="nearby-empty">
+                                    <p class="muted">Belum ada daftar tempat sekitar yang ditampilkan.</p>
+                                </div>
+                            @endforelse
                         </div>
                     </article>
 
@@ -358,3 +647,5 @@
 
     </div>
 @endsection
+
+

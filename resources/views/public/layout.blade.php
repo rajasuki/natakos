@@ -45,10 +45,8 @@
             /* ── Shell ─────────────────────────────── */
             .site-shell {
                 width: 100%;
-                max-width: 1200px;
-                margin: 0 auto;
-                padding-left: 24px;
-                padding-right: 24px;
+                padding-left: 32px;
+                padding-right: 32px;
             }
 
              /* ── Header ────────────────────────────── */
@@ -196,11 +194,86 @@
                   font-weight: 600;
                   font-size: 14px;
                   transition: color .2s ease;
+                  background: transparent;
+                  border: 0;
+                  cursor: pointer;
+                  padding: 0;
                }
 
               .nav-auth-link:hover {
                   color: var(--ui-ink);
                }
+
+              .nav-greeting {
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: rgba(0,0,0,.45);
+                  white-space: nowrap;
+              }
+
+              /* ── Dashboard dropdown ── */
+              .nav-item {
+                  position: relative;
+              }
+
+              .nav-chevron {
+                  transition: transform .2s ease;
+              }
+
+              .nav-item.is-open .nav-chevron {
+                  transform: rotate(180deg);
+              }
+
+              .nav-dropdown {
+                  position: absolute;
+                  top: calc(100% + 8px);
+                  left: 0;
+                  min-width: 170px;
+                  background: #fff;
+                  border: 1px solid var(--ui-border);
+                  border-radius: 12px;
+                  box-shadow: var(--ui-shadow-strong);
+                  padding: 6px;
+                  opacity: 0;
+                  visibility: hidden;
+                  transform: translateY(4px);
+                  transition: all .2s ease;
+                  z-index: 60;
+              }
+
+              .nav-item.is-open .nav-dropdown {
+                  opacity: 1;
+                  visibility: visible;
+                  transform: translateY(0);
+              }
+
+              .dropdown-link {
+                  display: flex;
+                  align-items: center;
+                  width: 100%;
+                  padding: 9px 12px;
+                  border: 0;
+                  border-radius: 7px;
+                  background: transparent;
+                  color: #3A5A45;
+                  font-size: 13.5px;
+                  font-weight: 500;
+                  cursor: pointer;
+                  transition: all .15s ease;
+                  text-align: left;
+                  white-space: nowrap;
+              }
+
+              .dropdown-link:hover {
+                  background: var(--ui-soft);
+                  color: var(--ui-ink);
+              }
+
+              .dropdown-link.is-active {
+                  background: var(--ui-soft);
+                  color: var(--ui-ink);
+                  font-weight: 600;
+              }
 
               .mobile-menu {
                  position: relative;
@@ -416,17 +489,17 @@
             }
 
             /* ── Media ─────────────────────────────── */
-            .room-card-media,
-            .detail-media,
-            .gallery-image {
-                width: 100%;
-                background: var(--ui-soft);
-                object-fit: cover;
-                display: block;
-            }
-            .room-card-media,
-            .detail-media { aspect-ratio: 4 / 3; }
-            .gallery-image { aspect-ratio: 4 / 3; }
+             .room-card-media,
+             .detail-media,
+             .gallery-image {
+                 width: 100%;
+                 background: var(--ui-soft);
+                 object-fit: cover;
+                 display: block;
+             }
+             .room-card-media { aspect-ratio: 16 / 9; }
+             .detail-media { aspect-ratio: 4 / 3; }
+             .gallery-image { aspect-ratio: 4 / 3; }
 
             .media-placeholder {
                 display: grid;
@@ -589,6 +662,44 @@
                  animation-delay: -4s;
              }
 
+             .glow-blob:nth-child(3) {
+                 width: 300px; height: 300px;
+                 top: 40%; left: -60px;
+                 background: var(--ui-glow-2);
+                 opacity: .25;
+                 animation-duration: 14s;
+                 animation-delay: -2s;
+             }
+
+             .glow-blob:nth-child(4) {
+                 width: 250px; height: 250px;
+                 bottom: 25%; right: -40px;
+                 background: var(--ui-glow-1);
+                 opacity: .2;
+                 animation-duration: 18s;
+                 animation-delay: -6s;
+             }
+
+             .glow-blob:nth-child(5) {
+                 width: 350px; height: 350px;
+                 bottom: -100px; left: 30%;
+                 background: var(--ui-glow-2);
+                 opacity: .18;
+                 animation-duration: 15s;
+                 animation-delay: -10s;
+             }
+
+             .cursor-glow {
+                 position: fixed;
+                 width: 280px;
+                 height: 280px;
+                 border-radius: 50%;
+                 background: radial-gradient(circle, rgba(74,124,89,.3) 0%, transparent 65%);
+                 pointer-events: none;
+                 z-index: -1;
+                 will-change: transform;
+             }
+
              @keyframes glow-float {
                  0%   { transform: translate(0, 0) scale(1); }
                  50%  { transform: translate(30px, -20px) scale(1.08); }
@@ -661,7 +772,7 @@
 
                  .headline { font-size: 52px; }
 
-                 .room-grid,
+                 .room-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
                  .gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
              }
         </style>
@@ -672,49 +783,11 @@
      <div class="site-glow" aria-hidden="true">
          <div class="glow-blob"></div>
          <div class="glow-blob"></div>
+         <div class="cursor-glow"></div>
      </div>
 
         {{-- ── Site Header ──────────────────────────────────────────── --}}
-         <header class="site-header">
-             <div class="site-shell header-row">
-
-                <a href="{{ route('home') }}" class="brand-link">
-                    <span class="brand-mark">{{ strtoupper(mb_substr($profile['name'], 0, 1)) }}</span>
-                    <span class="brand-text">{{ $profile['name'] }}</span>
-                </a>
-
-                <nav class="nav-links desktop-nav" aria-label="Navigasi publik">
-                    <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'is-active' : '' }}" @if(request()->routeIs('home')) aria-current="page" @endif>Home</a>
-                    <a href="{{ route('rooms.index') }}" class="nav-link {{ request()->routeIs('rooms.*') ? 'is-active' : '' }}" @if(request()->routeIs('rooms.*')) aria-current="page" @endif>Kamar</a>
-                    <a href="{{ route('home') }}#fasilitas" class="nav-link">Fasilitas</a>
-                    <a href="{{ route('home') }}#lokasi" class="nav-link">Lokasi</a>
-                    <a href="{{ route('home') }}#kontak" class="nav-link">Kontak</a>
-                </nav>
-
-                <div class="header-actions">
-                     <a href="{{ route('login') }}" class="nav-auth-link">Sign</a>
-
-                    <details class="mobile-menu">
-                        <summary class="mobile-menu-toggle" aria-label="Buka navigasi">
-                            <svg width="22" height="22" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        </summary>
-
-                        <div class="mobile-menu-panel">
-                            <nav class="mobile-nav-links" aria-label="Navigasi publik seluler">
-                                <a href="{{ route('home') }}" class="mobile-nav-link {{ request()->routeIs('home') ? 'is-active' : '' }}" @if(request()->routeIs('home')) aria-current="page" @endif>Home</a>
-                                <a href="{{ route('rooms.index') }}" class="mobile-nav-link {{ request()->routeIs('rooms.*') ? 'is-active' : '' }}" @if(request()->routeIs('rooms.*')) aria-current="page" @endif>Kamar</a>
-                                <a href="{{ route('home') }}#fasilitas" class="mobile-nav-link">Fasilitas</a>
-                                <a href="{{ route('home') }}#lokasi" class="mobile-nav-link">Lokasi</a>
-                                <a href="{{ route('home') }}#kontak" class="mobile-nav-link">Kontak</a>
-                            </nav>
-                        </div>
-                    </details>
-                </div>
-
-             </div>
-         </header>
+        @include('partials.navbar')
 
         {{-- ── Page Content ──────────────────────────────────────────── --}}
         @yield('content')
@@ -754,8 +827,43 @@
              } else {
                  header.classList.remove('nav-hidden');
              }
-             lastScroll = current;
-         }, { passive: true });
-     </script>
+          lastScroll = current;
+          }, { passive: true });
+
+           document.addEventListener('click', function (event) {
+               var toggle = event.target.closest('[data-nav-dropdown]');
+               if (toggle) {
+                   event.preventDefault();
+                   var item = toggle.closest('.nav-item');
+                   if (item) item.classList.toggle('is-open');
+                   return;
+               }
+               if (window.innerWidth >= 1024) {
+                   var inside = event.target.closest('.nav-item');
+                   if (!inside) {
+                       document.querySelectorAll('.nav-item.is-open').forEach(function (el) {
+                           el.classList.remove('is-open');
+                       });
+                   }
+               }
+           });
+
+           (function () {
+               var glow = document.querySelector('.cursor-glow');
+               if (!glow) return;
+               var tx = -9999, ty = -9999, cx = -9999, cy = -9999;
+               function tick() {
+                   cx += (tx - cx) * 0.12;
+                   cy += (ty - cy) * 0.12;
+                   glow.style.transform = 'translate(' + (cx - 140) + 'px, ' + (cy - 140) + 'px)';
+                   requestAnimationFrame(tick);
+               }
+               document.addEventListener('mousemove', function (e) {
+                   tx = e.clientX; ty = e.clientY;
+               });
+               tick();
+           })();
+        </script>
+
     </body>
 </html>

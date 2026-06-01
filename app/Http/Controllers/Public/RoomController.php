@@ -51,7 +51,9 @@ class RoomController extends Controller
                     count($filters['facilities'])
                 );
             })
-            ->latest('id')
+            ->when($filters['sort'] === 'price_asc', fn ($query) => $query->orderBy('price'))
+            ->when($filters['sort'] === 'price_desc', fn ($query) => $query->orderBy('price', 'desc'))
+            ->when($filters['sort'] === null, fn ($query) => $query->latest('id'))
             ->get();
 
         return view('public.rooms.index', [
@@ -128,12 +130,25 @@ class RoomController extends Controller
     }
 
     /**
-     * @param  array<int, string>  $allowedStatuses
-     * @return array{q:string|null,min_price:int|null,max_price:int|null,status:string|null,facilities:array<int, int>}
+     * @param  array<string, string>  $facilityTypeLabels
+     * @return array<string, Collection<int, Facility>>
+     */
+    private function facilityGroups(Collection $facilities, array $facilityTypeLabels): array
+    {
+        $groupedFacilities = $facilities->groupBy('type');
+
+        return collect(array_keys($facilityTypeLabels))
+            ->mapWithKeys(fn (string $type) => [$type => $groupedFacilities->get($type, collect())])
+            ->all();
+    }
+
+    /**
+     * @param  array{q:string|null,min_price:int|null,max_price:int|null,status:string|null,facilities:array<int,int>,sort:string|null}  $filters
      */
     private function filters(Request $request, Collection $facilities, array $allowedStatuses): array
     {
         $status = (string) $request->query('status', '');
+        $sort = (string) $request->query('sort', '');
         $validFacilityIds = $facilities->modelKeys();
         $selectedFacilityIds = collect((array) $request->query('facilities', []))
             ->map(function ($id): ?int {
@@ -153,25 +168,10 @@ class RoomController extends Controller
             'max_price' => $this->numericQuery($request->query('max_price')),
             'status' => in_array($status, $allowedStatuses, true) ? $status : null,
             'facilities' => $selectedFacilityIds,
+            'sort' => in_array($sort, ['price_asc', 'price_desc'], true) ? $sort : null,
         ];
     }
 
-    /**
-     * @param  array<string, string>  $facilityTypeLabels
-     * @return array<string, Collection<int, Facility>>
-     */
-    private function facilityGroups(Collection $facilities, array $facilityTypeLabels): array
-    {
-        $groupedFacilities = $facilities->groupBy('type');
-
-        return collect(array_keys($facilityTypeLabels))
-            ->mapWithKeys(fn (string $type) => [$type => $groupedFacilities->get($type, collect())])
-            ->all();
-    }
-
-    /**
-     * @param  array{q:string|null,min_price:int|null,max_price:int|null,status:string|null,facilities:array<int, int>}  $filters
-     */
     private function hasActiveFilters(array $filters): bool
     {
         return $filters['q'] !== null
