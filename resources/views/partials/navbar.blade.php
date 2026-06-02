@@ -49,7 +49,7 @@
                     <button type="submit" class="nav-auth-link">Logout</button>
                 </form>
             @else
-                <a href="{{ route('login') }}" class="nav-auth-link">Sign</a>
+                <a href="{{ route('login') }}" class="nav-auth-link">Sign In</a>
             @endauth
 
             <details class="mobile-menu">

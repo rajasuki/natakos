@@ -194,14 +194,23 @@
               .nav-auth-link {
                   display: inline-flex;
                   align-items: center;
-                  color: var(--ui-body);
+                  gap: 6px;
+                  color: #fff;
                   font-weight: 600;
                   font-size: 14px;
-                  transition: color .2s ease;
-                  background: transparent;
+                  transition: background-color .2s ease, color .2s ease, box-shadow .2s ease;
+                  background: var(--ui-accent);
                   border: 0;
                   cursor: pointer;
-                  padding: 0;
+                  padding: 10px 20px;
+                  border-radius: 999px;
+                  line-height: 1.2;
+                  min-height: 42px;
+               }
+
+               .nav-auth-link:hover {
+                  background: var(--ui-accent-hover);
+                  color: #fff;
                }
 
               .nav-auth-link:hover {
