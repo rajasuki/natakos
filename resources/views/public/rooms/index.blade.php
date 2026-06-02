@@ -739,7 +739,7 @@
                                 <p class="rooms-toolbar-meta">Hasil sudah disesuaikan dengan filter yang aktif.</p>
                             @endif
                         </div>
-                        <select class="rooms-sort" onchange="var u=new URL(window.location);u.searchParams.set('sort',this.value||'');window.location=u.toString();">
+                        <select name="sort" class="rooms-sort">
                             <option value="">Default</option>
                             <option value="price_asc" @selected($filters['sort'] === 'price_asc')>Harga terendah</option>
                             <option value="price_desc" @selected($filters['sort'] === 'price_desc')>Harga tertinggi</option>
@@ -923,4 +923,17 @@
             </div>
         </div>
     </section>
+
+    <script>
+    document.querySelector('.rooms-sort').addEventListener('change', function() {
+        var u = new URL(window.location.href);
+        if (this.value) {
+            u.searchParams.set('sort', this.value);
+        } else {
+            u.searchParams.delete('sort');
+        }
+        u.searchParams.delete('page');
+        window.location.href = u.toString();
+    });
+    </script>
 @endsection

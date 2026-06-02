@@ -11,16 +11,37 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('kos_profiles')) {
+            return;
+        }
+
         Schema::table('kos_profiles', function (Blueprint $table) {
-            $table->string('email', 255)->nullable()->after('whatsapp_number');
-            $table->string('owner_name', 255)->nullable()->after('email');
+            if (! Schema::hasColumn('kos_profiles', 'email')) {
+                $table->string('email', 255)->nullable()->after('whatsapp_number');
+            }
+
+            if (! Schema::hasColumn('kos_profiles', 'owner_name')) {
+                $table->string('owner_name', 255)->nullable()->after('email');
+            }
         });
     }
 
     public function down(): void
     {
-        Schema::table('kos_profiles', function (Blueprint $table) {
-            $table->dropColumn(['email', 'owner_name']);
-        });
+        if (! Schema::hasTable('kos_profiles')) {
+            return;
+        }
+
+        if (Schema::hasColumn('kos_profiles', 'email')) {
+            Schema::table('kos_profiles', function (Blueprint $table) {
+                $table->dropColumn('email');
+            });
+        }
+
+        if (Schema::hasColumn('kos_profiles', 'owner_name')) {
+            Schema::table('kos_profiles', function (Blueprint $table) {
+                $table->dropColumn('owner_name');
+            });
+        }
     }
 };
