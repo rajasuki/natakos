@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PaymentController extends Controller
@@ -40,7 +41,7 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function export(Request $request): StreamedResponse
+    public function export(Request $request): \Illuminate\Http\Response
     {
         $filters = $this->filters($request);
         $payments = $this->paymentsQuery($filters)
@@ -49,31 +50,12 @@ class PaymentController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        return response()->streamDownload(function () use ($payments): void {
-            $handle = fopen('php://output', 'w');
+        $statusLabels = $this->statusLabels();
+        $deadlineStatusLabels = $this->deadlineStatusLabels();
 
-            if ($handle === false) {
-                return;
-            }
+        $pdf = Pdf::loadView('admin.exports.payments-pdf', compact('payments', 'statusLabels', 'deadlineStatusLabels'));
 
-            fputcsv($handle, ['Penghuni', 'Kamar', 'Nominal', 'Periode mulai', 'Periode akhir', 'Tenggat bayar', 'Status', 'Catatan', 'Alasan penolakan']);
-
-            foreach ($payments as $payment) {
-                fputcsv($handle, [
-                    $payment->tenant?->user?->name,
-                    $payment->tenant?->room?->name,
-                    $payment->amount,
-                    $payment->period_start?->format('Y-m-d'),
-                    $payment->period_end?->format('Y-m-d'),
-                    $payment->due_date?->format('Y-m-d'),
-                    $payment->status,
-                    $payment->notes,
-                    $payment->rejection_reason,
-                ]);
-            }
-
-            fclose($handle);
-        }, 'payments-export.csv');
+        return $pdf->download('payments-export.pdf');
     }
 
     public function create(): View

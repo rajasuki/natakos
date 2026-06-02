@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RoomController extends Controller
 {
@@ -36,7 +36,7 @@ class RoomController extends Controller
         ]);
     }
 
-    public function export(Request $request): StreamedResponse
+    public function export(Request $request): \Illuminate\Http\Response
     {
         $filters = $this->filters($request);
 
@@ -45,29 +45,11 @@ class RoomController extends Controller
             ->latest('id')
             ->get();
 
-        return response()->streamDownload(function () use ($rooms): void {
-            $handle = fopen('php://output', 'w');
+        $statusLabels = $this->statusLabels();
 
-            if ($handle === false) {
-                return;
-            }
+        $pdf = Pdf::loadView('admin.exports.rooms-pdf', compact('rooms', 'statusLabels'));
 
-            fputcsv($handle, ['Nama kamar', 'Slug', 'Harga', 'Ukuran', 'Lantai', 'Status', 'Fasilitas']);
-
-            foreach ($rooms as $room) {
-                fputcsv($handle, [
-                    $room->name,
-                    $room->slug,
-                    $room->price,
-                    $room->size,
-                    $room->floor,
-                    $room->status,
-                    $room->facilities->pluck('name')->implode(', '),
-                ]);
-            }
-
-            fclose($handle);
-        }, 'rooms-export.csv');
+        return $pdf->download('rooms-export.pdf');
     }
 
     public function create(): View

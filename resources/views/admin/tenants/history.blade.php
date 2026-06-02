@@ -71,7 +71,7 @@
                     <div class="toolbar-actions">
                         <button type="submit" class="button button-primary">Terapkan filter</button>
                         <a href="{{ route('admin.tenants.history') }}" class="button button-secondary">Reset</a>
-                        <a href="{{ route('admin.tenants.export', array_merge(request()->query(), ['history' => 1])) }}" class="button button-subtle">Export CSV</a>
+                        <a href="{{ route('admin.tenants.export', array_merge(request()->query(), ['history' => 1])) }}" class="button button-subtle">Export PDF</a>
                     </div>
                 </div>
             </form>
