@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FacilityController;
+use App\Http\Controllers\Admin\KosProfileController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\RoomImageController;
@@ -50,6 +51,8 @@ Route::middleware('auth')->group(function () {
         Route::get('tenants/assign', [AdminTenantController::class, 'createExisting'])->name('tenants.create-existing');
         Route::post('tenants/assign', [AdminTenantController::class, 'storeExisting'])->name('tenants.store-existing');
         Route::resource('tenants', AdminTenantController::class)->except('show');
+        Route::get('/profile', [KosProfileController::class, 'edit'])->name('kos-profile.edit');
+        Route::match(['put', 'patch'], '/profile', [KosProfileController::class, 'update'])->name('kos-profile.update');
     });
 
     Route::prefix('tenant')->name('tenant.')->middleware('tenant')->group(function () {

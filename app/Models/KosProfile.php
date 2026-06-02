@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['name', 'description', 'address', 'whatsapp_number', 'google_maps_url', 'google_maps_embed_url', 'nearby_places', 'logo'])]
+#[Fillable(['name', 'description', 'address', 'whatsapp_number', 'email', 'owner_name', 'google_maps_url', 'google_maps_embed_url', 'nearby_places', 'logo'])]
 class KosProfile extends Model
 {
     use HasFactory;
