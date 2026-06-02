@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TenantController extends Controller
 {
@@ -54,7 +54,7 @@ class TenantController extends Controller
         ]);
     }
 
-    public function export(Request $request): StreamedResponse
+    public function export(Request $request): \Illuminate\Http\Response
     {
         $history = $request->boolean('history');
         $filters = $this->filters($request, $history);
@@ -62,30 +62,11 @@ class TenantController extends Controller
             ->orderByDesc($history ? 'end_date' : 'id')
             ->get();
 
-        return response()->streamDownload(function () use ($tenants): void {
-            $handle = fopen('php://output', 'w');
+        $statusLabels = $this->statusLabels();
 
-            if ($handle === false) {
-                return;
-            }
+        $pdf = Pdf::loadView('admin.exports.tenants-pdf', compact('tenants', 'statusLabels', 'history'));
 
-            fputcsv($handle, ['Nama penghuni', 'Email', 'Nomor HP', 'Kamar', 'Tanggal masuk', 'Tanggal keluar', 'Status', 'Catatan']);
-
-            foreach ($tenants as $tenant) {
-                fputcsv($handle, [
-                    $tenant->user?->name,
-                    $tenant->user?->email,
-                    $tenant->user?->phone,
-                    $tenant->room?->name,
-                    $tenant->start_date?->format('Y-m-d'),
-                    $tenant->end_date?->format('Y-m-d'),
-                    $tenant->status,
-                    $tenant->notes,
-                ]);
-            }
-
-            fclose($handle);
-        }, $history ? 'tenant-history-export.csv' : 'active-tenants-export.csv');
+        return $pdf->download($history ? 'tenant-history-export.pdf' : 'active-tenants-export.pdf');
     }
 
     public function create(): View

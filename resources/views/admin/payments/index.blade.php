@@ -673,7 +673,7 @@
                 <div class="payment-filter-right">
                     <a href="{{ route('admin.payments.index') }}" class="button button-secondary">Reset</a>
                     <button type="submit" class="button btn-filter-apply">Terapkan filter</button>
-                    <a href="{{ route('admin.payments.export', request()->query()) }}" class="button button-subtle" title="Export CSV">
+                    <a href="{{ route('admin.payments.export', request()->query()) }}" class="button button-subtle" title="Export PDF">
                         <span class="material-symbols-outlined" style="font-size:16px;">download</span>
                     </a>
                 </div>
