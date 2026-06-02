@@ -29,9 +29,17 @@
                  --ui-accent-soft:    #EEF5EF;
             }
 
-            *, *::before, *::after { box-sizing: border-box; }
+             html { scroll-behavior: smooth; }
 
-             body {
+             *, *::before, *::after { box-sizing: border-box; }
+
+             #fasilitas,
+             #lokasi,
+             #kontak {
+                 scroll-margin-top: 80px;
+             }
+
+              body {
                  margin: 0;
                  min-height: 100vh;
                  background: rgba(251,248,243,.85);

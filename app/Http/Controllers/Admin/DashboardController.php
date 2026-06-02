@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Room;
 use App\Models\Tenant;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -24,15 +24,8 @@ class DashboardController extends Controller
             ->groupBy('status')
             ->pluck('total', 'status');
 
-        $deadlineCounts = DB::table('payment_deadline_view')
-            ->selectRaw('deadline_status, COUNT(*) as total')
-            ->groupBy('deadline_status')
-            ->pluck('total', 'deadline_status');
-
-        $rentCounts = DB::table('tenant_end_date_view')
-            ->selectRaw('rent_period_status, COUNT(*) as total')
-            ->groupBy('rent_period_status')
-            ->pluck('total', 'rent_period_status');
+        $deadlineCounts = $this->deadlineCounts();
+        $rentCounts = $this->rentCounts();
 
         $metrics = [
             'total_rooms' => Room::query()->count(),
@@ -114,41 +107,154 @@ class DashboardController extends Controller
 
     private function paymentWarningRows(): Collection
     {
-        return DB::table('payment_deadline_view as payment_deadlines')
-            ->join('users', 'users.id', '=', 'payment_deadlines.user_id')
-            ->join('rooms', 'rooms.id', '=', 'payment_deadlines.room_id')
-            ->select([
-                'payment_deadlines.id',
-                'payment_deadlines.amount',
-                'payment_deadlines.period_start',
-                'payment_deadlines.period_end',
-                'payment_deadlines.due_date',
-                'payment_deadlines.days_remaining',
-                'payment_deadlines.deadline_status',
-                'users.name as tenant_name',
-                'users.phone as tenant_phone',
-                'rooms.name as room_name',
-            ])
-            ->orderBy('payment_deadlines.due_date')
-            ->get();
+        $today = Carbon::today();
+
+        return Payment::query()
+            ->with(['tenant.user', 'tenant.room'])
+            ->where('status', '!=', 'paid')
+            ->orderBy('due_date')
+            ->get()
+            ->map(function ($payment) use ($today) {
+                $dueDate = $payment->due_date ? Carbon::parse($payment->due_date)->startOfDay() : null;
+
+                if ($dueDate === null) {
+                    $deadlineStatus = 'safe';
+                    $daysRemaining = null;
+                } elseif ($dueDate->lt($today)) {
+                    $deadlineStatus = 'overdue';
+                    $daysRemaining = (int) $dueDate->diffInDays($today, false);
+                } elseif ($dueDate->eq($today)) {
+                    $deadlineStatus = 'due_today';
+                    $daysRemaining = 0;
+                } elseif ($dueDate->diffInDays($today) <= 5) {
+                    $deadlineStatus = 'due_soon';
+                    $daysRemaining = (int) $dueDate->diffInDays($today);
+                } else {
+                    $deadlineStatus = 'safe';
+                    $daysRemaining = (int) $dueDate->diffInDays($today);
+                }
+
+                return (object) [
+                    'id' => $payment->id,
+                    'amount' => $payment->amount,
+                    'period_start' => $payment->period_start,
+                    'period_end' => $payment->period_end,
+                    'due_date' => $payment->due_date,
+                    'days_remaining' => $daysRemaining,
+                    'deadline_status' => $deadlineStatus,
+                    'tenant_name' => $payment->tenant?->user?->name,
+                    'tenant_phone' => $payment->tenant?->user?->phone,
+                    'room_name' => $payment->tenant?->room?->name,
+                ];
+            });
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function deadlineCounts(): array
+    {
+        $today = Carbon::today();
+        $counts = [
+            'paid' => Payment::query()->where('status', 'paid')->count(),
+            'due_soon' => 0,
+            'due_today' => 0,
+            'overdue' => 0,
+        ];
+
+        Payment::query()
+            ->where('status', '!=', 'paid')
+            ->select('due_date')
+            ->get()
+            ->each(function ($payment) use ($today, &$counts) {
+                $dueDate = $payment->due_date ? Carbon::parse($payment->due_date)->startOfDay() : null;
+
+                if ($dueDate === null) {
+                    return;
+                }
+
+                if ($dueDate->lt($today)) {
+                    $counts['overdue']++;
+                } elseif ($dueDate->eq($today)) {
+                    $counts['due_today']++;
+                } elseif ($dueDate->diffInDays($today) <= 5) {
+                    $counts['due_soon']++;
+                }
+            });
+
+        return $counts;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function rentCounts(): array
+    {
+        $today = Carbon::today();
+        $counts = [
+            'ending_soon' => 0,
+            'ends_today' => 0,
+            'ended' => 0,
+        ];
+
+        Tenant::query()
+            ->where('status', 'active')
+            ->whereNotNull('end_date')
+            ->select('end_date')
+            ->get()
+            ->each(function ($tenant) use ($today, &$counts) {
+                $endDate = Carbon::parse($tenant->end_date)->startOfDay();
+
+                if ($endDate->lt($today)) {
+                    $counts['ended']++;
+                } elseif ($endDate->eq($today)) {
+                    $counts['ends_today']++;
+                } elseif ($endDate->diffInDays($today) <= 14) {
+                    $counts['ending_soon']++;
+                }
+            });
+
+        return $counts;
     }
 
     private function tenantEndWarnings(): Collection
     {
-        return DB::table('tenant_end_date_view as tenant_end_dates')
-            ->join('users', 'users.id', '=', 'tenant_end_dates.user_id')
-            ->join('rooms', 'rooms.id', '=', 'tenant_end_dates.room_id')
-            ->select([
-                'tenant_end_dates.tenant_id',
-                'tenant_end_dates.start_date',
-                'tenant_end_dates.end_date',
-                'tenant_end_dates.days_until_end',
-                'tenant_end_dates.rent_period_status',
-                'users.name as tenant_name',
-                'rooms.name as room_name',
-            ])
-            ->orderBy('tenant_end_dates.end_date')
+        $today = Carbon::today();
+
+        return Tenant::query()
+            ->with(['user', 'room'])
+            ->where('status', 'active')
+            ->whereNotNull('end_date')
+            ->orderBy('end_date')
             ->get()
+            ->map(function ($tenant) use ($today) {
+                $endDate = Carbon::parse($tenant->end_date)->startOfDay();
+                $diff = $today->diffInDays($endDate, false);
+
+                if ($diff < 0) {
+                    $status = 'ended';
+                    $daysUntilEnd = (int) abs($diff);
+                } elseif ($diff === 0) {
+                    $status = 'ends_today';
+                    $daysUntilEnd = 0;
+                } elseif ($diff <= 14) {
+                    $status = 'ending_soon';
+                    $daysUntilEnd = (int) $diff;
+                } else {
+                    $status = 'safe';
+                    $daysUntilEnd = (int) $diff;
+                }
+
+                return (object) [
+                    'tenant_id' => $tenant->id,
+                    'start_date' => $tenant->start_date,
+                    'end_date' => $tenant->end_date,
+                    'days_until_end' => $daysUntilEnd,
+                    'rent_period_status' => $status,
+                    'tenant_name' => $tenant->user?->name,
+                    'room_name' => $tenant->room?->name,
+                ];
+            })
             ->filter(fn (object $tenant): bool => in_array($tenant->rent_period_status, ['ending_soon', 'ends_today', 'ended'], true))
             ->values()
             ->take(5);

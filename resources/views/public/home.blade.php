@@ -550,7 +550,7 @@
         .kontak-cta {
             background: var(--ui-ink);
             padding: 48px 16px;
-            margin-top: 0;
+            margin-top: 32px;
         }
 
         @media (min-width: 768px) {

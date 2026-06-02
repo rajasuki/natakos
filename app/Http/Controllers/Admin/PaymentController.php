@@ -6,15 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Tenant;
 use App\Support\PaymentWorkflow;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PaymentController extends Controller
@@ -41,7 +42,7 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function export(Request $request): \Illuminate\Http\Response
+    public function export(Request $request): Response
     {
         $filters = $this->filters($request);
         $payments = $this->paymentsQuery($filters)
@@ -285,24 +286,69 @@ class PaymentController extends Controller
         }
 
         $labels = $this->deadlineStatusLabels();
+        $today = Carbon::today();
 
-        return DB::table('payment_deadline_view')
-            ->whereIn('id', $payments->modelKeys())
-            ->get()
-            ->mapWithKeys(function ($row) use ($labels): array {
-                $status = $row->deadline_status;
-                $daysRemaining = $row->days_remaining !== null ? (int) $row->days_remaining : null;
+        return $payments->mapWithKeys(function ($payment) use ($labels, $today): array {
+            $id = (int) $payment->id;
 
-                return [
-                    (int) $row->id => [
-                        'status' => $status,
-                        'label' => $labels[$status] ?? $status,
-                        'days_remaining' => $daysRemaining,
-                        'message' => $this->deadlineMessage($status, $daysRemaining),
-                    ],
-                ];
-            })
-            ->all();
+            if ($payment->status === 'paid') {
+                return [$id => [
+                    'status' => 'paid',
+                    'label' => $labels['paid'],
+                    'days_remaining' => null,
+                    'message' => $this->deadlineMessage('paid', null),
+                ]];
+            }
+
+            $dueDate = $payment->due_date ? Carbon::parse($payment->due_date)->startOfDay() : null;
+
+            if ($dueDate === null) {
+                return [$id => [
+                    'status' => 'safe',
+                    'label' => $labels['safe'],
+                    'days_remaining' => null,
+                    'message' => $this->deadlineMessage('safe', null),
+                ]];
+            }
+
+            $diff = $today->diffInDays($dueDate, false);
+
+            if ($diff < 0) {
+                $daysOverdue = (int) abs($diff);
+
+                return [$id => [
+                    'status' => 'overdue',
+                    'label' => $labels['overdue'],
+                    'days_remaining' => -$daysOverdue,
+                    'message' => $this->deadlineMessage('overdue', $daysOverdue),
+                ]];
+            }
+
+            if ($diff === 0) {
+                return [$id => [
+                    'status' => 'due_today',
+                    'label' => $labels['due_today'],
+                    'days_remaining' => 0,
+                    'message' => $this->deadlineMessage('due_today', 0),
+                ]];
+            }
+
+            if ($diff <= 5) {
+                return [$id => [
+                    'status' => 'due_soon',
+                    'label' => $labels['due_soon'],
+                    'days_remaining' => (int) $diff,
+                    'message' => $this->deadlineMessage('due_soon', (int) $diff),
+                ]];
+            }
+
+            return [$id => [
+                'status' => 'safe',
+                'label' => $labels['safe'],
+                'days_remaining' => (int) $diff,
+                'message' => $this->deadlineMessage('safe', (int) $diff),
+            ]];
+        })->all();
     }
 
     private function deadlineMessage(string $status, ?int $daysRemaining): string
@@ -341,12 +387,25 @@ class PaymentController extends Controller
             })
             ->when($filters['status'] !== null, fn ($query) => $query->where('status', $filters['status']))
             ->when($filters['deadline_status'] !== null, function ($query) use ($filters) {
-                $query->whereIn('id', function ($deadlineQuery) use ($filters) {
-                    $deadlineQuery
-                        ->select('id')
-                        ->from('payment_deadline_view')
-                        ->where('deadline_status', $filters['deadline_status']);
-                });
+                $today = now()->startOfDay();
+
+                match ($filters['deadline_status']) {
+                    'paid' => $query->where('status', 'paid'),
+                    'overdue' => $query
+                        ->where('status', '!=', 'paid')
+                        ->where('due_date', '<', $today),
+                    'due_today' => $query
+                        ->where('status', '!=', 'paid')
+                        ->whereDate('due_date', $today),
+                    'due_soon' => $query
+                        ->where('status', '!=', 'paid')
+                        ->where('due_date', '>', $today)
+                        ->where('due_date', '<=', $today->copy()->addDays(5)),
+                    'safe' => $query
+                        ->where('status', '!=', 'paid')
+                        ->where('due_date', '>', $today->copy()->addDays(5)),
+                    default => null,
+                };
             });
     }
 

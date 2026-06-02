@@ -7,9 +7,9 @@ use App\Models\KosProfile;
 use App\Models\Payment;
 use App\Models\Tenant;
 use App\Support\WhatsappLink;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -53,19 +53,14 @@ class DashboardController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        $paymentDeadlines = DB::table('payment_deadline_view')
-            ->where('tenant_id', $tenant->id)
-            ->get()
-            ->keyBy('id');
+        $paymentDeadlines = $this->paymentDeadlines($payments);
 
         $featuredPayment = $this->featuredPayment($payments);
         $paymentDeadline = $featuredPayment !== null
             ? $paymentDeadlines->get($featuredPayment->id)
             : null;
 
-        $rentSummary = DB::table('tenant_end_date_view')
-            ->where('tenant_id', $tenant->id)
-            ->first();
+        $rentSummary = $this->rentSummary($tenant);
 
         return view('tenant.dashboard', [
             'user' => $user,
@@ -158,10 +153,9 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  object|null  $paymentDeadline
      * @return array<string, string>|null
      */
-    private function paymentWarning(object|null $paymentDeadline): ?array
+    private function paymentWarning(?object $paymentDeadline): ?array
     {
         if ($paymentDeadline === null) {
             return null;
@@ -188,10 +182,9 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  object|null  $rentSummary
      * @return array<string, string>|null
      */
-    private function rentWarning(object|null $rentSummary): ?array
+    private function rentWarning(?object $rentSummary): ?array
     {
         if ($rentSummary === null) {
             return null;
@@ -215,5 +208,80 @@ class DashboardController extends Controller
             ],
             default => null,
         };
+    }
+
+    /**
+     * @param  Collection<int, Payment>  $payments
+     * @return Collection<string, object>
+     */
+    private function paymentDeadlines(Collection $payments): Collection
+    {
+        $today = Carbon::today();
+
+        return $payments->mapWithKeys(function ($payment) use ($today) {
+            $id = $payment->id;
+
+            if ($payment->status === 'paid') {
+                return [(string) $id => (object) [
+                    'id' => $id,
+                    'deadline_status' => 'paid',
+                    'days_remaining' => null,
+                ]];
+            }
+
+            $dueDate = $payment->due_date ? Carbon::parse($payment->due_date)->startOfDay() : null;
+
+            if ($dueDate === null) {
+                return [(string) $id => (object) [
+                    'id' => $id,
+                    'deadline_status' => 'safe',
+                    'days_remaining' => null,
+                ]];
+            }
+
+            $diff = $today->diffInDays($dueDate, false);
+
+            $status = match (true) {
+                $diff < 0 => 'overdue',
+                $diff === 0 => 'due_today',
+                $diff <= 5 => 'due_soon',
+                default => 'safe',
+            };
+
+            return [(string) $id => (object) [
+                'id' => $id,
+                'deadline_status' => $status,
+                'days_remaining' => (int) $diff,
+            ]];
+        });
+    }
+
+    /**
+     * @return object{rent_period_status:string, days_until_end:int|null}|null
+     */
+    private function rentSummary(Tenant $tenant): ?object
+    {
+        if ($tenant->end_date === null) {
+            return (object) [
+                'rent_period_status' => 'no_end_date',
+                'days_until_end' => null,
+            ];
+        }
+
+        $today = Carbon::today();
+        $endDate = Carbon::parse($tenant->end_date)->startOfDay();
+        $diff = $today->diffInDays($endDate, false);
+
+        $status = match (true) {
+            $diff < 0 => 'ended',
+            $diff === 0 => 'ends_today',
+            $diff <= 14 => 'ending_soon',
+            default => 'safe',
+        };
+
+        return (object) [
+            'rent_period_status' => $status,
+            'days_until_end' => (int) $diff,
+        ];
     }
 }

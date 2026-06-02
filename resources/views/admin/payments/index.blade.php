@@ -521,6 +521,53 @@
         font-size: 14px;
     }
 
+    /* ── Modal Reject ── */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.45);
+        z-index: 100;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+    .modal-overlay.is-open { display: flex; }
+    .modal-box {
+        background: #fff;
+        border-radius: 16px;
+        max-width: 480px;
+        width: 100%;
+        padding: 28px;
+        box-shadow: 0 16px 48px rgba(0,0,0,.2);
+    }
+    .modal-box h3 { margin: 0 0 8px; font-size: 18px; color: var(--ui-ink); }
+    .modal-box p { margin: 0 0 20px; font-size: 14px; color: var(--ui-body); line-height: 1.6; }
+    .modal-box textarea {
+        width: 100%;
+        min-height: 100px;
+        padding: 12px;
+        border: 1px solid var(--ui-border);
+        border-radius: 10px;
+        font-size: 14px;
+        font-family: inherit;
+        resize: vertical;
+        color: var(--ui-ink);
+        background: #fff;
+        outline: none;
+    }
+    .modal-box textarea:focus {
+        border-color: var(--ui-accent);
+        box-shadow: 0 0 0 3px rgba(74,124,89,.15);
+    }
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        justify-content: flex-end;
+    }
+    .modal-actions .button { min-height: 40px; padding: 10px 20px; }
+
     .payment-rejection-note {
         font-size: 11px;
         color: #991b1b;
@@ -761,15 +808,10 @@
                                                         Setujui
                                                     </button>
                                                 </form>
-                                                <form method="POST" action="{{ route('admin.payments.review.update', $payment) }}" style="display:inline;">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <input type="hidden" name="review_action" value="reject">
-                                                    <button type="submit" class="payment-action-reject" title="Tolak" onclick="return confirm('Tolak pembayaran ini?');">
-                                                        <span class="material-symbols-outlined">close</span>
-                                                        Tolak
-                                                    </button>
-                                                </form>
+                                                <button type="button" class="payment-action-reject" title="Tolak" onclick="openRejectModal({{ $payment->id }})">
+                                                    <span class="material-symbols-outlined">close</span>
+                                                    Tolak
+                                                </button>
                                             @endif
 
                                             @if ($reminderUrl && in_array($payment->status, ['unpaid', 'rejected'], true))
@@ -821,4 +863,37 @@
             </div>
         </div>
     @endif
+
+    {{-- ── Reject Modal ── --}}
+    <div class="modal-overlay" id="rejectModal">
+        <div class="modal-box">
+            <h3>Tolak pembayaran</h3>
+            <p>Alasan penolakan wajib diisi agar penghuni tahu apa yang perlu diperbaiki.</p>
+            <form method="POST" action="" id="rejectForm">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="review_action" value="reject">
+                <textarea name="rejection_reason" placeholder="Tulis alasan penolakan..." required></textarea>
+                <div class="modal-actions">
+                    <button type="button" class="button button-secondary" onclick="closeRejectModal()">Batal</button>
+                    <button type="submit" class="button button-primary" style="background:#dc2626;">Tolak Pembayaran</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openRejectModal(paymentId) {
+            const form = document.getElementById('rejectForm');
+            form.action = '{{ route('admin.payments.review.update', '__PAYMENT__') }}'.replace('__PAYMENT__', paymentId);
+            document.getElementById('rejectModal').classList.add('is-open');
+        }
+        function closeRejectModal() {
+            document.getElementById('rejectModal').classList.remove('is-open');
+            document.getElementById('rejectForm').querySelector('textarea').value = '';
+        }
+        document.getElementById('rejectModal').addEventListener('click', function (e) {
+            if (e.target === this) closeRejectModal();
+        });
+    </script>
 @endsection
