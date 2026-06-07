@@ -885,6 +885,76 @@
                  border-radius: 6px;
                  font-size: 14px;
              }
+
+            /* ── Visual polish ─────────────────────── */
+            @keyframes publicFadeUp {
+                from { opacity: 0; transform: translateY(16px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+
+            .page-section {
+                animation: publicFadeUp .5s ease both;
+            }
+            .page-section:nth-child(1) { animation-delay: .05s; }
+            .page-section:nth-child(2) { animation-delay: .15s; }
+            .page-section:nth-child(3) { animation-delay: .25s; }
+            .page-section:nth-child(4) { animation-delay: .35s; }
+
+            .room-card {
+                transition: transform .3s ease, box-shadow .3s ease;
+            }
+            .room-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 32px rgba(28,43,34,.12);
+            }
+
+            .room-card-media {
+                transition: transform .4s ease;
+            }
+            .room-card:hover .room-card-media {
+                transform: scale(1.04);
+            }
+
+            .feature-card {
+                transition: transform .25s ease, box-shadow .25s ease;
+            }
+            .feature-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 24px rgba(28,43,34,.1);
+            }
+
+            .hero-band {
+                animation: publicFadeUp .6s ease both;
+                transition: box-shadow .3s ease;
+            }
+            .hero-band:hover {
+                box-shadow: 0 8px 32px rgba(28,43,34,.1);
+            }
+
+            ::-webkit-scrollbar { width: 6px; }
+            ::-webkit-scrollbar-track { background: transparent; }
+            ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 999px; }
+            ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
+
+            .brand-link:hover .brand-mark {
+                box-shadow: 0 4px 16px rgba(74,124,89,.3);
+            }
+
+            .section-dark .room-card,
+            .section-dark .feature-card {
+                background: rgba(255,255,255,.04);
+                border-color: rgba(255,255,255,.08);
+            }
+            .section-dark .room-card:hover,
+            .section-dark .feature-card:hover {
+                background: rgba(255,255,255,.08);
+                border-color: rgba(255,255,255,.12);
+            }
+
+            .glow-blob {
+                animation: glow-float 14s ease-in-out infinite alternate;
+                will-change: transform;
+            }
         </style>
 
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">

@@ -1112,6 +1112,7 @@
             }
         </style>
 
+        @include('admin._polish')
         @stack('styles')
     </head>
     <body>

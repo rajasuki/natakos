@@ -33,6 +33,7 @@
                         <a href="{{ route('admin.tenants.index') }}" class="dropdown-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}">Penghuni</a>
                         <a href="{{ route('admin.payments.index') }}" class="dropdown-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}">Pembayaran</a>
                         <a href="{{ route('admin.bookings.index') }}" class="dropdown-link {{ request()->routeIs('admin.bookings.*') ? 'is-active' : '' }}">Pengajuan Sewa</a>
+                        <a href="{{ route('admin.users.index') }}" class="dropdown-link {{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}">Akun Pengguna</a>
                         <a href="{{ route('admin.kos-profile.edit') }}" class="dropdown-link {{ request()->routeIs('admin.kos-profile.*') ? 'is-active' : '' }}">Profil</a>
                         <div style="height:1px;background:var(--ui-border);margin:4px 0;"></div>
                         <a href="{{ route('admin.utility-bills.index') }}" class="dropdown-link {{ request()->routeIs('admin.utility-bills.*') ? 'is-active' : '' }}">Tagihan Utilitas</a>
@@ -92,6 +93,7 @@
                             <a href="{{ route('admin.facilities.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.facilities.*') ? 'is-active' : '' }}">Fasilitas</a>
                             <a href="{{ route('admin.tenants.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}">Penghuni</a>
                             <a href="{{ route('admin.payments.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}">Pembayaran</a>
+                            <a href="{{ route('admin.users.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}">Akun Pengguna</a>
                             <a href="{{ route('admin.kos-profile.edit') }}" class="mobile-nav-link {{ request()->routeIs('admin.kos-profile.*') ? 'is-active' : '' }}">Profil</a>
                             <div class="mobile-nav-divider"></div>
                             <span class="mobile-nav-label">Lainnya</span>

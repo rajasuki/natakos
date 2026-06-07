@@ -102,8 +102,19 @@
                         <select id="room_id" name="room_id" class="select" required>
                             <option value="">Pilih kamar</option>
                             @foreach ($rooms as $room)
-                                <option value="{{ $room->id }}" @selected((string) old('room_id', $tenant?->room_id) === (string) $room->id)>
-                                    {{ $room->name }} - {{ $roomStatusLabels[$room->status] ?? $room->status }}
+                                @php
+                                    $isFull = ($room->available_slots ?? 0) <= 0;
+                                @endphp
+                                <option value="{{ $room->id }}" @selected((string) old('room_id', $tenant?->room_id) === (string) $room->id) @disabled($isFull)>
+                                    {{ $room->name }} — {{ $roomStatusLabels[$room->status] ?? $room->status }}
+                                    @if ($room->active_tenant_count > 0)
+                                        ({{ $room->active_tenant_count }}/{{ $room->capacity ?? 1 }} terisi)
+                                    @else
+                                        ({{ $room->capacity ?? 1 }} orang)
+                                    @endif
+                                    @if ($isFull)
+                                        — PENUH
+                                    @endif
                                 </option>
                             @endforeach
                         </select>

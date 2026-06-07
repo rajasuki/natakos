@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\RoomImageController;
 use App\Http\Controllers\Admin\TenantController as AdminTenantController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\UtilityBillController as AdminUtilityBillController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -83,6 +84,7 @@ Route::middleware('auth')->group(function () {
         Route::get('operational-expenses/export', [OperationalExpenseController::class, 'export'])->name('operational-expenses.export');
         Route::get('operational-expenses/export-csv', [OperationalExpenseController::class, 'exportCsv'])->name('operational-expenses.export-csv');
         Route::resource('operational-expenses', OperationalExpenseController::class)->except('show');
+        Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
     });
 
     Route::prefix('tenant')->name('tenant.')->middleware('tenant')->group(function () {

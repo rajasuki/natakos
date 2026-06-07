@@ -104,6 +104,10 @@ class RoomController extends Controller
         $room = Room::create($data);
         $room->facilities()->sync($facilityIds);
 
+        if ($request->hasFile('gallery_photos')) {
+            $this->storeGalleryImages($request->file('gallery_photos'), $room);
+        }
+
         return redirect()
             ->route('admin.rooms.index')
             ->with('success', 'Kamar berhasil ditambahkan.');

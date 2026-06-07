@@ -104,7 +104,7 @@ class TenantController extends Controller
     public function create(): View
     {
         return view('admin.tenants.create', [
-            'rooms' => $this->rooms(),
+            'rooms' => $this->roomsWithOccupancy(),
             'roomStatusLabels' => $this->roomStatusLabels(),
             'statusLabels' => $this->statusLabels(),
         ]);
@@ -113,7 +113,7 @@ class TenantController extends Controller
     public function createExisting(): View
     {
         return view('admin.tenants.create-existing', [
-            'rooms' => $this->rooms(),
+            'rooms' => $this->roomsWithOccupancy(),
             'roomStatusLabels' => $this->roomStatusLabels(),
             'statusLabels' => $this->statusLabels(),
             'existingUsers' => User::query()
@@ -195,7 +195,7 @@ class TenantController extends Controller
     {
         return view('admin.tenants.edit', [
             'tenant' => $tenant->load(['user', 'room']),
-            'rooms' => $this->rooms(),
+            'rooms' => $this->roomsWithOccupancy(),
             'roomStatusLabels' => $this->roomStatusLabels(),
             'statusLabels' => $this->statusLabels(),
         ]);
@@ -434,6 +434,19 @@ class TenantController extends Controller
     private function rooms()
     {
         return Room::query()->orderBy('name')->get();
+    }
+
+    private function roomsWithOccupancy()
+    {
+        return Room::query()
+            ->withCount(['tenants as active_tenant_count' => fn ($q) => $q->where('status', 'active')])
+            ->orderBy('name')
+            ->get()
+            ->map(function ($room) {
+                $room->available_slots = ($room->capacity ?? 1) - ($room->active_tenant_count ?? 0);
+
+                return $room;
+            });
     }
 
     /**
