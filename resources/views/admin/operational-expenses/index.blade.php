@@ -10,6 +10,12 @@
         <span class="material-symbols-outlined" style="font-size:16px;">add</span>
         Catat biaya
     </a>
+    <a href="{{ route('admin.operational-expenses.export', request()->query()) }}" class="button button-secondary">
+        <span class="material-symbols-outlined" style="font-size:16px;">picture_as_pdf</span>
+    </a>
+    <a href="{{ route('admin.operational-expenses.export-csv', request()->query()) }}" class="button button-secondary">
+        <span class="material-symbols-outlined" style="font-size:16px;">download</span>
+    </a>
 @endsection
 
 @section('content')

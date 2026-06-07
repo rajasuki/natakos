@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\OperationalExpense;
 use App\Support\ActivityLogger;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -105,6 +107,78 @@ class OperationalExpenseController extends Controller
         return redirect()
             ->route('admin.operational-expenses.index')
             ->with('success', 'Biaya operasional berhasil dihapus.');
+    }
+
+    public function export(Request $request): Response
+    {
+        $filters = $this->filters($request);
+        $expenses = $this->exportQuery($filters)->get();
+        $categoryLabels = $this->categoryLabels();
+
+        $pdf = Pdf::loadView('admin.exports.operational-expenses-pdf', compact('expenses', 'categoryLabels'));
+
+        return $pdf->download('operational-expenses-export.pdf');
+    }
+
+    public function exportCsv(Request $request): Response
+    {
+        $filters = $this->filters($request);
+        $expenses = $this->exportQuery($filters)->get();
+        $categoryLabels = $this->categoryLabels();
+
+        $headers = ['Deskripsi', 'Kategori', 'Jumlah', 'Tanggal', 'Catatan'];
+        $rows = $expenses->map(fn ($e) => [
+            $e->description,
+            $categoryLabels[$e->category] ?? $e->category,
+            $e->amount,
+            $e->date?->format('Y-m-d') ?? '',
+            $e->notes ?? '',
+        ]);
+
+        $csv = $this->buildCsv($headers, $rows->all());
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="operational-expenses-export.csv"',
+        ]);
+    }
+
+    private function exportQuery(array $filters)
+    {
+        $query = OperationalExpense::query();
+
+        if ($filters['category'] !== null) {
+            $query->where('category', $filters['category']);
+        }
+
+        if ($filters['q'] !== null) {
+            $term = '%'.$filters['q'].'%';
+            $query->where(function ($q) use ($term) {
+                $q->where('description', 'like', $term)
+                    ->orWhere('notes', 'like', $term);
+            });
+        }
+
+        return $query->orderByDesc('date')->orderByDesc('id');
+    }
+
+    /**
+     * @param  array<int, string>  $headers
+     * @param  array<int, array<int, string>>  $rows
+     */
+    private function buildCsv(array $headers, array $rows): string
+    {
+        $output = fopen('php://temp', 'r+');
+
+        fputcsv($output, $headers, ',', '"', '');
+
+        foreach ($rows as $row) {
+            fputcsv($output, $row, ',', '"', '');
+        }
+
+        rewind($output);
+
+        return stream_get_contents($output);
     }
 
     private function categoryLabels(): array

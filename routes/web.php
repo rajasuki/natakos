@@ -76,8 +76,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/profile', [KosProfileController::class, 'edit'])->name('kos-profile.edit');
         Route::match(['put', 'patch'], '/profile', [KosProfileController::class, 'update'])->name('kos-profile.update');
         Route::get('logs', [ActivityLogController::class, 'index'])->name('logs.index');
+        Route::get('utility-bills/export', [AdminUtilityBillController::class, 'export'])->name('utility-bills.export');
+        Route::get('utility-bills/export-csv', [AdminUtilityBillController::class, 'exportCsv'])->name('utility-bills.export-csv');
         Route::resource('utility-bills', AdminUtilityBillController::class)->except('show');
         Route::resource('maintenance-requests', AdminMaintenanceRequestController::class)->except('create', 'store', 'show');
+        Route::get('operational-expenses/export', [OperationalExpenseController::class, 'export'])->name('operational-expenses.export');
+        Route::get('operational-expenses/export-csv', [OperationalExpenseController::class, 'exportCsv'])->name('operational-expenses.export-csv');
         Route::resource('operational-expenses', OperationalExpenseController::class)->except('show');
     });
 

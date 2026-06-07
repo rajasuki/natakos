@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Tenant;
 use App\Models\UtilityBill;
 use App\Support\ActivityLogger;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -128,6 +130,91 @@ class UtilityBillController extends Controller
         return redirect()
             ->route('admin.utility-bills.index')
             ->with('success', 'Tagihan utilitas berhasil dihapus.');
+    }
+
+    public function export(Request $request): Response
+    {
+        $filters = $this->filters($request);
+        $bills = $this->exportQuery($filters)->get();
+        $typeLabels = $this->typeLabels();
+        $statusLabels = $this->statusLabels();
+
+        $pdf = Pdf::loadView('admin.exports.utility-bills-pdf', compact('bills', 'typeLabels', 'statusLabels'));
+
+        return $pdf->download('utility-bills-export.pdf');
+    }
+
+    public function exportCsv(Request $request): Response
+    {
+        $filters = $this->filters($request);
+        $bills = $this->exportQuery($filters)->get();
+        $typeLabels = $this->typeLabels();
+        $statusLabels = $this->statusLabels();
+
+        $headers = ['Penghuni', 'Kamar', 'Jenis', 'Periode', 'Jumlah', 'Jatuh Tempo', 'Status', 'Dibayar', 'Catatan'];
+        $rows = $bills->map(fn ($b) => [
+            $b->tenant?->user?->name ?? '',
+            $b->tenant?->room?->name ?? '',
+            $typeLabels[$b->type] ?? $b->type,
+            $b->period,
+            $b->amount,
+            $b->due_date?->format('Y-m-d') ?? '',
+            $statusLabels[$b->status] ?? $b->status,
+            $b->paid_at?->format('Y-m-d') ?? '',
+            $b->notes ?? '',
+        ]);
+
+        $csv = $this->buildCsv($headers, $rows->all());
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="utility-bills-export.csv"',
+        ]);
+    }
+
+    private function exportQuery(array $filters)
+    {
+        $query = UtilityBill::query()->with(['tenant.user', 'tenant.room']);
+
+        if ($filters['type'] !== null) {
+            $query->where('type', $filters['type']);
+        }
+
+        if ($filters['status'] !== null) {
+            $query->where('status', $filters['status']);
+        }
+
+        if ($filters['q'] !== null) {
+            $term = '%'.$filters['q'].'%';
+            $query->where(function ($q) use ($term) {
+                $q->whereHas('tenant.user', function ($uq) use ($term) {
+                    $uq->where('name', 'like', $term);
+                })->orWhereHas('tenant.room', function ($rq) use ($term) {
+                    $rq->where('name', 'like', $term);
+                });
+            });
+        }
+
+        return $query->orderByDesc('id');
+    }
+
+    /**
+     * @param  array<int, string>  $headers
+     * @param  array<int, array<int, string>>  $rows
+     */
+    private function buildCsv(array $headers, array $rows): string
+    {
+        $output = fopen('php://temp', 'r+');
+
+        fputcsv($output, $headers, ',', '"', '');
+
+        foreach ($rows as $row) {
+            fputcsv($output, $row, ',', '"', '');
+        }
+
+        rewind($output);
+
+        return stream_get_contents($output);
     }
 
     private function typeLabels(): array
