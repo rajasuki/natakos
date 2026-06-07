@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ChatBan;
 use App\Models\ChatMessage;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -13,12 +14,23 @@ use Illuminate\View\View;
 
 class ChatController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $messages = ChatMessage::query()
-            ->with('user')
-            ->orderByDesc('created_at')
-            ->paginate(50);
+        $query = ChatMessage::query()->with('user');
+
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->integer('user_id'));
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date('date_from'));
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date('date_to'));
+        }
+
+        $messages = $query->orderByDesc('created_at')->paginate(50);
 
         $bans = ChatBan::query()
             ->with(['user', 'bannedBy'])
@@ -29,6 +41,7 @@ class ChatController extends Controller
             'messages' => $messages,
             'bans' => $bans,
             'users' => User::query()->where('role', 'tenant')->orderBy('name')->get(),
+            'filters' => $request->only(['user_id', 'date_from', 'date_to']),
         ]);
     }
 
@@ -87,5 +100,27 @@ class ChatController extends Controller
         return redirect()
             ->route('admin.chat.index')
             ->with('success', "{$user->name} berhasil di-unban dari obrolan.");
+    }
+
+    public function profile(Request $request): JsonResponse
+    {
+        $user = User::with('tenant.room')->findOrFail((int) $request->query('user'));
+
+        $roomName = null;
+        if ($user->tenant && $user->tenant->room) {
+            $roomName = $user->tenant->room->name;
+        }
+
+        return response()->json([
+            'name' => $user->name,
+            'email' => $user->email,
+            'bio' => $user->bio,
+            'avatar_url' => $user->avatar ? asset('storage/'.$user->avatar) : null,
+            'bg_url' => $user->profile_bg ? asset('storage/'.$user->profile_bg) : null,
+            'title' => $user->title,
+            'title_effect' => $user->title_effect ?? 'none',
+            'room' => $roomName,
+            'initial' => strtoupper(substr($user->name, 0, 1)),
+        ]);
     }
 }

@@ -109,13 +109,37 @@
                 </div>
             </div>
             <div class="card-body">
+                <form method="GET" action="{{ route('admin.chat.index') }}" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--ui-border);">
+                    <div class="field" style="flex:1;min-width:160px;">
+                        <label for="filter_user">Penghuni</label>
+                        <select id="filter_user" name="user_id" class="select">
+                            <option value="">Semua penghuni</option>
+                            @foreach ($users as $u)
+                                <option value="{{ $u->id }}" @selected((int)($filters['user_id'] ?? '') === $u->id)>{{ $u->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="field" style="flex:0 0 180px;">
+                        <label for="date_from">Dari tanggal</label>
+                        <input id="date_from" name="date_from" type="date" class="input" value="{{ $filters['date_from'] ?? '' }}">
+                    </div>
+                    <div class="field" style="flex:0 0 180px;">
+                        <label for="date_to">Sampai tanggal</label>
+                        <input id="date_to" name="date_to" type="date" class="input" value="{{ $filters['date_to'] ?? '' }}">
+                    </div>
+                    <button type="submit" class="button button-primary" style="margin-bottom:16px;">Filter</button>
+                    @if (count(array_filter($filters ?? [])))
+                        <a href="{{ route('admin.chat.index') }}" class="button button-subtle" style="margin-bottom:16px;">Hapus filter</a>
+                    @endif
+                </form>
+
                 @forelse ($messages as $msg)
                     @php
                         $initial = strtoupper(substr($msg->user->name, 0, 1));
                         $isEdited = $msg->created_at->timestamp !== $msg->updated_at->timestamp;
                     @endphp
                     <div style="display:flex; gap:12px; padding:12px 0; {{ !$loop->last ? 'border-bottom:1px solid var(--ui-border);' : '' }} align-items:flex-start;">
-                        <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--ui-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;overflow:hidden;">
+                        <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--ui-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;overflow:hidden;cursor:pointer;" data-user-id="{{ $msg->user_id }}" onclick="openProfilePopup(this.dataset.userId)">
                             @if ($msg->user->avatar)
                                 <img src="{{ asset('storage/'.$msg->user->avatar) }}" alt="" style="width:100%;height:100%;object-fit:cover;">
                             @else
@@ -124,7 +148,7 @@
                         </div>
                         <div style="flex:1;min-width:0;">
                             <div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;">
-                                <strong style="font-size:13px;">{{ $msg->user->name }}</strong>
+                                <strong style="font-size:13px;cursor:pointer;" data-user-id="{{ $msg->user_id }}" onclick="openProfilePopup(this.dataset.userId)">{{ $msg->user->name }}</strong>
                                 @if ($msg->user->title)
                                     <span class="user-title user-title-{{ $msg->user->title_effect ?: 'none' }}">{{ $msg->user->title }}</span>
                                 @endif
@@ -132,6 +156,11 @@
                                 @if ($isEdited) <span style="font-size:10px;color:var(--ui-body);font-style:italic;">· diedit</span> @endif
                             </div>
                             <div id="admin-msg-text-{{ $msg->id }}" style="font-size:14px;line-height:1.6;margin-top:2px;white-space:pre-wrap;">{{ $msg->content }}</div>
+                            @if ($msg->image)
+                                <a href="{{ asset('storage/'.$msg->image) }}" target="_blank" style="display:inline-block;margin-top:4px;">
+                                    <img src="{{ asset('storage/'.$msg->image) }}" alt="Gambar" style="max-width:100%;max-height:300px;border-radius:var(--radius-md);display:block;" loading="lazy">
+                                </a>
+                            @endif
                             <form method="POST" action="{{ route('admin.chat.update', $msg) }}" id="admin-msg-edit-{{ $msg->id }}" style="display:none;margin-top:6px;">
                                 @csrf @method('PUT')
                                 <textarea name="content" class="admin-edit-textarea" maxlength="1000" style="width:100%;border:1px solid var(--ui-accent);border-radius:6px;padding:8px 10px;font-size:14px;resize:none;min-height:60px;font-family:inherit;box-sizing:border-box;">{{ $msg->content }}</textarea>
@@ -157,16 +186,47 @@
                 @endforelse
 
                 <div style="margin-top:16px;">
-                    {{ $messages->links() }}
+                    {{ $messages->appends($filters)->links() }}
                 </div>
             </div>
         </section>
 
     </div>
+
+    <div class="profile-popup-overlay" id="profile-popup" onclick="if(event.target===this)closeProfilePopup()">
+        <div class="profile-popup" id="profile-popup-inner">
+            <div id="popup-bg" class="profile-popup-bg-empty">Latar profil</div>
+            <button class="profile-popup-close" onclick="closeProfilePopup()">&times;</button>
+            <div class="profile-popup-body">
+                <div class="profile-popup-avatar" id="popup-avatar">?</div>
+                <h3 class="profile-popup-name" id="popup-name">-</h3>
+                <span class="user-title" id="popup-title" style="display:none;"></span>
+                <p class="profile-popup-room" id="popup-room" style="display:none;"></p>
+                <p class="profile-popup-email" id="popup-email">-</p>
+                <div class="profile-popup-bio" id="popup-bio" style="display:none;"></div>
+                <div class="profile-popup-bio-empty" id="popup-bio-empty">Belum ada bio.</div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('styles')
 <style>
+    .profile-popup-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.3); z-index:999; align-items:center; justify-content:center; }
+    .profile-popup-overlay.is-open { display:flex; }
+    .profile-popup { background:#fff; border-radius:var(--radius-xl); max-width:380px; width:90%; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.15); animation:popIn .2s ease; }
+    @keyframes popIn { from{transform:scale(.95);opacity:0} to{transform:scale(1);opacity:1} }
+    .profile-popup-bg { width:100%; height:140px; object-fit:cover; display:block; background:var(--ui-soft); }
+    .profile-popup-bg-empty { width:100%; height:140px; background:linear-gradient(135deg, var(--ui-accent), #2d5a3e); display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; opacity:.6; }
+    .profile-popup-body { padding:0 20px 20px; margin-top:-40px; position:relative; }
+    .profile-popup-avatar { width:80px; height:80px; border-radius:50%; border:4px solid #fff; background:var(--ui-accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:700; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.1); }
+    .profile-popup-avatar img { width:100%; height:100%; object-fit:cover; }
+    .profile-popup-name { margin:12px 0 2px; font-size:18px; font-weight:700; color:var(--ui-ink); }
+    .profile-popup-room { margin:4px 0 0; font-size:13px; color:var(--ui-accent); font-weight:600; }
+    .profile-popup-email { margin:0 0 12px; font-size:13px; color:var(--ui-body); }
+    .profile-popup-bio { font-size:14px; line-height:1.6; color:var(--gray-600); white-space:pre-wrap; padding-top:12px; border-top:1px solid var(--ui-border); }
+    .profile-popup-bio-empty { font-size:13px; color:var(--ui-body); font-style:italic; padding-top:12px; border-top:1px solid var(--ui-border); }
+    .profile-popup-close { position:absolute; top:12px; right:12px; background:rgba(0,0,0,.4); color:#fff; border:0; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; }
     .user-title { display:inline-block; font-size:10px; font-weight:600; padding:1px 7px; border-radius:4px; margin-left:4px; vertical-align:middle; }
     .user-title-none { background:var(--ui-soft); color:var(--ui-body); }
     .user-title-gold { background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; box-shadow:0 0 8px rgba(245,158,11,.3); }
@@ -180,6 +240,66 @@
 
 @push('scripts')
 <script>
+    window.openProfilePopup = function(userId) {
+        fetch('{{ route('admin.chat.profile') }}?user=' + userId)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var nameEl = document.getElementById('popup-name');
+                nameEl.textContent = data.name;
+
+                var titleEl = document.getElementById('popup-title');
+                if (data.title) {
+                    titleEl.textContent = data.title;
+                    titleEl.className = 'user-title user-title-' + (data.title_effect || 'none');
+                    titleEl.style.display = 'inline-block';
+                } else {
+                    titleEl.style.display = 'none';
+                }
+
+                var roomEl = document.getElementById('popup-room');
+                if (data.room) {
+                    roomEl.textContent = data.room;
+                    roomEl.style.display = 'block';
+                } else {
+                    roomEl.style.display = 'none';
+                }
+
+                var avatarEl = document.getElementById('popup-avatar');
+                if (data.avatar_url) {
+                    avatarEl.innerHTML = '<img src="' + data.avatar_url + '" alt="' + data.name + '">';
+                } else {
+                    avatarEl.textContent = data.initial;
+                }
+
+                var bgEl = document.getElementById('popup-bg');
+                if (data.bg_url) {
+                    bgEl.className = 'profile-popup-bg';
+                    bgEl.innerHTML = '<img src="' + data.bg_url + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+                } else {
+                    bgEl.className = 'profile-popup-bg-empty';
+                    bgEl.textContent = 'Latar profil';
+                }
+
+                var bioEl = document.getElementById('popup-bio');
+                var bioEmptyEl = document.getElementById('popup-bio-empty');
+                if (data.bio) {
+                    bioEl.textContent = data.bio;
+                    bioEl.style.display = 'block';
+                    bioEmptyEl.style.display = 'none';
+                } else {
+                    bioEl.style.display = 'none';
+                    bioEmptyEl.style.display = 'block';
+                }
+
+                document.getElementById('profile-popup').classList.add('is-open');
+            })
+            .catch(function() {});
+    };
+
+    window.closeProfilePopup = function() {
+        document.getElementById('profile-popup').classList.remove('is-open');
+    };
+
     window.startAdminEdit = function(msgId) {
         document.getElementById('admin-msg-text-' + msgId).style.display = 'none';
         document.getElementById('admin-msg-edit-' + msgId).style.display = 'block';

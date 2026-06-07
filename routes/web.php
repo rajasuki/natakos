@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
         Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
         Route::match(['put', 'patch'], 'users/{user}/title', [AdminUserController::class, 'updateTitle'])->name('users.title');
         Route::get('chat', [AdminChatController::class, 'index'])->name('chat.index');
+        Route::get('chat/profile', [AdminChatController::class, 'profile'])->name('chat.profile');
         Route::match(['put', 'patch'], 'chat/{message}', [AdminChatController::class, 'update'])->name('chat.update');
         Route::delete('chat/{message}', [AdminChatController::class, 'destroy'])->name('chat.destroy');
         Route::post('chat/ban', [AdminChatController::class, 'ban'])->name('chat.ban');

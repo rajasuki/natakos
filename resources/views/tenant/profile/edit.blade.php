@@ -39,11 +39,8 @@
                 <div class="field">
                     <label>Foto Profil</label>
                     <div class="media-upload">
-                        @if ($user->avatar)
-                            <img src="{{ asset('storage/'.$user->avatar) }}" alt="{{ $user->name }}" class="media-preview">
-                        @else
-                            <div class="media-preview-placeholder">{{ strtoupper(substr($user->name, 0, 1)) }}</div>
-                        @endif
+                        <img src="{{ $user->avatar ? asset('storage/'.$user->avatar) : '' }}" alt="{{ $user->name }}" class="media-preview" id="avatar-preview-img" style="{{ $user->avatar ? '' : 'display:none' }}">
+                        <div class="media-preview-placeholder" id="avatar-placeholder" style="{{ $user->avatar ? 'display:none' : '' }}">{{ strtoupper(substr($user->name, 0, 1)) }}</div>
                         <div>
                             <label for="avatar" class="button button-subtle" style="cursor:pointer;">Pilih Gambar</label>
                             <input id="avatar" name="avatar" type="file" accept="image/*" hidden>
@@ -56,11 +53,8 @@
                 <div class="field">
                     <label>Latar Profil</label>
                     <div class="media-upload">
-                        @if ($user->profile_bg)
-                            <img src="{{ asset('storage/'.$user->profile_bg) }}" alt="Latar profil" class="bg-preview">
-                        @else
-                            <div class="bg-preview-empty">Belum ada latar</div>
-                        @endif
+                        <img src="{{ $user->profile_bg ? asset('storage/'.$user->profile_bg) : '' }}" alt="Latar profil" class="bg-preview" id="bg-preview-img" style="{{ $user->profile_bg ? '' : 'display:none' }}">
+                        <div class="bg-preview-empty" id="bg-preview-empty" style="{{ $user->profile_bg ? 'display:none' : '' }}">Belum ada latar</div>
                         <div>
                             <label for="profile_bg" class="button button-subtle" style="cursor:pointer;">Pilih Gambar</label>
                             <input id="profile_bg" name="profile_bg" type="file" accept="image/*" hidden>
@@ -130,3 +124,33 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+document.getElementById('avatar').onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const img = document.getElementById('avatar-preview-img');
+        img.src = ev.target.result;
+        img.style.display = '';
+        document.getElementById('avatar-placeholder').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+};
+
+document.getElementById('profile_bg').onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const img = document.getElementById('bg-preview-img');
+        img.src = ev.target.result;
+        img.style.display = '';
+        document.getElementById('bg-preview-empty').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+};
+</script>
+@endpush
