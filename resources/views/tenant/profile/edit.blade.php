@@ -11,22 +11,62 @@
     .form-card { background:#fff; border:1px solid var(--ui-border); border-radius:var(--radius-lg); padding:24px; }
     .field { display:grid; gap:6px; margin-bottom:16px; }
     .field label { font-size:13px; font-weight:600; color:var(--gray-600); }
-    .input { width:100%; border:1px solid var(--ui-border); background:#fff; color:var(--ui-ink); padding:10px 14px; border-radius:var(--radius-md); font-size:14px; transition:border-color .15s; }
-    .input:focus { outline:none; border-color:var(--ui-accent); box-shadow:0 0 0 3px rgba(74,124,89,.12); }
+    .input, .textarea { width:100%; border:1px solid var(--ui-border); background:#fff; color:var(--ui-ink); padding:10px 14px; border-radius:var(--radius-md); font-size:14px; transition:border-color .15s; font-family:inherit; }
+    .input:focus, .textarea:focus { outline:none; border-color:var(--ui-accent); box-shadow:0 0 0 3px rgba(74,124,89,.12); }
+    .textarea { resize:vertical; min-height:80px; }
     .field-error { color:#be123c; font-size:12px; font-weight:600; }
     .helper { font-size:12px; color:var(--ui-body); margin-top:4px; }
     .form-sep { height:1px; background:var(--ui-border); border:0; margin:24px 0; }
+    .media-upload { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+    .media-preview { width:72px; height:72px; border-radius:50%; object-fit:cover; border:2px solid var(--ui-border); background:var(--ui-soft); flex-shrink:0; }
+    .media-preview-placeholder { width:72px; height:72px; border-radius:50%; background:var(--ui-accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:700; border:2px solid var(--ui-accent); flex-shrink:0; }
+    .bg-preview { width:160px; height:90px; border-radius:var(--radius-md); object-fit:cover; border:1px solid var(--ui-border); background:var(--ui-soft); flex-shrink:0; }
+    .bg-preview-empty { width:160px; height:90px; border-radius:var(--radius-md); border:2px dashed var(--ui-border); display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--ui-body); flex-shrink:0; }
 </style>
 @endpush
 
 @section('content')
     <div class="form-wrap">
         <h1>Edit Profil</h1>
-        <p>Perbarui data diri dan password akun Anda.</p>
+        <p>Perbarui foto, bio, latar profil, dan data akun Anda.</p>
 
         <div class="form-card">
-            <form method="POST" action="{{ route('tenant.profile.update') }}">
+            <form method="POST" action="{{ route('tenant.profile.update') }}" enctype="multipart/form-data">
                 @csrf @method('PUT')
+
+                <div class="field">
+                    <label>Foto Profil</label>
+                    <div class="media-upload">
+                        @if ($user->avatar)
+                            <img src="{{ asset('storage/'.$user->avatar) }}" alt="{{ $user->name }}" class="media-preview">
+                        @else
+                            <div class="media-preview-placeholder">{{ strtoupper(substr($user->name, 0, 1)) }}</div>
+                        @endif
+                        <div>
+                            <label for="avatar" class="button button-subtle" style="cursor:pointer;">Pilih Gambar</label>
+                            <input id="avatar" name="avatar" type="file" accept="image/*" hidden>
+                            <div class="helper">Format: JPG, JPEG, PNG, WEBP, GIF. Maks. 5MB.</div>
+                            @error('avatar') <div class="field-error">{{ $message }}</div> @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Latar Profil</label>
+                    <div class="media-upload">
+                        @if ($user->profile_bg)
+                            <img src="{{ asset('storage/'.$user->profile_bg) }}" alt="Latar profil" class="bg-preview">
+                        @else
+                            <div class="bg-preview-empty">Belum ada latar</div>
+                        @endif
+                        <div>
+                            <label for="profile_bg" class="button button-subtle" style="cursor:pointer;">Pilih Gambar</label>
+                            <input id="profile_bg" name="profile_bg" type="file" accept="image/*" hidden>
+                            <div class="helper">Gambar latar profil. GIF didukung dan akan berjalan otomatis. Maks. 5MB.</div>
+                            @error('profile_bg') <div class="field-error">{{ $message }}</div> @enderror
+                        </div>
+                    </div>
+                </div>
 
                 <div class="field">
                     <label for="name">Nama Lengkap <span class="muted">*</span></label>
@@ -44,6 +84,13 @@
                     <label for="phone">Nomor Telepon</label>
                     <input id="phone" name="phone" type="text" value="{{ old('phone', $user->phone) }}" class="input" placeholder="08xxxxxxxxxx">
                     @error('phone') <div class="field-error">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="field">
+                    <label for="bio">Tentang Saya</label>
+                    <textarea id="bio" name="bio" class="textarea" maxlength="1000" placeholder="Ceritakan tentang diri Anda...">{{ old('bio', $user->bio) }}</textarea>
+                    @error('bio') <div class="field-error">{{ $message }}</div> @enderror
+                    <div class="helper">Penghuni lain bisa melihat bio ini saat melihat profil Anda di obrolan.</div>
                 </div>
 
                 <hr class="form-sep">

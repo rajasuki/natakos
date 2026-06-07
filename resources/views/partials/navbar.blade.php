@@ -37,6 +37,7 @@
                         <a href="{{ route('admin.kos-profile.edit') }}" class="dropdown-link {{ request()->routeIs('admin.kos-profile.*') ? 'is-active' : '' }}">Profil</a>
                         <div style="height:1px;background:var(--ui-border);margin:4px 0;"></div>
                         <a href="{{ route('admin.utility-bills.index') }}" class="dropdown-link {{ request()->routeIs('admin.utility-bills.*') ? 'is-active' : '' }}">Tagihan Utilitas</a>
+                        <a href="{{ route('admin.chat.index') }}" class="dropdown-link {{ request()->routeIs('admin.chat.*') ? 'is-active' : '' }}">Obrolan</a>
                         <a href="{{ route('admin.maintenance-requests.index') }}" class="dropdown-link {{ request()->routeIs('admin.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
                         <a href="{{ route('admin.operational-expenses.index') }}" class="dropdown-link {{ request()->routeIs('admin.operational-expenses.*') ? 'is-active' : '' }}">Biaya Operasional</a>
                         <a href="{{ route('admin.logs.index') }}" class="dropdown-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}">Log Aktivitas</a>
@@ -50,6 +51,7 @@
                     </a>
                     <div class="nav-dropdown">
                         <a href="{{ route('tenant.dashboard') }}" class="dropdown-link {{ request()->routeIs('tenant.dashboard') ? 'is-active' : '' }}">Dashboard</a>
+                        <a href="{{ route('tenant.chat.index') }}" class="dropdown-link {{ request()->routeIs('tenant.chat.*') ? 'is-active' : '' }}">Obrolan</a>
                         <a href="{{ route('tenant.maintenance-requests.index') }}" class="dropdown-link {{ request()->routeIs('tenant.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
                         <a href="{{ route('tenant.profile.edit') }}" class="dropdown-link {{ request()->routeIs('tenant.profile.*') ? 'is-active' : '' }}">Profil</a>
                     </div>
@@ -98,6 +100,7 @@
                             <div class="mobile-nav-divider"></div>
                             <span class="mobile-nav-label">Lainnya</span>
                             <a href="{{ route('admin.utility-bills.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.utility-bills.*') ? 'is-active' : '' }}">Tagihan Utilitas</a>
+                            <a href="{{ route('admin.chat.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.chat.*') ? 'is-active' : '' }}">Obrolan</a>
                             <a href="{{ route('admin.maintenance-requests.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
                             <a href="{{ route('admin.operational-expenses.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.operational-expenses.*') ? 'is-active' : '' }}">Biaya Operasional</a>
                             <a href="{{ route('admin.logs.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}">Log Aktivitas</a>
@@ -105,6 +108,7 @@
                             <div class="mobile-nav-divider"></div>
                             <span class="mobile-nav-label">Tenant</span>
                             <a href="{{ route('tenant.dashboard') }}" class="mobile-nav-link {{ request()->routeIs('tenant.dashboard') ? 'is-active' : '' }}" @if(request()->routeIs('tenant.dashboard')) aria-current="page" @endif>Dashboard</a>
+                            <a href="{{ route('tenant.chat.index') }}" class="mobile-nav-link {{ request()->routeIs('tenant.chat.*') ? 'is-active' : '' }}">Obrolan</a>
                             <a href="{{ route('tenant.maintenance-requests.index') }}" class="mobile-nav-link {{ request()->routeIs('tenant.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
                             <a href="{{ route('tenant.profile.edit') }}" class="mobile-nav-link {{ request()->routeIs('tenant.profile.*') ? 'is-active' : '' }}">Profil</a>
                             @endif

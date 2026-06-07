@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
+use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\KosProfileController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Public\BookingController as PublicBookingController;
 use App\Http\Controllers\Public\HomeController as PublicHomeController;
 use App\Http\Controllers\Public\RoomController as PublicRoomController;
+use App\Http\Controllers\Tenant\ChatController as TenantChatController;
 use App\Http\Controllers\Tenant\DashboardController as TenantDashboardController;
 use App\Http\Controllers\Tenant\MaintenanceRequestController as TenantMaintenanceRequestController;
 use App\Http\Controllers\Tenant\PaymentProofController;
@@ -85,6 +87,10 @@ Route::middleware('auth')->group(function () {
         Route::get('operational-expenses/export-csv', [OperationalExpenseController::class, 'exportCsv'])->name('operational-expenses.export-csv');
         Route::resource('operational-expenses', OperationalExpenseController::class)->except('show');
         Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('chat', [AdminChatController::class, 'index'])->name('chat.index');
+        Route::delete('chat/{message}', [AdminChatController::class, 'destroy'])->name('chat.destroy');
+        Route::post('chat/ban', [AdminChatController::class, 'ban'])->name('chat.ban');
+        Route::delete('chat/unban/{ban}', [AdminChatController::class, 'unban'])->name('chat.unban');
     });
 
     Route::prefix('tenant')->name('tenant.')->middleware('tenant')->group(function () {
@@ -95,5 +101,11 @@ Route::middleware('auth')->group(function () {
         Route::post('maintenance-requests', [TenantMaintenanceRequestController::class, 'store'])->name('maintenance-requests.store');
         Route::get('profile', [TenantProfileController::class, 'edit'])->name('profile.edit');
         Route::match(['put', 'patch'], 'profile', [TenantProfileController::class, 'update'])->name('profile.update');
+        Route::get('chat', [TenantChatController::class, 'index'])->name('chat.index');
+        Route::get('chat/poll', [TenantChatController::class, 'poll'])->name('chat.poll');
+        Route::get('chat/profile', [TenantChatController::class, 'profile'])->name('chat.profile');
+        Route::post('chat', [TenantChatController::class, 'store'])->name('chat.store');
+        Route::match(['put', 'patch'], 'chat/{message}', [TenantChatController::class, 'update'])->name('chat.update');
+        Route::delete('chat/{message}', [TenantChatController::class, 'destroy'])->name('chat.destroy');
     });
 });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tenant;
 use App\Http\Controllers\Controller;
 use App\Models\BookingRequest;
 use App\Models\KosProfile;
+use App\Models\MaintenanceRequest;
 use App\Models\Payment;
 use App\Models\Tenant;
 use App\Models\UtilityBill;
@@ -49,6 +50,7 @@ class DashboardController extends Controller
                 'rentSummary' => null,
                 'rentWarning' => null,
                 'utilityBills' => collect(),
+                'maintenanceRequests' => collect(),
                 'whatsappUrl' => $whatsappUrl,
                 'roomStatusLabels' => $this->roomStatusLabels(),
                 'paymentStatusLabels' => $this->paymentStatusLabels(),
@@ -79,6 +81,12 @@ class DashboardController extends Controller
 
         $rentSummary = $this->rentSummary($tenant);
 
+        $maintenanceRequests = MaintenanceRequest::query()
+            ->where('tenant_id', $tenant->id)
+            ->orderByDesc('id')
+            ->limit(5)
+            ->get();
+
         return view('tenant.dashboard', [
             'user' => $user,
             'tenant' => $tenant,
@@ -91,6 +99,7 @@ class DashboardController extends Controller
             'rentSummary' => $rentSummary,
             'rentWarning' => $this->rentWarning($rentSummary),
             'utilityBills' => $utilityBills,
+            'maintenanceRequests' => $maintenanceRequests,
             'whatsappUrl' => $whatsappUrl,
             'roomStatusLabels' => $this->roomStatusLabels(),
             'paymentStatusLabels' => $this->paymentStatusLabels(),

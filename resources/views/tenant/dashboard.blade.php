@@ -797,6 +797,58 @@
                         </div>
                     </div>
                 </article>
+
+                {{-- Pengajuan Perbaikan --}}
+                <article class="tenant-card">
+                    <div class="tenant-card-head">
+                        <h2><span class="material-symbols-outlined">build</span> Pengajuan Perbaikan</h2>
+                        <a href="{{ route('tenant.maintenance-requests.create') }}" class="button button-primary" style="padding:6px 14px;font-size:12px;">Ajukan</a>
+                    </div>
+                    <div class="tenant-payment-list">
+                        @forelse ($maintenanceRequests as $mr)
+                            @php
+                                $mrPriorityLabels = ['low' => 'Rendah', 'normal' => 'Normal', 'high' => 'Tinggi', 'urgent' => 'Darurat'];
+                                $mrStatusLabels = ['pending' => 'Menunggu', 'in_progress' => 'Ditangani', 'resolved' => 'Selesai', 'rejected' => 'Ditolak'];
+                                $mrPriorityBadge = match($mr->priority) {
+                                    'urgent' => 'badge-rejected',
+                                    'high' => 'badge-unpaid',
+                                    'normal' => 'badge-pending',
+                                    default => 'badge-pending',
+                                };
+                                $mrStatusBadge = match($mr->status) {
+                                    'pending' => 'badge-pending',
+                                    'in_progress' => 'badge-unpaid',
+                                    'resolved' => 'badge-paid',
+                                    'rejected' => 'badge-rejected',
+                                    default => 'badge-unpaid',
+                                };
+                            @endphp
+                            <div class="tenant-payment-row">
+                                <div class="tenant-proof-main">
+                                    <div class="tenant-proof-period">{{ $mr->title }}</div>
+                                    <div class="tenant-proof-dates" style="margin-top:2px;">
+                                        <span class="tag tag-small" style="background:var(--ui-soft);padding:2px 8px;border-radius:6px;font-size:11px;">{{ $mrPriorityLabels[$mr->priority] ?? $mr->priority }}</span>
+                                    </div>
+                                </div>
+                                <div class="tenant-proof-status-wrap">
+                                    <span class="tenant-status-badge {{ $mrStatusBadge }}">{{ $mrStatusLabels[$mr->status] ?? $mr->status }}</span>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="tenant-empty">
+                                <p>Belum ada pengajuan perbaikan. Laporkan kerusakan kamar jika ada.</p>
+                                <div class="tenant-empty-actions">
+                                    <a href="{{ route('tenant.maintenance-requests.create') }}" class="button button-primary">Ajukan Perbaikan</a>
+                                </div>
+                            </div>
+                        @endforelse
+                        @if ($maintenanceRequests->isNotEmpty())
+                            <div class="tenant-payment-footer" style="border-top:0;padding-top:8px;">
+                                <a href="{{ route('tenant.maintenance-requests.index') }}" class="button button-subtle" style="font-size:12px;">Lihat semua pengajuan</a>
+                            </div>
+                        @endif
+                    </div>
+                </article>
             </div>
 
             {{-- RIGHT COLUMN --}}
