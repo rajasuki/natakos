@@ -10,6 +10,7 @@ use App\Support\ActivityLogger;
 use App\Support\RoomOccupancy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\View\View;
 
 class BookingController extends Controller
@@ -31,8 +32,12 @@ class BookingController extends Controller
         ]);
     }
 
-    public function approve(BookingRequest $booking): RedirectResponse
+    public function approve(Request $request, BookingRequest $booking): Redirector|RedirectResponse
     {
+        if ($request->isMethod('get')) {
+            return redirect()->route('admin.bookings.index');
+        }
+
         abort_if($booking->status !== 'pending', 404);
 
         $room = $booking->room;
@@ -84,8 +89,12 @@ class BookingController extends Controller
             ->with('success', 'Pengajuan sewa disetujui. Penghuni dan tagihan pertama sudah dibuat.');
     }
 
-    public function reject(Request $request, BookingRequest $booking): RedirectResponse
+    public function reject(Request $request, BookingRequest $booking): Redirector|RedirectResponse
     {
+        if ($request->isMethod('get')) {
+            return redirect()->route('admin.bookings.index');
+        }
+
         abort_if($booking->status !== 'pending', 404);
 
         $validated = $request->validate([

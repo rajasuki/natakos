@@ -47,8 +47,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
         Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
-        Route::match(['put', 'patch'], '/bookings/{booking}/approve', [AdminBookingController::class, 'approve'])->name('bookings.approve');
-        Route::match(['put', 'patch'], '/bookings/{booking}/reject', [AdminBookingController::class, 'reject'])->name('bookings.reject');
+        Route::match(['get', 'put', 'patch'], '/bookings/{booking}/approve', [AdminBookingController::class, 'approve'])->name('bookings.approve');
+        Route::match(['get', 'put', 'patch'], '/bookings/{booking}/reject', [AdminBookingController::class, 'reject'])->name('bookings.reject');
         Route::delete('/bookings/{booking}', [AdminBookingController::class, 'destroy'])->name('bookings.destroy');
         Route::resource('facilities', FacilityController::class)->except('show');
         Route::get('payments/{payment}/proof', [PaymentController::class, 'proof'])->name('payments.proof');
