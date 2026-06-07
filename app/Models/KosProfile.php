@@ -225,4 +225,12 @@ class KosProfile extends Model
             || $place['estimate_unit'] !== ''
             || $place['travel_mode'] !== '';
     }
+
+    protected function casts(): array
+    {
+        return [
+            'late_fee_per_day' => 'integer',
+            'max_late_fee' => 'integer',
+        ];
+    }
 }

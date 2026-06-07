@@ -558,10 +558,10 @@ class TenantController extends Controller
     {
         $output = fopen('php://temp', 'r+');
 
-        fputcsv($output, $headers, ',', '"', '');
+        fputcsv($output, $headers, ',', '"', '\\');
 
         foreach ($rows as $row) {
-            fputcsv($output, $row, ',', '"', '');
+            fputcsv($output, $row, ',', '"', '\\');
         }
 
         rewind($output);

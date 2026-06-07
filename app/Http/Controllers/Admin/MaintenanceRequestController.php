@@ -17,7 +17,7 @@ class MaintenanceRequestController extends Controller
     {
         $query = MaintenanceRequest::query()
             ->with(['tenant.user', 'tenant.room', 'room', 'resolvedBy'])
-            ->orderByRaw("FIELD(status, 'pending', 'in_progress', 'resolved', 'rejected')")
+            ->orderByRaw("CASE status WHEN 'pending' THEN 0 WHEN 'in_progress' THEN 1 WHEN 'resolved' THEN 2 ELSE 3 END")
             ->orderByDesc('id');
 
         $filters = $this->filters($request);

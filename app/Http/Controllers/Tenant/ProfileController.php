@@ -39,7 +39,7 @@ class ProfileController extends Controller
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
             'bio' => $validated['bio'] ?? null,
-            'show_room' => $request->boolean('show_room'),
+            'show_room' => (bool) ($validated['show_room'] ?? false),
         ];
 
         if ($request->hasFile('avatar')) {

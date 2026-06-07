@@ -82,7 +82,7 @@ class BookingController extends Controller
             'google_maps_url' => $profile?->google_maps_url,
             'google_maps_embed_url' => $profile?->google_maps_embed_url,
             'nearby_places' => $nearbyPlaces,
-            'email' => 'shyannuar24@gmail.com',
+            'email' => $profile?->email ?? 'shyannuar24@gmail.com',
         ];
     }
 }

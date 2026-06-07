@@ -79,7 +79,7 @@ class HomeController extends Controller
             'google_maps_embed_url' => $profile?->google_maps_embed_url,
             'nearby_places' => $nearbyPlaces,
             'whatsapp_url' => WhatsappLink::build($whatsappNumber, 'Halo, saya ingin bertanya tentang kamar di IchiKOS.'),
-            'email' => 'shyannuar24@gmail.com',
+            'email' => $profile?->email ?? 'shyannuar24@gmail.com',
             'owner_name' => 'Ibu Icih',
         ];
     }

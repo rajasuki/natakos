@@ -118,7 +118,7 @@ class DashboardController extends Controller
     {
         return $this->paymentWarningRows()
             ->filter(fn (object $payment): bool => $payment->deadline_status === 'overdue')
-            ->sortBy('days_remaining')
+            ->sortByDesc('days_remaining')
             ->values()
             ->take(5);
     }
