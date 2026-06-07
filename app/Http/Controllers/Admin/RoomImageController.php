@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Models\RoomImage;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,7 +25,7 @@ class RoomImageController extends Controller
         ]);
     }
 
-    public function store(Request $request, Room $room): RedirectResponse|\Illuminate\Http\JsonResponse
+    public function store(Request $request, Room $room): RedirectResponse|JsonResponse
     {
         $data = $request->validate([
             'images' => ['required', 'array', 'min:1'],

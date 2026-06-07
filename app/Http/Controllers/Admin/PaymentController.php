@@ -59,6 +59,39 @@ class PaymentController extends Controller
         return $pdf->download('payments-export.pdf');
     }
 
+    public function exportCsv(Request $request): Response
+    {
+        $filters = $this->filters($request);
+        $payments = $this->paymentsQuery($filters)
+            ->with(['tenant.user', 'tenant.room'])
+            ->orderBy('due_date')
+            ->orderByDesc('id')
+            ->get();
+
+        $statusLabels = $this->statusLabels();
+
+        $headers = ['Penghuni', 'Email', 'Kamar', 'Jumlah', 'Periode Mulai', 'Periode Selesai', 'Tenggat', 'Status', 'Dibayar', 'Catatan'];
+        $rows = $payments->map(fn ($p) => [
+            $p->tenant?->user?->name ?? '',
+            $p->tenant?->user?->email ?? '',
+            $p->tenant?->room?->name ?? '',
+            $p->amount,
+            $p->period_start?->format('Y-m-d') ?? '',
+            $p->period_end?->format('Y-m-d') ?? '',
+            $p->due_date?->format('Y-m-d') ?? '',
+            $statusLabels[$p->status] ?? $p->status,
+            $p->paid_at?->format('Y-m-d H:i') ?? '',
+            $p->notes ?? '',
+        ]);
+
+        $csv = $this->buildCsv($headers, $rows->all());
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="payments-export.csv"',
+        ]);
+    }
+
     public function create(): View
     {
         return view('admin.payments.create', [
@@ -445,6 +478,25 @@ class PaymentController extends Controller
             'Lunas' => Payment::query()->where('status', 'paid')->count(),
             'Ditolak' => Payment::query()->where('status', 'rejected')->count(),
         ];
+    }
+
+    /**
+     * @param  array<int, string>  $headers
+     * @param  array<int, array<int, string>>  $rows
+     */
+    private function buildCsv(array $headers, array $rows): string
+    {
+        $output = fopen('php://temp', 'r+');
+
+        fputcsv($output, $headers, ',', '"', '');
+
+        foreach ($rows as $row) {
+            fputcsv($output, $row, ',', '"', '');
+        }
+
+        rewind($output);
+
+        return stream_get_contents($output);
     }
 
     private function deleteProofImage(?string $path): void

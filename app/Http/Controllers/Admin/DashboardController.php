@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BookingRequest;
+use App\Models\MaintenanceRequest;
 use App\Models\Payment;
 use App\Models\Room;
 use App\Models\Tenant;
+use App\Models\UtilityBill;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
@@ -36,12 +39,15 @@ class DashboardController extends Controller
             'payments_unpaid' => $this->countFrom($paymentCounts, 'unpaid'),
             'payments_pending_verification' => $this->countFrom($paymentCounts, 'pending_verification'),
             'payments_paid' => $this->countFrom($paymentCounts, 'paid'),
-            'payments_due_soon' => $this->countFrom($deadlineCounts, 'due_soon'),
-            'payments_due_today' => $this->countFrom($deadlineCounts, 'due_today'),
-            'payments_overdue' => $this->countFrom($deadlineCounts, 'overdue'),
-            'tenants_ending_soon' => $this->countFrom($rentCounts, 'ending_soon'),
-            'tenants_end_today' => $this->countFrom($rentCounts, 'ends_today'),
-            'tenants_ended' => $this->countFrom($rentCounts, 'ended'),
+            'payments_due_soon' => $deadlineCounts['due_soon'] ?? 0,
+            'payments_due_today' => $deadlineCounts['due_today'] ?? 0,
+            'payments_overdue' => $deadlineCounts['overdue'] ?? 0,
+            'tenants_ending_soon' => $rentCounts['ending_soon'] ?? 0,
+            'tenants_end_today' => $rentCounts['ends_today'] ?? 0,
+            'tenants_ended' => $rentCounts['ended'] ?? 0,
+            'booking_pending' => BookingRequest::query()->where('status', 'pending')->count(),
+            'maintenance_pending' => MaintenanceRequest::query()->where('status', 'pending')->count(),
+            'utility_unpaid' => UtilityBill::query()->where('status', 'unpaid')->count(),
         ];
 
         return view('admin.dashboard', [

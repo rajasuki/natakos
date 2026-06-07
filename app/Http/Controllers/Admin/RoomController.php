@@ -6,16 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Facility;
 use App\Models\Room;
 use App\Support\RoomOccupancy;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class RoomController extends Controller
 {
@@ -36,7 +38,7 @@ class RoomController extends Controller
         ]);
     }
 
-    public function export(Request $request): \Illuminate\Http\Response
+    public function export(Request $request): Response
     {
         $filters = $this->filters($request);
 
@@ -50,6 +52,37 @@ class RoomController extends Controller
         $pdf = Pdf::loadView('admin.exports.rooms-pdf', compact('rooms', 'statusLabels'));
 
         return $pdf->download('rooms-export.pdf');
+    }
+
+    public function exportCsv(Request $request): Response
+    {
+        $filters = $this->filters($request);
+
+        $rooms = $this->roomsQuery($filters)
+            ->with(['facilities' => fn ($query) => $query->orderBy('type')->orderBy('name')])
+            ->latest('id')
+            ->get();
+
+        $statusLabels = $this->statusLabels();
+
+        $headers = ['Nama', 'Slug', 'Harga', 'Kapasitas', 'Ukuran', 'Lantai', 'Status', 'Deskripsi'];
+        $rows = $rooms->map(fn ($room) => [
+            $room->name,
+            $room->slug,
+            $room->price,
+            $room->capacity,
+            $room->size ?? '',
+            $room->floor ?? '',
+            $statusLabels[$room->status] ?? $room->status,
+            $room->description ?? '',
+        ]);
+
+        $csv = $this->buildCsv($headers, $rows->all());
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="rooms-export.csv"',
+        ]);
     }
 
     public function create(): View
@@ -163,6 +196,7 @@ class RoomController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'price' => ['required', 'integer', 'min:0'],
+            'capacity' => ['required', 'integer', 'min:1', 'max:10'],
             'size' => ['nullable', 'string', 'max:100'],
             'floor' => ['nullable', 'string', 'max:50'],
             'description' => ['nullable', 'string'],
@@ -315,7 +349,7 @@ class RoomController extends Controller
     }
 
     /**
-     * @param  array<int, \Illuminate\Http\UploadedFile>  $photos
+     * @param  array<int, UploadedFile>  $photos
      */
     private function storeGalleryImages(array $photos, Room $room): void
     {
@@ -330,6 +364,25 @@ class RoomController extends Controller
                 'sort_order' => $nextSortOrder,
             ]);
         }
+    }
+
+    /**
+     * @param  array<int, string>  $headers
+     * @param  array<int, array<int, string>>  $rows
+     */
+    private function buildCsv(array $headers, array $rows): string
+    {
+        $output = fopen('php://temp', 'r+');
+
+        fputcsv($output, $headers, ',', '"', '');
+
+        foreach ($rows as $row) {
+            fputcsv($output, $row, ',', '"', '');
+        }
+
+        rewind($output);
+
+        return stream_get_contents($output);
     }
 
     private function deleteImage(?string $path): void

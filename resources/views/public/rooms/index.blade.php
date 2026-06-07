@@ -856,6 +856,12 @@
                                         <h3 class="room-card-title">{{ $room->name }}</h3>
 
                                         <div class="room-card-chips">
+                                            @if ($room->capacity)
+                                                <span class="room-card-chip">
+                                                    <span class="material-symbols-outlined">groups</span>
+                                                    {{ $room->capacity }} org
+                                                </span>
+                                            @endif
                                             @if ($room->size)
                                                 <span class="room-card-chip">
                                                     <span class="material-symbols-outlined">aspect_ratio</span>

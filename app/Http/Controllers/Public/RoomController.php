@@ -206,5 +206,4 @@ class RoomController extends Controller
     {
         return addcslashes($value, '\\%_');
     }
-
 }

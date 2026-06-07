@@ -95,7 +95,7 @@ class FacilityIcon
     public static function render(Facility $facility, string $size = 'md'): string
     {
         $icon = self::resolve($facility);
-        $class = 'facility-icon' . ($size === 'sm' ? ' facility-icon-sm' : '');
+        $class = 'facility-icon'.($size === 'sm' ? ' facility-icon-sm' : '');
 
         return '<span class="material-symbols-outlined '.$class.'" style="font-variation-settings:\'FILL\' 0;">'.$icon.'</span>';
     }

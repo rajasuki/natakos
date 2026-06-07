@@ -30,6 +30,16 @@ class Tenant extends Model
         return $this->hasMany(Payment::class);
     }
 
+    public function utilityBills(): HasMany
+    {
+        return $this->hasMany(UtilityBill::class);
+    }
+
+    public function maintenanceRequests(): HasMany
+    {
+        return $this->hasMany(MaintenanceRequest::class);
+    }
+
     protected function casts(): array
     {
         return [

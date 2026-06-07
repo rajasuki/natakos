@@ -505,11 +505,42 @@
     }
 
     /* ── Empty state ── */
+    .tenant-status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    .tenant-status-badge.badge-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .tenant-status-badge.badge-paid {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .tenant-status-badge.badge-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .tenant-status-badge.badge-unpaid {
+        background: var(--ui-soft);
+        color: var(--ui-body);
+    }
+
     .tenant-empty {
-        padding: 40px 28px;
-        background: var(--gray-50);
-        border: 1.5px dashed var(--ui-border);
-        border-radius: var(--radius-lg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px;
         text-align: center;
     }
 
@@ -771,6 +802,60 @@
             {{-- RIGHT COLUMN --}}
             <div class="tenant-dash-right">
 
+                {{-- Booking Requests --}}
+                <article class="tenant-card">
+                    <div class="tenant-card-head">
+                        <h2><span class="material-symbols-outlined">how_to_reg</span> Pengajuan Sewa</h2>
+                        @if ($bookingRequests->isNotEmpty())
+                            <a href="{{ route('rooms.index') }}" class="button button-subtle" style="padding:6px 14px;font-size:12px;">Cari kamar lain</a>
+                        @endif
+                    </div>
+                    <div class="tenant-payment-list">
+                        @forelse ($bookingRequests as $br)
+                            @php
+                                $brStatusLabel = match($br->status) {
+                                    'pending' => 'Menunggu',
+                                    'approved' => 'Disetujui',
+                                    'rejected' => 'Ditolak',
+                                    default => $br->status,
+                                };
+                                $brBadgeClass = match($br->status) {
+                                    'pending' => 'badge-pending',
+                                    'approved' => 'badge-paid',
+                                    'rejected' => 'badge-rejected',
+                                    default => 'badge-unpaid',
+                                };
+                            @endphp
+                            <div class="tenant-payment-row">
+                                <div class="tenant-proof-main">
+                                    <div class="tenant-proof-period">
+                                        {{ $br->room?->name ?? 'Kamar dihapus' }}
+                                    </div>
+                                    <div class="tenant-proof-dates">
+                                        {{ \App\Support\UiFormatter::date($br->start_date) }} &mdash; {{ \App\Support\UiFormatter::date($br->end_date) }}
+                                    </div>
+                                    @if ($br->notes)
+                                        <div style="font-size:12px;color:var(--ui-body);margin-top:4px;">{{ $br->notes }}</div>
+                                    @endif
+                                    @if ($br->status === 'rejected' && $br->rejection_reason)
+                                        <div style="font-size:12px;color:#991b1b;margin-top:4px;">Alasan: {{ $br->rejection_reason }}</div>
+                                    @endif
+                                </div>
+                                <div class="tenant-proof-status-wrap">
+                                    <span class="tenant-status-badge {{ $brBadgeClass }}">{{ $brStatusLabel }}</span>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="tenant-empty">
+                                <p>Belum ada pengajuan sewa. Anda bisa mengajukan sewa langsung dari halaman detail kamar.</p>
+                                <div class="tenant-empty-actions">
+                                    <a href="{{ route('rooms.index') }}" class="button button-primary">Lihat kamar tersedia</a>
+                                </div>
+                            </div>
+                        @endforelse
+                    </div>
+                </article>
+
                 {{-- Pembayaran --}}
                 <article class="tenant-card">
                     <div class="tenant-card-head">
@@ -899,6 +984,44 @@
                         </div>
                     @endif
                 </article>
+
+                {{-- Tagihan Utilitas --}}
+                @if ($tenant && $utilityBills->isNotEmpty())
+                <article class="tenant-card">
+                    <div class="tenant-card-head">
+                        <h2><span class="material-symbols-outlined">bolt</span> Tagihan Utilitas</h2>
+                    </div>
+                    <div class="tenant-payment-list">
+                        @foreach ($utilityBills as $bill)
+                            <article class="tenant-payment-item {{ $bill->status === 'paid' ? 'tenant-payment-history' : '' }}" id="utility-{{ $bill->id }}">
+                                <div class="tenant-payment-item-header">
+                                    <div>
+                                        <h3 class="tenant-payment-item-title">{{ $utilityTypeLabels[$bill->type] ?? $bill->type }}</h3>
+                                        <p class="tenant-payment-item-period">Periode: {{ $bill->period }}</p>
+                                    </div>
+                                    <div class="tenant-price-right">
+                                        <p class="tenant-payment-item-price">{{ \App\Support\UiFormatter::currency($bill->amount) }}</p>
+                                        @if ($bill->status !== 'paid')
+                                            <p class="tenant-payment-item-due {{ $bill->due_date?->isPast() ? 'tenant-payment-item-due-error' : '' }}">
+                                                <span class="material-symbols-outlined">calendar_today</span>
+                                                Jatuh Tempo: {{ \App\Support\UiFormatter::date($bill->due_date) }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="tenant-payment-item-body">
+                                    <div class="tenant-payment-status-row">
+                                        <div class="tenant-flex-center">
+                                            <span class="tenant-payment-status-label">Status:</span>
+                                            <span class="badge badge-{{ $bill->status }}">{{ $bill->status === 'paid' ? 'Lunas' : 'Belum Bayar' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                </article>
+                @endif
             </div>
 
         </section>

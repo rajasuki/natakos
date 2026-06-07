@@ -20,12 +20,16 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        if (! Schema::hasTable('facilities')) {
-            return;
+        $requiredTables = ['facilities', 'rooms', 'tenants', 'payments', 'users'];
+        foreach ($requiredTables as $table) {
+            if (! Schema::hasTable($table)) {
+                return;
+            }
         }
 
         $this->seedFacilities();
         $this->seedUsers();
+        $this->seedAdmin();
         $this->seedRooms();
         $this->seedTenants();
         $this->seedPayments();
@@ -107,6 +111,19 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'phone' => '081234567895',
                 'role' => 'tenant',
+            ],
+        );
+    }
+
+    private function seedAdmin(): void
+    {
+        User::firstOrCreate(
+            ['email' => 'admin@natakos.test'],
+            [
+                'name' => 'Admin NATAKOS',
+                'password' => Hash::make('password'),
+                'phone' => '081234567890',
+                'role' => 'admin',
             ],
         );
     }

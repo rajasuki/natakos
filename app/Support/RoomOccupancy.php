@@ -62,4 +62,19 @@ class RoomOccupancy
             ->where('status', 'active')
             ->exists();
     }
+
+    public static function activeTenantCount(Room $room): int
+    {
+        return Tenant::query()
+            ->where('room_id', $room->id)
+            ->where('status', 'active')
+            ->count();
+    }
+
+    public static function isAtCapacity(Room $room): bool
+    {
+        $capacity = $room->capacity ?? 1;
+
+        return self::activeTenantCount($room) >= $capacity;
+    }
 }

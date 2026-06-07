@@ -32,11 +32,26 @@
                         <a href="{{ route('admin.facilities.index') }}" class="dropdown-link {{ request()->routeIs('admin.facilities.*') ? 'is-active' : '' }}">Fasilitas</a>
                         <a href="{{ route('admin.tenants.index') }}" class="dropdown-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}">Penghuni</a>
                         <a href="{{ route('admin.payments.index') }}" class="dropdown-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}">Pembayaran</a>
+                        <a href="{{ route('admin.bookings.index') }}" class="dropdown-link {{ request()->routeIs('admin.bookings.*') ? 'is-active' : '' }}">Pengajuan Sewa</a>
                         <a href="{{ route('admin.kos-profile.edit') }}" class="dropdown-link {{ request()->routeIs('admin.kos-profile.*') ? 'is-active' : '' }}">Profil</a>
+                        <div style="height:1px;background:var(--ui-border);margin:4px 0;"></div>
+                        <a href="{{ route('admin.utility-bills.index') }}" class="dropdown-link {{ request()->routeIs('admin.utility-bills.*') ? 'is-active' : '' }}">Tagihan Utilitas</a>
+                        <a href="{{ route('admin.maintenance-requests.index') }}" class="dropdown-link {{ request()->routeIs('admin.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
+                        <a href="{{ route('admin.logs.index') }}" class="dropdown-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}">Log Aktivitas</a>
                     </div>
                 </div>
                 @elseif(Auth::user()->role === 'tenant')
-                <a href="{{ route('tenant.dashboard') }}" class="nav-link {{ request()->routeIs('tenant.dashboard') ? 'is-active' : '' }}" @if(request()->routeIs('tenant.dashboard')) aria-current="page" @endif>Dashboard</a>
+                <div class="nav-item has-dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-nav-dropdown>
+                        Dashboard
+                        <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </a>
+                    <div class="nav-dropdown">
+                        <a href="{{ route('tenant.dashboard') }}" class="dropdown-link {{ request()->routeIs('tenant.dashboard') ? 'is-active' : '' }}">Dashboard</a>
+                        <a href="{{ route('tenant.maintenance-requests.index') }}" class="dropdown-link {{ request()->routeIs('tenant.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
+                        <a href="{{ route('tenant.profile.edit') }}" class="dropdown-link {{ request()->routeIs('tenant.profile.*') ? 'is-active' : '' }}">Profil</a>
+                    </div>
+                </div>
                 @endif
             @endauth
         </nav>
@@ -77,8 +92,17 @@
                             <a href="{{ route('admin.tenants.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}">Penghuni</a>
                             <a href="{{ route('admin.payments.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}">Pembayaran</a>
                             <a href="{{ route('admin.kos-profile.edit') }}" class="mobile-nav-link {{ request()->routeIs('admin.kos-profile.*') ? 'is-active' : '' }}">Profil</a>
+                            <div class="mobile-nav-divider"></div>
+                            <span class="mobile-nav-label">Lainnya</span>
+                            <a href="{{ route('admin.utility-bills.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.utility-bills.*') ? 'is-active' : '' }}">Tagihan Utilitas</a>
+                            <a href="{{ route('admin.maintenance-requests.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
+                            <a href="{{ route('admin.logs.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}">Log Aktivitas</a>
                             @elseif(Auth::user()->role === 'tenant')
+                            <div class="mobile-nav-divider"></div>
+                            <span class="mobile-nav-label">Tenant</span>
                             <a href="{{ route('tenant.dashboard') }}" class="mobile-nav-link {{ request()->routeIs('tenant.dashboard') ? 'is-active' : '' }}" @if(request()->routeIs('tenant.dashboard')) aria-current="page" @endif>Dashboard</a>
+                            <a href="{{ route('tenant.maintenance-requests.index') }}" class="mobile-nav-link {{ request()->routeIs('tenant.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
+                            <a href="{{ route('tenant.profile.edit') }}" class="mobile-nav-link {{ request()->routeIs('tenant.profile.*') ? 'is-active' : '' }}">Profil</a>
                             @endif
                             <div class="mobile-nav-divider"></div>
                             <form method="POST" action="{{ route('logout') }}">

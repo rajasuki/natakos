@@ -259,6 +259,39 @@
                             <p>{{ $alertDueSoon > 0 ? 'Tagihan yang perlu segera ditindaklanjuti.' : 'Tidak ada tagihan yang mendekati tenggat.' }}</p>
                         </div>
                     </div>
+                    @if ($m['booking_pending'] > 0)
+                    <div class="dashboard-alert-row">
+                        <svg class="dashboard-alert-icon dashboard-alert-icon-warning" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        <div class="dashboard-alert-text">
+                            <h3>{{ $m['booking_pending'] }} pengajuan sewa baru</h3>
+                            <p>Calon penghuni menunggu persetujuan Anda. <a href="{{ route('admin.bookings.index') }}" style="text-decoration:underline;color:var(--ui-accent);font-weight:600;">Lihat pengajuan</a></p>
+                        </div>
+                    </div>
+                    @endif
+                    @if ($m['maintenance_pending'] > 0)
+                    <div class="dashboard-alert-row">
+                        <svg class="dashboard-alert-icon dashboard-alert-icon-warning" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        <div class="dashboard-alert-text">
+                            <h3>{{ $m['maintenance_pending'] }} pengajuan perbaikan baru</h3>
+                            <p>Laporan perbaikan dari penghuni menunggu tindakan. <a href="{{ route('admin.maintenance-requests.index') }}" style="text-decoration:underline;color:var(--ui-accent);font-weight:600;">Kelola perbaikan</a></p>
+                        </div>
+                    </div>
+                    @endif
+                    @if ($m['utility_unpaid'] > 0)
+                    <div class="dashboard-alert-row">
+                        <svg class="dashboard-alert-icon dashboard-alert-icon-warning" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        <div class="dashboard-alert-text">
+                            <h3>{{ $m['utility_unpaid'] }} tagihan utilitas belum dibayar</h3>
+                            <p>Tagihan air, listrik, atau internet yang masih outstanding. <a href="{{ route('admin.utility-bills.index') }}" style="text-decoration:underline;color:var(--ui-accent);font-weight:600;">Lihat tagihan</a></p>
+                        </div>
+                    </div>
+                    @endif
                     <div class="dashboard-alert-row">
                         <svg class="dashboard-alert-icon dashboard-alert-icon-danger" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>

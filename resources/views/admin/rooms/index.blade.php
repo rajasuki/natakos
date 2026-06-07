@@ -527,6 +527,7 @@
                             <th>Foto</th>
                             <th>Kamar</th>
                             <th>Harga / Bulan</th>
+                            <th>Kapasitas</th>
                             <th>Ukuran</th>
                             <th>Lantai</th>
                             <th>Status</th>
@@ -552,6 +553,7 @@
                                     <div class="room-table-slug">/{{ $room->slug }}</div>
                                 </td>
                                 <td data-label="Harga" class="room-table-price">{{ \App\Support\UiFormatter::currency($room->price) }}</td>
+                                <td data-label="Kapasitas">{{ $room->capacity }} org</td>
                                 <td data-label="Ukuran">{{ $room->size ?: '-' }}</td>
                                 <td data-label="Lantai">{{ $room->floor ?: '-' }}</td>
                                 <td data-label="Status">

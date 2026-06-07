@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Models\BookingRequest;
 use App\Models\KosProfile;
 use App\Models\Payment;
 use App\Models\Tenant;
+use App\Models\UtilityBill;
 use App\Support\WhatsappLink;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -28,10 +30,17 @@ class DashboardController extends Controller
 
         $whatsappUrl = $this->whatsappUrl(KosProfile::query()->value('whatsapp_number'));
 
+        $bookingRequests = BookingRequest::query()
+            ->where('user_id', $user->id)
+            ->with('room')
+            ->orderByDesc('id')
+            ->get();
+
         if ($tenant === null) {
             return view('tenant.dashboard', [
                 'user' => $user,
                 'tenant' => null,
+                'bookingRequests' => $bookingRequests,
                 'payments' => collect(),
                 'paymentDeadlines' => collect(),
                 'featuredPayment' => null,
@@ -39,15 +48,23 @@ class DashboardController extends Controller
                 'paymentWarning' => null,
                 'rentSummary' => null,
                 'rentWarning' => null,
+                'utilityBills' => collect(),
                 'whatsappUrl' => $whatsappUrl,
                 'roomStatusLabels' => $this->roomStatusLabels(),
                 'paymentStatusLabels' => $this->paymentStatusLabels(),
                 'deadlineStatusLabels' => $this->deadlineStatusLabels(),
                 'rentStatusLabels' => $this->rentStatusLabels(),
+                'utilityTypeLabels' => $this->utilityTypeLabels(),
             ]);
         }
 
         $payments = Payment::query()
+            ->where('tenant_id', $tenant->id)
+            ->orderByDesc('due_date')
+            ->orderByDesc('id')
+            ->get();
+
+        $utilityBills = UtilityBill::query()
             ->where('tenant_id', $tenant->id)
             ->orderByDesc('due_date')
             ->orderByDesc('id')
@@ -65,6 +82,7 @@ class DashboardController extends Controller
         return view('tenant.dashboard', [
             'user' => $user,
             'tenant' => $tenant,
+            'bookingRequests' => $bookingRequests,
             'payments' => $payments,
             'paymentDeadlines' => $paymentDeadlines,
             'featuredPayment' => $featuredPayment,
@@ -72,11 +90,13 @@ class DashboardController extends Controller
             'paymentWarning' => $this->paymentWarning($paymentDeadline),
             'rentSummary' => $rentSummary,
             'rentWarning' => $this->rentWarning($rentSummary),
+            'utilityBills' => $utilityBills,
             'whatsappUrl' => $whatsappUrl,
             'roomStatusLabels' => $this->roomStatusLabels(),
             'paymentStatusLabels' => $this->paymentStatusLabels(),
             'deadlineStatusLabels' => $this->deadlineStatusLabels(),
             'rentStatusLabels' => $this->rentStatusLabels(),
+            'utilityTypeLabels' => $this->utilityTypeLabels(),
         ]);
     }
 
@@ -131,6 +151,15 @@ class DashboardController extends Controller
             'ends_today' => 'Berakhir Hari Ini',
             'ending_soon' => 'Hampir Berakhir',
             'safe' => 'Aman',
+        ];
+    }
+
+    private function utilityTypeLabels(): array
+    {
+        return [
+            'water' => 'Air',
+            'electricity' => 'Listrik',
+            'internet' => 'Internet',
         ];
     }
 

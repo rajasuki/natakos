@@ -359,6 +359,19 @@
                             </div>
 
                             <div class="field">
+                                <label for="capacity">Kapasitas <span class="muted">*</span></label>
+                                <select id="capacity" name="capacity" class="select" required>
+                                    @php $selectedCap = old('capacity', $room?->capacity ?? 1); @endphp
+                                    @foreach (range(1, 10) as $cap)
+                                        <option value="{{ $cap }}" @selected((int) $selectedCap === $cap)>{{ $cap }} orang</option>
+                                    @endforeach
+                                </select>
+                                @if ($errorBag?->has('capacity'))
+                                    <div class="field-error">{{ $errorBag->first('capacity') }}</div>
+                                @endif
+                            </div>
+
+                            <div class="field">
                                 <label for="size">Ukuran</label>
                                 <input id="size" name="size" type="text" value="{{ old('size', $room?->size) }}" class="input" placeholder="Contoh: 3x4 m">
                                 @if ($errorBag?->has('size'))

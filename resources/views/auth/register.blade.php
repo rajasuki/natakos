@@ -312,6 +312,9 @@
 
                         <form method="POST" action="{{ route('register') }}" class="form-layout">
                             @csrf
+                            @if ($roomSlug ?? false)
+                                <input type="hidden" name="room_slug" value="{{ $roomSlug }}">
+                            @endif
 
                             <div class="field-row">
                                 <div class="field">

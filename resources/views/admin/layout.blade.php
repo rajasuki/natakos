@@ -665,6 +665,15 @@
             .badge-room,
             .badge-no-end-date { background: var(--gray-100); color: var(--gray-600); }
             .badge-public     { background: var(--gray-100); color: var(--gray-600); }
+            .badge-water      { background: #dbeafe; color: #1e40af; }
+            .badge-electricity { background: #fef3c7; color: #92400e; }
+            .badge-internet   { background: #d1fae5; color: #065f46; }
+            .badge-low        { background: #f0fdf4; color: #166534; }
+            .badge-high       { background: #fef3c7; color: #92400e; }
+            .badge-urgent     { background: #fee2e2; color: #991b1b; }
+            .badge-in_progress { background: #fff7ed; color: #9a3412; }
+            .badge-resolved   { background: #d1fae5; color: #065f46; }
+            .badge-pending    { background: #fef3c7; color: #92400e; }
 
             .badge-pending-verification {
                 background: #fff7ed;

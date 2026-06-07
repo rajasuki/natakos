@@ -12,19 +12,20 @@ use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
-    public function showForm()
+    public function showForm(Request $request)
     {
         return view('auth.register', [
             'profile' => $this->profileData(),
+            'roomSlug' => $request->query('room'),
         ]);
     }
 
     public function register(Request $request)
     {
         $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'email', 'unique:users,email'],
-            'phone'    => ['required', 'string', 'max:20'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'phone' => ['required', 'string', 'max:20'],
             'password' => [
                 'required',
                 'string',
@@ -34,29 +35,36 @@ class RegisterController extends Controller
                 'regex:/[0-9]/',
             ],
         ], [
-            'name.required'      => 'Nama lengkap wajib diisi.',
-            'email.required'     => 'Email wajib diisi.',
-            'email.email'        => 'Format email tidak valid.',
-            'email.unique'       => 'Email sudah terdaftar.',
-            'phone.required'     => 'Nomor HP wajib diisi.',
-            'password.required'  => 'Password wajib diisi.',
-            'password.min'       => 'Password minimal 8 karakter.',
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'phone.required' => 'Nomor HP wajib diisi.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
-            'password.regex'     => 'Password harus mengandung minimal 1 huruf kapital dan 1 angka.',
+            'password.regex' => 'Password harus mengandung minimal 1 huruf kapital dan 1 angka.',
         ]);
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'phone'    => $request->phone,
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'role'     => 'tenant',
+            'role' => 'tenant',
         ]);
 
         Auth::login($user);
 
+        $roomSlug = $request->input('room_slug');
+
+        if ($roomSlug) {
+            return redirect()->route('rooms.book', $roomSlug)
+                ->with('success', 'Akun berhasil dibuat. Silakan ajukan sewa kamar pilihan Anda.');
+        }
+
         return redirect()->route('tenant.dashboard')
-            ->with('success', 'Akun berhasil dibuat. Selamat datang, ' . $user->name . '!');
+            ->with('success', 'Akun berhasil dibuat. Selamat datang, '.$user->name.'!');
     }
 
     /**

@@ -447,9 +447,9 @@
                             <p class="detail-info-box-value">{{ \App\Support\UiFormatter::date($room->created_at) }}</p>
                         </div>
                         <div class="detail-info-box">
-                            <span class="material-symbols-outlined">bolt</span>
-                            <p class="detail-info-box-label">Listrik</p>
-                            <p class="detail-info-box-value">Token</p>
+                            <span class="material-symbols-outlined">groups</span>
+                            <p class="detail-info-box-label">Kapasitas</p>
+                            <p class="detail-info-box-value">{{ $room->capacity }} orang</p>
                         </div>
                     </div>
 
@@ -519,7 +519,20 @@
                     <h3>Tertarik dengan kamar ini?</h3>
                     <p>Hubungi pengelola {{ $profile['name'] }} untuk menanyakan ketersediaan, fasilitas, dan detail lainnya.</p>
                     <div class="detail-cta-actions">
-                        <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="detail-cta-button detail-cta-button-primary">
+                        @if ($room->status === 'available')
+                            @auth
+                                <a href="{{ route('rooms.book', $room) }}" class="detail-cta-button detail-cta-button-primary">
+                                    <span class="material-symbols-outlined" style="font-size:18px;">how_to_reg</span>
+                                    Ajukan Sewa
+                                </a>
+                            @else
+                                <a href="{{ route('register', ['room' => $room->slug]) }}" class="detail-cta-button detail-cta-button-primary">
+                                    <span class="material-symbols-outlined" style="font-size:18px;">how_to_reg</span>
+                                    Daftar & Ajukan Sewa
+                                </a>
+                            @endauth
+                        @endif
+                        <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="detail-cta-button detail-cta-button-secondary">
                             <span class="material-symbols-outlined" style="font-size:18px;">chat</span>
                             Tanya via WhatsApp
                         </a>

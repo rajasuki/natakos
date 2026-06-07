@@ -7,15 +7,16 @@ use App\Models\Room;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Support\RoomOccupancy;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class TenantController extends Controller
 {
@@ -54,7 +55,7 @@ class TenantController extends Controller
         ]);
     }
 
-    public function export(Request $request): \Illuminate\Http\Response
+    public function export(Request $request): Response
     {
         $history = $request->boolean('history');
         $filters = $this->filters($request, $history);
@@ -69,6 +70,36 @@ class TenantController extends Controller
         return $pdf->download($history ? 'tenant-history-export.pdf' : 'active-tenants-export.pdf');
     }
 
+    public function exportCsv(Request $request): Response
+    {
+        $history = $request->boolean('history');
+        $filters = $this->filters($request, $history);
+        $tenants = $this->tenantsQuery($filters, $history)
+            ->orderByDesc($history ? 'end_date' : 'id')
+            ->get();
+
+        $statusLabels = $this->statusLabels();
+
+        $headers = ['Nama', 'Email', 'Telepon', 'Kamar', 'Mulai', 'Selesai', 'Status', 'Catatan'];
+        $rows = $tenants->map(fn ($t) => [
+            $t->user?->name ?? '',
+            $t->user?->email ?? '',
+            $t->user?->phone ?? '',
+            $t->room?->name ?? '',
+            $t->start_date?->format('Y-m-d') ?? '',
+            $t->end_date?->format('Y-m-d') ?? '',
+            $statusLabels[$t->status] ?? $t->status,
+            $t->notes ?? '',
+        ]);
+
+        $csv = $this->buildCsv($headers, $rows->all());
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.($history ? 'tenant-history' : 'active-tenants').'-export.csv"',
+        ]);
+    }
+
     public function create(): View
     {
         return view('admin.tenants.create', [
@@ -78,57 +109,56 @@ class TenantController extends Controller
         ]);
     }
 
-
-
     public function createExisting(): View
-{
-    return view('admin.tenants.create-existing', [
-        'rooms'            => $this->rooms(),
-        'roomStatusLabels' => $this->roomStatusLabels(),
-        'statusLabels'     => $this->statusLabels(),
-        'existingUsers'    => User::query()
-            ->where('role', 'tenant')
-            ->orderBy('name')
-            ->get(),
-    ]);
-}
-
-public function storeExisting(Request $request): RedirectResponse
-{
-    $validated = $request->validate([
-        'user_id'    => ['required', 'integer', Rule::exists('users', 'id')],
-        'room_id'    => ['required', 'integer', Rule::exists('rooms', 'id')],
-        'start_date' => ['required', 'date'],
-        'end_date'   => ['nullable', 'date', 'after_or_equal:start_date'],
-        'status'     => ['required', Rule::in(array_keys($this->statusLabels()))],
-        'notes'      => ['nullable', 'string'],
-    ]);
-
-    if (($validated['status'] ?? null) === 'moved_out' && empty($validated['end_date'])) {
-        throw ValidationException::withMessages([
-            'end_date' => 'Tanggal keluar wajib diisi jika status penghuni adalah Sudah Keluar.',
+    {
+        return view('admin.tenants.create-existing', [
+            'rooms' => $this->rooms(),
+            'roomStatusLabels' => $this->roomStatusLabels(),
+            'statusLabels' => $this->statusLabels(),
+            'existingUsers' => User::query()
+                ->where('role', 'tenant')
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 
-    $this->validateRoomAssignment($validated['room_id'], $validated['status']);
-
-    DB::transaction(function () use ($validated): void {
-        Tenant::create([
-            'user_id'    => $validated['user_id'],
-            'room_id'    => $validated['room_id'],
-            'start_date' => $validated['start_date'],
-            'end_date'   => $validated['end_date'] ?? null,
-            'status'     => $validated['status'],
-            'notes'      => $validated['notes'] ?? null,
+    public function storeExisting(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'user_id' => ['required', 'integer', Rule::exists('users', 'id')],
+            'room_id' => ['required', 'integer', Rule::exists('rooms', 'id')],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'status' => ['required', Rule::in(array_keys($this->statusLabels()))],
+            'notes' => ['nullable', 'string'],
         ]);
 
-        RoomOccupancy::syncStatuses([$validated['room_id']]);
-    });
-
-    return redirect()
-        ->route('admin.tenants.index')
-        ->with('success', 'Penempatan berhasil ditambahkan ke akun penghuni yang sudah ada.');
+        if (($validated['status'] ?? null) === 'moved_out' && empty($validated['end_date'])) {
+            throw ValidationException::withMessages([
+                'end_date' => 'Tanggal keluar wajib diisi jika status penghuni adalah Sudah Keluar.',
+            ]);
         }
+
+        $this->validateRoomAssignment($validated['room_id'], $validated['status']);
+
+        DB::transaction(function () use ($validated): void {
+            Tenant::create([
+                'user_id' => $validated['user_id'],
+                'room_id' => $validated['room_id'],
+                'start_date' => $validated['start_date'],
+                'end_date' => $validated['end_date'] ?? null,
+                'status' => $validated['status'],
+                'notes' => $validated['notes'] ?? null,
+            ]);
+
+            RoomOccupancy::syncStatuses([$validated['room_id']]);
+        });
+
+        return redirect()
+            ->route('admin.tenants.index')
+            ->with('success', 'Penempatan berhasil ditambahkan ke akun penghuni yang sudah ada.');
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $validated = $this->validatedData($request);
@@ -432,6 +462,25 @@ public function storeExisting(Request $request): RedirectResponse
         ];
     }
 
+    /**
+     * @param  array<int, string>  $headers
+     * @param  array<int, array<int, string>>  $rows
+     */
+    private function buildCsv(array $headers, array $rows): string
+    {
+        $output = fopen('php://temp', 'r+');
+
+        fputcsv($output, $headers, ',', '"', '');
+
+        foreach ($rows as $row) {
+            fputcsv($output, $row, ',', '"', '');
+        }
+
+        rewind($output);
+
+        return stream_get_contents($output);
+    }
+
     private function validateRoomAssignment(int $roomId, string $tenantStatus, ?Tenant $tenant = null): void
     {
         if ($tenantStatus !== 'active') {
@@ -450,15 +499,17 @@ public function storeExisting(Request $request): RedirectResponse
             ]);
         }
 
-        $hasOtherActiveTenant = Tenant::query()
+        $activeTenantCount = Tenant::query()
             ->where('room_id', $roomId)
             ->where('status', 'active')
             ->when($tenant !== null, fn ($query) => $query->where('id', '!=', $tenant->id))
-            ->exists();
+            ->count();
 
-        if ($hasOtherActiveTenant) {
+        $capacity = $room->capacity ?? 1;
+
+        if ($activeTenantCount >= $capacity) {
             throw ValidationException::withMessages([
-                'room_id' => 'Kamar ini sudah ditempati penghuni aktif lain.',
+                'room_id' => 'Kamar ini sudah mencapai kapasitas maksimal ('.$capacity.' orang).',
             ]);
         }
     }
