@@ -46,6 +46,7 @@ class ProfileController extends Controller
             if ($user->avatar) {
                 Storage::disk('public')->delete($user->avatar);
             }
+            Storage::disk('public')->makeDirectory('avatars');
             $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
         }
 
@@ -53,6 +54,7 @@ class ProfileController extends Controller
             if ($user->profile_bg) {
                 Storage::disk('public')->delete($user->profile_bg);
             }
+            Storage::disk('public')->makeDirectory('profile-bg');
             $data['profile_bg'] = $request->file('profile_bg')->store('profile-bg', 'public');
         }
 
