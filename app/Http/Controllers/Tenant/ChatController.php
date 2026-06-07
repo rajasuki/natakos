@@ -27,7 +27,7 @@ class ChatController extends Controller
         }
 
         $messages = ChatMessage::query()
-            ->with('user')
+            ->with('user.tenant.room')
             ->orderBy('created_at')
             ->paginate($perPage, ['*'], 'page', $page);
 
@@ -122,7 +122,7 @@ class ChatController extends Controller
         $afterId = (int) $request->query('after', 0);
 
         $messages = ChatMessage::query()
-            ->with('user')
+            ->with('user.tenant.room')
             ->where('id', '>', $afterId)
             ->orderBy('id')
             ->get();
@@ -175,6 +175,12 @@ class ChatController extends Controller
             }
 
             $editedBadge = $isEdited ? '<span class="chat-edited-badge"> · diedit</span>' : '';
+            $titleHtml = $msg->user->title
+                ? '<span class="user-title user-title-'.e($msg->user->title_effect ?: 'none').'">'.e($msg->user->title).'</span>'
+                : '';
+            $roomHtml = (! $isSelf && $msg->user->show_room && $msg->user->tenant && $msg->user->tenant->room)
+                ? '<span class="chat-bubble-room">'.e($msg->user->tenant->room->name).'</span>'
+                : '';
 
             $html .= '<div class="chat-message '.($isSelf ? 'chat-message-self' : '').'" data-message-id="'.$msg->id.'">
                 <div class="chat-avatar-wrap">
@@ -182,7 +188,7 @@ class ChatController extends Controller
                 </div>
                 <div class="chat-bubble">
                     <div class="chat-bubble-head">
-                        '.($isSelf ? '' : '<span class="chat-bubble-name" data-user-id="'.$msg->user_id.'">'.e($msg->user->name).'</span>').'
+                        '.($isSelf ? '' : '<span class="chat-bubble-name" data-user-id="'.$msg->user_id.'">'.e($msg->user->name).$titleHtml.'</span>'.$roomHtml).'
                         <span class="chat-bubble-time">'.UiFormatter::date($msg->created_at, 'H:i').$editedBadge.'</span>
                     </div>
                     '.$imageHtml.'
@@ -201,7 +207,15 @@ class ChatController extends Controller
 
     public function profile(Request $request): JsonResponse
     {
-        $user = User::findOrFail((int) $request->query('user'));
+        $user = User::with('tenant.room')->findOrFail((int) $request->query('user'));
+        $isAdmin = $request->user()?->role === 'admin';
+
+        $roomName = null;
+        if ($user->tenant && $user->tenant->room) {
+            if ($isAdmin || $user->show_room) {
+                $roomName = $user->tenant->room->name;
+            }
+        }
 
         return response()->json([
             'name' => $user->name,
@@ -209,6 +223,9 @@ class ChatController extends Controller
             'bio' => $user->bio,
             'avatar_url' => $user->avatar ? asset('storage/'.$user->avatar) : null,
             'bg_url' => $user->profile_bg ? asset('storage/'.$user->profile_bg) : null,
+            'title' => $user->title,
+            'title_effect' => $user->title_effect ?? 'none',
+            'room' => $roomName,
             'initial' => strtoupper(substr($user->name, 0, 1)),
         ]);
     }

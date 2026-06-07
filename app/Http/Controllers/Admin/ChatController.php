@@ -32,6 +32,19 @@ class ChatController extends Controller
         ]);
     }
 
+    public function update(Request $request, ChatMessage $message): RedirectResponse
+    {
+        $validated = $request->validate([
+            'content' => ['required', 'string', 'max:1000'],
+        ]);
+
+        $message->update(['content' => $validated['content']]);
+
+        return redirect()
+            ->route('admin.chat.index')
+            ->with('success', 'Pesan berhasil diedit.');
+    }
+
     public function destroy(ChatMessage $message): RedirectResponse
     {
         $message->delete();

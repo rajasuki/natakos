@@ -27,6 +27,7 @@ class ProfileController extends Controller
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'phone' => ['nullable', 'string', 'max:30'],
             'bio' => ['nullable', 'string', 'max:1000'],
+            'show_room' => ['boolean'],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
             'profile_bg' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
             'current_password' => ['nullable', 'required_with:new_password', 'string', 'current_password'],
@@ -38,6 +39,7 @@ class ProfileController extends Controller
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
             'bio' => $validated['bio'] ?? null,
+            'show_room' => $request->boolean('show_room'),
         ];
 
         if ($request->hasFile('avatar')) {

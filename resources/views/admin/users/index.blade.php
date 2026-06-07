@@ -5,6 +5,17 @@
 @section('page_title', 'Akun Pengguna')
 @section('page_description', 'Daftar semua akun yang terdaftar di sistem, termasuk admin dan penghuni.')
 
+@push('styles')
+<style>
+    .title-form { display:flex; gap:4px; align-items:center; flex-wrap:wrap; }
+    .title-input { width:100px; padding:4px 6px; font-size:12px; border:1px solid var(--ui-border); border-radius:4px; }
+    .title-select { padding:4px 6px; font-size:12px; border:1px solid var(--ui-border); border-radius:4px; background:#fff; }
+    .title-save { padding:4px 10px; font-size:11px; }
+    .user-title-badge { display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; }
+    .user-title-none { background:var(--ui-soft); color:var(--ui-body); }
+</style>
+@endpush
+
 @section('content')
     <div class="card">
         <div class="card-body" style="padding-bottom:0;">
@@ -46,7 +57,8 @@
                             <th>Telepon</th>
                             <th>Role</th>
                             <th>Kamar</th>
-                            <th>Status Penghuni</th>
+                            <th>Status</th>
+                            <th>Title</th>
                             <th>Bergabung</th>
                             <th>Aksi</th>
                         </tr>
@@ -90,6 +102,18 @@
                                     @else
                                         <span class="muted">-</span>
                                     @endif
+                                </td>
+                                <td>
+                                    <form method="POST" action="{{ route('admin.users.title', $user) }}" class="title-form">
+                                        @csrf @method('PUT')
+                                        <input type="text" name="title" class="title-input" value="{{ $user->title }}" placeholder="Title..." maxlength="100">
+                                        <select name="title_effect" class="title-select">
+                                            @foreach ($effectLabels as $val => $label)
+                                                <option value="{{ $val }}" @selected($user->title_effect === $val)>{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        <button type="submit" class="button button-sm button-subtle title-save">Simpan</button>
+                                    </form>
                                 </td>
                                 <td>
                                     <span style="font-size:12px;color:var(--ui-body);">

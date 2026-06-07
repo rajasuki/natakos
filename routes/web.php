@@ -87,7 +87,9 @@ Route::middleware('auth')->group(function () {
         Route::get('operational-expenses/export-csv', [OperationalExpenseController::class, 'exportCsv'])->name('operational-expenses.export-csv');
         Route::resource('operational-expenses', OperationalExpenseController::class)->except('show');
         Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::match(['put', 'patch'], 'users/{user}/title', [AdminUserController::class, 'updateTitle'])->name('users.title');
         Route::get('chat', [AdminChatController::class, 'index'])->name('chat.index');
+        Route::match(['put', 'patch'], 'chat/{message}', [AdminChatController::class, 'update'])->name('chat.update');
         Route::delete('chat/{message}', [AdminChatController::class, 'destroy'])->name('chat.destroy');
         Route::post('chat/ban', [AdminChatController::class, 'ban'])->name('chat.ban');
         Route::delete('chat/unban/{ban}', [AdminChatController::class, 'unban'])->name('chat.unban');

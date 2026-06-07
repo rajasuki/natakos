@@ -23,8 +23,19 @@
     .chat-message-self .chat-bubble-head { justify-content:flex-end; }
     .chat-bubble-name { font-size:12px; font-weight:700; color:var(--ui-accent); cursor:pointer; }
     .chat-bubble-name:hover { text-decoration:underline; }
+    .chat-bubble-room { font-size:10px; color:var(--ui-body); }
     .chat-bubble-time { font-size:11px; color:var(--ui-body); white-space:nowrap; }
     .chat-edited-badge { font-size:10px; color:var(--ui-body); font-style:italic; }
+
+    /* ── Title badges ── */
+    .user-title { display:inline-block; font-size:10px; font-weight:600; padding:1px 7px; border-radius:4px; margin-left:4px; vertical-align:middle; }
+    .user-title-none { background:var(--ui-soft); color:var(--ui-body); }
+    .user-title-gold { background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; box-shadow:0 0 8px rgba(245,158,11,.3); }
+    .user-title-rainbow { background:linear-gradient(90deg,#f43f5e,#f59e0b,#22c55e,#3b82f6,#a855f7); color:#fff; background-size:200% 100%; animation:rainbowShift 3s linear infinite; }
+    @keyframes rainbowShift { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+    .user-title-glow { background:var(--ui-accent); color:#fff; animation:titleGlow 2s ease-in-out infinite; }
+    @keyframes titleGlow { 0%,100%{box-shadow:0 0 4px rgba(74,124,89,.3)} 50%{box-shadow:0 0 14px rgba(74,124,89,.6)} }
+    .user-title-fire { background:linear-gradient(135deg,#ef4444,#f97316); color:#fff; box-shadow:0 0 10px rgba(239,68,68,.3); }
 
     .chat-image { max-width:100%; max-height:300px; border-radius:var(--radius-md); display:block; margin:4px 0; cursor:pointer; }
     .chat-image-link { display:block; }
@@ -74,6 +85,7 @@
     .profile-popup-avatar { width:80px; height:80px; border-radius:50%; border:4px solid #fff; background:var(--ui-accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:700; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.1); }
     .profile-popup-avatar img { width:100%; height:100%; object-fit:cover; }
     .profile-popup-name { margin:12px 0 2px; font-size:18px; font-weight:700; color:var(--ui-ink); }
+    .profile-popup-room { margin:4px 0 0; font-size:13px; color:var(--ui-accent); font-weight:600; }
     .profile-popup-email { margin:0 0 12px; font-size:13px; color:var(--ui-body); }
     .profile-popup-bio { font-size:14px; line-height:1.6; color:var(--gray-600); white-space:pre-wrap; padding-top:12px; border-top:1px solid var(--ui-border); }
     .profile-popup-bio-empty { font-size:13px; color:var(--ui-body); font-style:italic; padding-top:12px; border-top:1px solid var(--ui-border); }
@@ -123,6 +135,8 @@
             <div class="profile-popup-body">
                 <div class="profile-popup-avatar" id="popup-avatar">?</div>
                 <h3 class="profile-popup-name" id="popup-name">-</h3>
+                <span class="user-title" id="popup-title" style="display:none;"></span>
+                <p class="profile-popup-room" id="popup-room" style="display:none;"></p>
                 <p class="profile-popup-email" id="popup-email">-</p>
                 <div class="profile-popup-bio" id="popup-bio" style="display:none;"></div>
                 <div class="profile-popup-bio-empty" id="popup-bio-empty">Belum ada bio.</div>
@@ -173,6 +187,23 @@
             .then(function(data) {
                 document.getElementById('popup-name').textContent = data.name;
                 document.getElementById('popup-email').textContent = data.email;
+
+                var titleEl = document.getElementById('popup-title');
+                if (data.title) {
+                    titleEl.textContent = data.title;
+                    titleEl.className = 'user-title user-title-' + data.title_effect;
+                    titleEl.style.display = 'inline-block';
+                } else {
+                    titleEl.style.display = 'none';
+                }
+
+                var roomEl = document.getElementById('popup-room');
+                if (data.room) {
+                    roomEl.textContent = data.room;
+                    roomEl.style.display = 'block';
+                } else {
+                    roomEl.style.display = 'none';
+                }
 
                 var avatarEl = document.getElementById('popup-avatar');
                 if (data.avatar_url) {

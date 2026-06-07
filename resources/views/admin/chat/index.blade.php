@@ -112,6 +112,7 @@
                 @forelse ($messages as $msg)
                     @php
                         $initial = strtoupper(substr($msg->user->name, 0, 1));
+                        $isEdited = $msg->created_at->timestamp !== $msg->updated_at->timestamp;
                     @endphp
                     <div style="display:flex; gap:12px; padding:12px 0; {{ !$loop->last ? 'border-bottom:1px solid var(--ui-border);' : '' }} align-items:flex-start;">
                         <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--ui-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;overflow:hidden;">
@@ -122,16 +123,31 @@
                             @endif
                         </div>
                         <div style="flex:1;min-width:0;">
-                            <div style="display:flex;gap:8px;align-items:baseline;">
+                            <div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;">
                                 <strong style="font-size:13px;">{{ $msg->user->name }}</strong>
+                                @if ($msg->user->title)
+                                    <span class="user-title user-title-{{ $msg->user->title_effect ?: 'none' }}">{{ $msg->user->title }}</span>
+                                @endif
                                 <span style="font-size:11px;color:var(--ui-body);">{{ \App\Support\UiFormatter::date($msg->created_at, 'd M Y H:i') }}</span>
+                                @if ($isEdited) <span style="font-size:10px;color:var(--ui-body);font-style:italic;">· diedit</span> @endif
                             </div>
-                            <div style="font-size:14px;line-height:1.6;margin-top:2px;white-space:pre-wrap;">{{ $msg->content }}</div>
+                            <div id="admin-msg-text-{{ $msg->id }}" style="font-size:14px;line-height:1.6;margin-top:2px;white-space:pre-wrap;">{{ $msg->content }}</div>
+                            <form method="POST" action="{{ route('admin.chat.update', $msg) }}" id="admin-msg-edit-{{ $msg->id }}" style="display:none;margin-top:6px;">
+                                @csrf @method('PUT')
+                                <textarea name="content" class="admin-edit-textarea" maxlength="1000" style="width:100%;border:1px solid var(--ui-accent);border-radius:6px;padding:8px 10px;font-size:14px;resize:none;min-height:60px;font-family:inherit;box-sizing:border-box;">{{ $msg->content }}</textarea>
+                                <div style="display:flex;gap:6px;margin-top:6px;">
+                                    <button type="submit" class="button button-primary" style="padding:4px 12px;font-size:12px;">Simpan</button>
+                                    <button type="button" class="button button-subtle" style="padding:4px 12px;font-size:12px;" onclick="cancelAdminEdit({{ $msg->id }})">Batal</button>
+                                </div>
+                            </form>
                         </div>
-                        <form method="POST" action="{{ route('admin.chat.destroy', $msg) }}" onsubmit="return confirm('Hapus pesan ini?');" style="flex-shrink:0;">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="button button-subtle" style="font-size:12px;color:#be123c;">Hapus</button>
-                        </form>
+                        <div style="display:flex;gap:4px;flex-shrink:0;align-items:flex-start;">
+                            <button type="button" class="button button-subtle" style="font-size:12px;" onclick="startAdminEdit({{ $msg->id }})">Edit</button>
+                            <form method="POST" action="{{ route('admin.chat.destroy', $msg) }}" onsubmit="return confirm('Hapus pesan ini?');">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="button button-subtle" style="font-size:12px;color:#be123c;">Hapus</button>
+                            </form>
+                        </div>
                     </div>
                 @empty
                     <section class="empty-state">
@@ -148,3 +164,29 @@
 
     </div>
 @endsection
+
+@push('styles')
+<style>
+    .user-title { display:inline-block; font-size:10px; font-weight:600; padding:1px 7px; border-radius:4px; margin-left:4px; vertical-align:middle; }
+    .user-title-none { background:var(--ui-soft); color:var(--ui-body); }
+    .user-title-gold { background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; box-shadow:0 0 8px rgba(245,158,11,.3); }
+    .user-title-rainbow { background:linear-gradient(90deg,#f43f5e,#f59e0b,#22c55e,#3b82f6,#a855f7); color:#fff; background-size:200% 100%; animation:rainbowShift 3s linear infinite; }
+    @keyframes rainbowShift { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+    .user-title-glow { background:var(--ui-accent); color:#fff; animation:titleGlow 2s ease-in-out infinite; }
+    @keyframes titleGlow { 0%,100%{box-shadow:0 0 4px rgba(74,124,89,.3)} 50%{box-shadow:0 0 14px rgba(74,124,89,.6)} }
+    .user-title-fire { background:linear-gradient(135deg,#ef4444,#f97316); color:#fff; box-shadow:0 0 10px rgba(239,68,68,.3); }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+    window.startAdminEdit = function(msgId) {
+        document.getElementById('admin-msg-text-' + msgId).style.display = 'none';
+        document.getElementById('admin-msg-edit-' + msgId).style.display = 'block';
+    };
+    window.cancelAdminEdit = function(msgId) {
+        document.getElementById('admin-msg-text-' + msgId).style.display = 'block';
+        document.getElementById('admin-msg-edit-' + msgId).style.display = 'none';
+    };
+</script>
+@endpush

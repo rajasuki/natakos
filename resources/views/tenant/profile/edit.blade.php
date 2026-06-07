@@ -22,6 +22,8 @@
     .media-preview-placeholder { width:72px; height:72px; border-radius:50%; background:var(--ui-accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:700; border:2px solid var(--ui-accent); flex-shrink:0; }
     .bg-preview { width:160px; height:90px; border-radius:var(--radius-md); object-fit:cover; border:1px solid var(--ui-border); background:var(--ui-soft); flex-shrink:0; }
     .bg-preview-empty { width:160px; height:90px; border-radius:var(--radius-md); border:2px dashed var(--ui-border); display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--ui-body); flex-shrink:0; }
+    .checkbox-label { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:500; cursor:pointer; }
+    .checkbox-label input[type=checkbox] { width:18px; height:18px; accent-color:var(--ui-accent); }
 </style>
 @endpush
 
@@ -91,6 +93,16 @@
                     <textarea id="bio" name="bio" class="textarea" maxlength="1000" placeholder="Ceritakan tentang diri Anda...">{{ old('bio', $user->bio) }}</textarea>
                     @error('bio') <div class="field-error">{{ $message }}</div> @enderror
                     <div class="helper">Penghuni lain bisa melihat bio ini saat melihat profil Anda di obrolan.</div>
+                </div>
+
+                <div class="field">
+                    <label class="checkbox-label">
+                        <input type="hidden" name="show_room" value="0">
+                        <input type="checkbox" name="show_room" value="1" @checked(old('show_room', $user->show_room ?? true))>
+                        <span>Tampilkan kamar saya ke penghuni lain</span>
+                    </label>
+                    @error('show_room') <div class="field-error">{{ $message }}</div> @enderror
+                    <div class="helper">Jika dimatikan, penghuni lain tidak akan melihat kamar Anda di profil. Admin tetap bisa melihatnya.</div>
                 </div>
 
                 <hr class="form-sep">
