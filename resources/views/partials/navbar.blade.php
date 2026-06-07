@@ -37,6 +37,7 @@
                         <div style="height:1px;background:var(--ui-border);margin:4px 0;"></div>
                         <a href="{{ route('admin.utility-bills.index') }}" class="dropdown-link {{ request()->routeIs('admin.utility-bills.*') ? 'is-active' : '' }}">Tagihan Utilitas</a>
                         <a href="{{ route('admin.maintenance-requests.index') }}" class="dropdown-link {{ request()->routeIs('admin.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
+                        <a href="{{ route('admin.operational-expenses.index') }}" class="dropdown-link {{ request()->routeIs('admin.operational-expenses.*') ? 'is-active' : '' }}">Biaya Operasional</a>
                         <a href="{{ route('admin.logs.index') }}" class="dropdown-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}">Log Aktivitas</a>
                     </div>
                 </div>
@@ -96,6 +97,7 @@
                             <span class="mobile-nav-label">Lainnya</span>
                             <a href="{{ route('admin.utility-bills.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.utility-bills.*') ? 'is-active' : '' }}">Tagihan Utilitas</a>
                             <a href="{{ route('admin.maintenance-requests.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
+                            <a href="{{ route('admin.operational-expenses.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.operational-expenses.*') ? 'is-active' : '' }}">Biaya Operasional</a>
                             <a href="{{ route('admin.logs.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}">Log Aktivitas</a>
                             @elseif(Auth::user()->role === 'tenant')
                             <div class="mobile-nav-divider"></div>

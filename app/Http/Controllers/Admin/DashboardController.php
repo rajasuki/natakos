@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BookingRequest;
+use App\Models\KosProfile;
 use App\Models\MaintenanceRequest;
+use App\Models\OperationalExpense;
 use App\Models\Payment;
 use App\Models\Room;
 use App\Models\Tenant;
@@ -48,6 +50,16 @@ class DashboardController extends Controller
             'booking_pending' => BookingRequest::query()->where('status', 'pending')->count(),
             'maintenance_pending' => MaintenanceRequest::query()->where('status', 'pending')->count(),
             'utility_unpaid' => UtilityBill::query()->where('status', 'unpaid')->count(),
+            'opex_month' => OperationalExpense::query()
+                ->whereYear('date', now()->year)
+                ->whereMonth('date', now()->month)
+                ->sum('amount'),
+            'late_fee_per_day' => KosProfile::query()->value('late_fee_per_day') ?? 0,
+            'overdue_with_fees' => Payment::query()
+                ->where('status', 'unpaid')
+                ->where('due_date', '<', now())
+                ->where('late_fee', '>', 0)
+                ->count(),
         ];
 
         return view('admin.dashboard', [

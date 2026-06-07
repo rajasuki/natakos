@@ -734,6 +734,7 @@
                             <th>Penghuni</th>
                             <th>Kamar</th>
                             <th>Nominal</th>
+                            <th>Denda</th>
                             <th>Periode</th>
                             <th>Tenggat bayar</th>
                             <th>Status pembayaran</th>
@@ -765,6 +766,14 @@
                                 </td>
                                 <td data-label="Nominal">
                                     <span class="payment-table-amount">{{ \App\Support\UiFormatter::currency($payment->amount) }}</span>
+                                </td>
+                                <td data-label="Denda">
+                                    @if ($payment->late_fee > 0)
+                                        <span style="color:#9f1239;font-weight:600;">+{{ \App\Support\UiFormatter::currency($payment->late_fee) }}</span>
+                                        <div style="font-size:11px;color:var(--ui-body);">{{ $payment->late_fee_days }} hari</div>
+                                    @else
+                                        <span style="color:var(--ui-body);font-size:12px;">-</span>
+                                    @endif
                                 </td>
                                 <td data-label="Periode">
                                     <div class="payment-table-period">{{ \App\Support\UiFormatter::date($payment->period_start) }}</div>

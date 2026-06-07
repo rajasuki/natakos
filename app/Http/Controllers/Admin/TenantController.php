@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Support\ActivityLogger;
 use App\Support\RoomOccupancy;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Collection;
@@ -321,6 +322,80 @@ class TenantController extends Controller
         return redirect()
             ->route('admin.tenants.history')
             ->with('success', 'Check-out penghuni berhasil diproses dan riwayat masa tinggal sudah disimpan.');
+    }
+
+    public function transfer(Tenant $tenant): View
+    {
+        $tenant->load(['user', 'room']);
+
+        if ($tenant->status !== 'active') {
+            abort(404);
+        }
+
+        $rooms = Room::query()
+            ->withCount(['tenants as active_tenant_count' => fn ($q) => $q->where('status', 'active')])
+            ->orderBy('name')
+            ->get()
+            ->map(function ($room) {
+                $room->is_at_capacity = ($room->active_tenant_count ?? 0) >= ($room->capacity ?? 1);
+
+                return $room;
+            });
+
+        return view('admin.tenants.transfer', [
+            'tenant' => $tenant,
+            'rooms' => $rooms,
+            'roomStatusLabels' => $this->roomStatusLabels(),
+            'statusLabels' => $this->statusLabels(),
+        ]);
+    }
+
+    public function processTransfer(Request $request, Tenant $tenant): RedirectResponse
+    {
+        $tenant->load(['user', 'room']);
+
+        if ($tenant->status !== 'active') {
+            return redirect()
+                ->route('admin.tenants.index')
+                ->with('error', 'Hanya penghuni aktif yang bisa dipindahkan.');
+        }
+
+        $validated = $request->validate([
+            'room_id' => ['required', 'integer', Rule::exists('rooms', 'id')],
+            'transfer_date' => ['required', 'date'],
+        ]);
+
+        $newRoom = Room::query()->findOrFail($validated['room_id']);
+
+        if ($newRoom->id === $tenant->room_id) {
+            return redirect()
+                ->back()
+                ->with('error', 'Kamar tujuan sama dengan kamar saat ini.');
+        }
+
+        if ($newRoom->status === 'maintenance') {
+            return redirect()
+                ->back()
+                ->with('error', 'Kamar tujuan sedang dalam perbaikan.');
+        }
+
+        $this->validateRoomAssignment($validated['room_id'], 'active', $tenant);
+
+        $previousRoomId = $tenant->room_id;
+
+        DB::transaction(function () use ($tenant, $validated, $previousRoomId, $newRoom): void {
+            $tenant->update([
+                'room_id' => $validated['room_id'],
+            ]);
+
+            RoomOccupancy::syncStatuses([$previousRoomId, $tenant->room_id]);
+
+            ActivityLogger::log('transferred', 'tenant', $tenant->id, "Memindahkan penghuni {$tenant->user?->name} dari {$tenant->room?->name} ke {$newRoom->name} per {$validated['transfer_date']}");
+        });
+
+        return redirect()
+            ->route('admin.tenants.index')
+            ->with('success', "Penghuni berhasil dipindahkan ke {$newRoom->name}.");
     }
 
     /**

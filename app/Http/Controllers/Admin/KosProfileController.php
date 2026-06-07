@@ -63,6 +63,8 @@ class KosProfileController extends Controller
             'google_maps_embed_url' => ['nullable', 'string', 'max:2048'],
             'google_maps_url' => ['nullable', 'url', 'max:2048'],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'late_fee_per_day' => ['nullable', 'integer', 'min:0'],
+            'max_late_fee' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $logo = $validated['logo'] ?? null;
@@ -92,6 +94,8 @@ class KosProfileController extends Controller
             'whatsapp_number' => '6285217430009',
             'google_maps_url' => null,
             'logo' => null,
+            'late_fee_per_day' => 0,
+            'max_late_fee' => null,
         ];
     }
 

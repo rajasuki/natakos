@@ -559,6 +559,9 @@
                                             <a href="{{ route('admin.tenants.checkout', $tenant) }}" class="tenant-table-btn tenant-table-btn-checkout" title="Check-out">
                                                 <span class="material-symbols-outlined">logout</span>
                                             </a>
+                                            <a href="{{ route('admin.tenants.transfer', $tenant) }}" class="tenant-table-btn tenant-table-btn-edit" title="Pindah Kamar">
+                                                <span class="material-symbols-outlined">move_group</span>
+                                            </a>
                                         @endif
                                         <form method="POST" action="{{ route('admin.tenants.destroy', $tenant) }}" onsubmit="return confirm('Hapus penghuni ini?');" style="display:inline;">
                                             @csrf

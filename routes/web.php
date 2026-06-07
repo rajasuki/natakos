@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\KosProfileController;
 use App\Http\Controllers\Admin\MaintenanceRequestController as AdminMaintenanceRequestController;
+use App\Http\Controllers\Admin\OperationalExpenseController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\RoomImageController;
@@ -67,6 +68,8 @@ Route::middleware('auth')->group(function () {
         Route::get('tenants/history', [AdminTenantController::class, 'history'])->name('tenants.history');
         Route::get('tenants/{tenant}/checkout', [AdminTenantController::class, 'checkout'])->name('tenants.checkout');
         Route::match(['put', 'patch'], 'tenants/{tenant}/checkout', [AdminTenantController::class, 'processCheckout'])->name('tenants.checkout.update');
+        Route::get('tenants/{tenant}/transfer', [AdminTenantController::class, 'transfer'])->name('tenants.transfer');
+        Route::match(['put', 'patch'], 'tenants/{tenant}/transfer', [AdminTenantController::class, 'processTransfer'])->name('tenants.transfer.update');
         Route::get('tenants/assign', [AdminTenantController::class, 'createExisting'])->name('tenants.create-existing');
         Route::post('tenants/assign', [AdminTenantController::class, 'storeExisting'])->name('tenants.store-existing');
         Route::resource('tenants', AdminTenantController::class)->except('show');
@@ -75,6 +78,7 @@ Route::middleware('auth')->group(function () {
         Route::get('logs', [ActivityLogController::class, 'index'])->name('logs.index');
         Route::resource('utility-bills', AdminUtilityBillController::class)->except('show');
         Route::resource('maintenance-requests', AdminMaintenanceRequestController::class)->except('create', 'store', 'show');
+        Route::resource('operational-expenses', OperationalExpenseController::class)->except('show');
     });
 
     Route::prefix('tenant')->name('tenant.')->middleware('tenant')->group(function () {

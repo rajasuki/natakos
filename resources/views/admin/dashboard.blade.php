@@ -396,6 +396,34 @@
                 </div>
             </article>
 
+            {{-- Biaya Operasional --}}
+            <article class="dashboard-stat-card">
+                <div class="dashboard-stat-head">
+                    <h3 class="dashboard-stat-title">
+                        <svg class="dashboard-stat-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                        Biaya Operasional
+                    </h3>
+                </div>
+                <div class="dashboard-stat-body">
+                    <div class="dashboard-mini-grid">
+                        <div class="dashboard-mini-stat is-warning">
+                            <p class="dashboard-mini-label">Bulan Ini</p>
+                            <p class="dashboard-mini-value">{{ \App\Support\UiFormatter::currency($m['opex_month']) }}</p>
+                            <div class="dashboard-mini-bar"></div>
+                        </div>
+                        <div class="dashboard-mini-stat {{ $m['overdue_with_fees'] > 0 ? 'is-danger' : 'is-neutral' }}">
+                            <p class="dashboard-mini-label">Kena Denda</p>
+                            <p class="dashboard-mini-value">{{ number_format($m['overdue_with_fees'], 0, ',', '.') }}</p>
+                            <div class="dashboard-mini-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
         </section>
 
         {{-- ── 3. TABLES — stacked ── --}}
