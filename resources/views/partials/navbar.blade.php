@@ -60,6 +60,9 @@
                         <a href="{{ route('admin.badges.index') }}" class="dropdown-link {{ request()->routeIs('admin.badges.*') ? 'is-active' : '' }}">
                             <span class="material-symbols-outlined">verified</span> Badge
                         </a>
+                        <a href="{{ route('admin.announcements.index') }}" class="dropdown-link {{ request()->routeIs('admin.announcements.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">campaign</span> Pengumuman
+                        </a>
                         <a href="{{ route('admin.chat.index') }}" class="dropdown-link {{ request()->routeIs('admin.chat.*') ? 'is-active' : '' }}">
                             <span class="material-symbols-outlined">forum</span> Obrolan
                         </a>
@@ -140,6 +143,7 @@
                             <a href="{{ route('admin.facilities.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.facilities.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">deck</span> Fasilitas</a>
                             <a href="{{ route('admin.tenants.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">group</span> Penghuni</a>
                             <a href="{{ route('admin.badges.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.badges.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">verified</span> Badge</a>
+                            <a href="{{ route('admin.announcements.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.announcements.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">campaign</span> Pengumuman</a>
                             <a href="{{ route('admin.payments.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">payments</span> Pembayaran</a>
                             <a href="{{ route('admin.bookings.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.bookings.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">request_quote</span> Pengajuan Sewa</a>
                             <a href="{{ route('admin.users.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">manage_accounts</span> Akun Pengguna</a>

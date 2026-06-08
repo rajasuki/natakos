@@ -838,7 +838,53 @@
                 border-radius: var(--radius-lg);
             }
 
-            .form-card { padding: 24px; }
+            .form-card {
+                padding: 24px;
+                background: #fff;
+                border: 1px solid var(--ui-border);
+                border-radius: var(--radius-lg);
+            }
+
+            .form-group {
+                display: grid;
+                gap: 6px;
+                margin-bottom: 16px;
+            }
+
+            .form-label {
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--gray-600);
+            }
+
+            .form-input {
+                width: 100%;
+                border: 1px solid var(--ui-border);
+                background: #fff;
+                color: var(--ui-ink);
+                padding: 10px 14px;
+                border-radius: var(--radius-md);
+                font-size: 14px;
+                transition: border-color 0.15s, box-shadow 0.15s;
+            }
+
+            .form-input:focus {
+                outline: none;
+                border-color: var(--ui-accent);
+                box-shadow: 0 0 0 3px rgba(74,124,89,.12);
+            }
+
+            textarea.form-input {
+                min-height: 140px;
+                resize: vertical;
+            }
+
+            .form-error {
+                font-size: 12px;
+                line-height: 1.6;
+                color: #be123c;
+                font-weight: 600;
+            }
 
             .form-layout { display: grid; gap: 20px; }
 
