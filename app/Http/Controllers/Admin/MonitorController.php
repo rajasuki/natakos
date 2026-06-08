@@ -10,10 +10,8 @@ class MonitorController extends Controller
 {
     public function index(): View
     {
-        $onlineThreshold = now()->subMinutes(5);
-
         $onlineUsers = User::query()
-            ->where('last_seen_at', '>=', $onlineThreshold)
+            ->whereRaw('last_seen_at >= NOW() - INTERVAL 5 MINUTE')
             ->orderByDesc('last_seen_at')
             ->get();
 
@@ -27,7 +25,6 @@ class MonitorController extends Controller
             'onlineCount' => $onlineUsers->count(),
             'tenantCount' => User::query()->where('role', 'tenant')->count(),
             'adminCount' => User::query()->where('role', 'admin')->count(),
-            'onlineThreshold' => $onlineThreshold,
         ]);
     }
 }
