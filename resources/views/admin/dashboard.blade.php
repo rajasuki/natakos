@@ -222,10 +222,9 @@
             ['label' => 'Perbaikan',    'value' => number_format($m['rooms_maintenance'], 0, ',', '.'), 'mod' => $m['rooms_maintenance'] > 0 ? 'is-warning' : 'is-neutral'],
         ];
 
-        $tenantTotal = $m['active_tenants'] + $m['tenants_ended'];
         $tenantStats = [
-            ['label' => 'Total Penghuni', 'value' => number_format($tenantTotal, 0, ',', '.'), 'mod' => 'is-info'],
-            ['label' => 'Baru Bulan Ini', 'value' => '2', 'mod' => 'is-success'],
+            ['label' => 'Total Penghuni', 'value' => number_format($m['total_tenants'], 0, ',', '.'), 'mod' => 'is-info'],
+            ['label' => 'Baru Bulan Ini', 'value' => number_format($m['new_tenants_this_month'], 0, ',', '.'), 'mod' => 'is-success'],
             ['label' => 'Akan Keluar',    'value' => number_format($m['tenants_ending_soon'], 0, ',', '.'), 'mod' => $m['tenants_ending_soon'] > 0 ? 'is-warning' : 'is-neutral'],
             ['label' => 'Overstay',       'value' => number_format($m['tenants_ended'], 0, ',', '.'), 'mod' => $m['tenants_ended'] > 0 ? 'is-danger' : 'is-neutral'],
         ];
@@ -374,7 +373,7 @@
                     <div class="dashboard-mini-grid">
                         <div class="dashboard-mini-stat is-success">
                             <p class="dashboard-mini-label">Pendapatan Bulan Ini</p>
-                            <p class="dashboard-mini-value"><span class="dashboard-mini-value-currency">Rp45.000.000</span></p>
+                            <p class="dashboard-mini-value"><span class="dashboard-mini-value-currency">{{ \App\Support\UiFormatter::currency($m['monthly_revenue']) }}</span></p>
                             <div class="dashboard-mini-bar"></div>
                         </div>
                         <div class="dashboard-mini-stat {{ $m['payments_unpaid'] > 0 ? 'is-warning' : 'is-neutral' }}">
@@ -614,7 +613,7 @@
                                         @elseif ($tenant->rent_period_status === 'ends_today')
                                             <span style="color:#9a3412;font-weight:700">Hari ini</span>
                                         @else
-                                            <span style="font-weight:600">{{ (int) $tenant->days_until_end }} hari</span>
+                                            <span style="font-weight:600">{{ abs((int) $tenant->days_until_end) }} hari</span>
                                         @endif
                                     </td>
                                     <td>

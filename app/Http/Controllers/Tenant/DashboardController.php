@@ -313,7 +313,7 @@ class DashboardController extends Controller
         $status = match (true) {
             $diff < 0 => 'ended',
             $diff === 0 => 'ends_today',
-            $diff <= 14 => 'ending_soon',
+            $diff <= 7 => 'ending_soon',
             default => 'safe',
         };
 
