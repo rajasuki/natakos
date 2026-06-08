@@ -32,6 +32,11 @@
 - Room main images, room gallery images, and kos logos use the `public` disk (`storage/app/public`). Run `php artisan storage:link` if you need them accessible from `/storage`.
 - Payment proof uploads intentionally use the default filesystem disk (`local` by default), and the admin/tenant proof handlers check both `local` and `public` when deleting or serving old paths. Do not simplify that storage behavior without tracing both controllers.
 
+## Badge System
+- Admin manages badges at `admin.badges.*` routes (index, create, edit, destroy). Badges have name, description, effect (none|gold|rainbow|glow|fire), optional requirement_type (chat_messages|payments_count|stay_days) and requirement_value.
+- Tenants select unlocked badges on the profile edit page. `Badge::syncUnlockedFor($user)` computes which badges the user qualifies for. Selection sets `user.title` and `user.title_effect` which the chat display already renders with CSS classes.
+- Badge selection validates that the badge exists, is active, and is unlocked by the user. Passing `selected_badge_id = null` clears the title. The `Badge` model (`app/Models/Badge.php`) contains all unlock logic.
+
 ## Conventions
 - User-facing copy, validation messages, labels, and WhatsApp text are in Indonesian. Preserve that language unless the task explicitly changes product copy.
 - Status values are hard-coded across controllers, views, and tests. Keep these exact sets synchronized when changing workflow logic: room `available|occupied|maintenance`, tenant `active|inactive|moved_out`, payment `unpaid|pending_verification|paid|rejected`.

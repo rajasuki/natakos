@@ -24,6 +24,12 @@
     .bg-preview-empty { width:160px; height:90px; border-radius:var(--radius-md); border:2px dashed var(--ui-border); display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--ui-body); flex-shrink:0; }
     .checkbox-label { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:500; cursor:pointer; }
     .checkbox-label input[type=checkbox] { width:18px; height:18px; accent-color:var(--ui-accent); }
+    .badge-option { display:flex; align-items:center; gap:10px; padding:10px 14px; border:1px solid var(--ui-border); border-radius:var(--radius-md); cursor:pointer; transition:border-color .15s,background .15s; }
+    .badge-option:hover { border-color:var(--ui-accent); }
+    .badge-option input[type=radio] { accent-color:var(--ui-accent); }
+    .badge-option-selected { border-color:var(--ui-accent); background:rgba(74,124,89,.06); }
+    .badge-option-locked { opacity:.55; cursor:not-allowed; }
+    .badge-option-locked:hover { border-color:var(--ui-border); }
 </style>
 @endpush
 
@@ -97,6 +103,35 @@
                     </label>
                     @error('show_room') <div class="field-error">{{ $message }}</div> @enderror
                     <div class="helper">Jika dimatikan, penghuni lain tidak akan melihat kamar Anda di profil. Admin tetap bisa melihatnya.</div>
+                </div>
+
+                <hr class="form-sep">
+
+                <p style="font-size:13px;font-weight:600;color:var(--ui-body);margin:0 0 16px;">Badge & Gelar</p>
+
+                <div class="field">
+                    <label>Pilih Badge</label>
+                    <div style="display:grid;gap:8px;">
+                        <label class="badge-option {{ $selectedBadge ? '' : 'badge-option-selected' }}" data-badge-id="">
+                            <input type="radio" name="selected_badge_id" value="" {{ $selectedBadge ? '' : 'checked' }}>
+                            <span class="material-symbols-outlined" style="font-size:20px;">do_not_disturb_alt</span>
+                            <span style="font-size:13px;color:var(--ui-body);">Tidak ada badge</span>
+                        </label>
+                        @foreach ($badges as $badge)
+                            @php
+                                $unlocked = $badge->isUnlockedFor($user);
+                                $isSelected = $selectedBadge && $selectedBadge->id === $badge->id;
+                            @endphp
+                            <label class="badge-option {{ $isSelected ? 'badge-option-selected' : '' }} {{ $unlocked ? '' : 'badge-option-locked' }}" data-badge-id="{{ $badge->id }}" {{ $unlocked ? '' : 'title="Syarat belum terpenuhi"' }}>
+                                <input type="radio" name="selected_badge_id" value="{{ $badge->id }}" {{ $isSelected ? 'checked' : '' }} {{ $unlocked ? '' : 'disabled' }}>
+                                <span class="user-title user-title-{{ $badge->effect }}">{{ $badge->name }}</span>
+                                @if (!$unlocked)
+                                    <span class="material-symbols-outlined" style="font-size:16px;color:var(--ui-body);margin-left:auto;">lock</span>
+                                @endif
+                            </label>
+                        @endforeach
+                    </div>
+                    @error('selected_badge_id') <div class="field-error">{{ $message }}</div> @enderror
                 </div>
 
                 <hr class="form-sep">

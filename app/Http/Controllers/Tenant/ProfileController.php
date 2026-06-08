@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Models\Badge;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,8 +14,13 @@ class ProfileController extends Controller
 {
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        Badge::syncUnlockedFor($user);
+
         return view('tenant.profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'badges' => Badge::where('is_active', true)->get(),
+            'selectedBadge' => $user->badges()->wherePivot('is_selected', true)->first(),
         ]);
     }
 
@@ -32,6 +38,7 @@ class ProfileController extends Controller
             'profile_bg' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
             'current_password' => ['nullable', 'required_with:new_password', 'string', 'current_password'],
             'new_password' => ['nullable', 'string', 'min:8'],
+            'selected_badge_id' => ['nullable', 'exists:badges,id'],
         ]);
 
         $data = [
@@ -63,6 +70,29 @@ class ProfileController extends Controller
         }
 
         $user->update($data);
+
+        if (array_key_exists('selected_badge_id', $validated)) {
+            Badge::syncUnlockedFor($user);
+
+            if ($validated['selected_badge_id']) {
+                $badge = Badge::find($validated['selected_badge_id']);
+                if ($badge && $badge->is_active && $badge->isUnlockedFor($user)) {
+                    $user->badges()->updateExistingPivot($badge->id, ['is_selected' => true]);
+                    $user->badges()->where('badge_id', '!=', $badge->id)->wherePivot('is_selected', true)->each(function ($b) use ($user) {
+                        $user->badges()->updateExistingPivot($b->id, ['is_selected' => false]);
+                    });
+                    $user->update([
+                        'title' => $badge->name,
+                        'title_effect' => $badge->effect,
+                    ]);
+                }
+            } else {
+                $user->badges()->wherePivot('is_selected', true)->each(function ($b) use ($user) {
+                    $user->badges()->updateExistingPivot($b->id, ['is_selected' => false]);
+                });
+                $user->update(['title' => null, 'title_effect' => null]);
+            }
+        }
 
         return redirect()
             ->route('tenant.profile.edit')
