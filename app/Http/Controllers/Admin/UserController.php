@@ -71,7 +71,7 @@ class UserController extends Controller
 
             if ($validated['selected_badge_id']) {
                 $badge = Badge::find($validated['selected_badge_id']);
-                if ($badge && $badge->is_active && $badge->isUnlockedFor($user)) {
+                if ($badge && $badge->is_active) {
                     $user->badges()->syncWithoutDetaching([$badge->id => ['is_selected' => true]]);
                     $user->badges()->where('badge_id', '!=', $badge->id)->wherePivot('is_selected', true)->each(function ($b) use ($user) {
                         $user->badges()->updateExistingPivot($b->id, ['is_selected' => false]);
