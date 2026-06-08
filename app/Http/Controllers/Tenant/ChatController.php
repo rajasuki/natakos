@@ -175,8 +175,9 @@ class ChatController extends Controller
             }
 
             $editedBadge = $isEdited ? '<span class="chat-edited-badge"> · diedit</span>' : '';
+            $effect = $msg->user->title_effect ?: 'none';
             $titleHtml = $msg->user->title
-                ? '<span class="user-title user-title-'.e($msg->user->title_effect ?: 'none').'">'.e($msg->user->title).'</span>'
+                ? '<span class="user-title user-title-'.e($effect).'">'.e($msg->user->title).'</span>'
                 : '';
             $roomHtml = (! $isSelf && $msg->user->show_room && $msg->user->tenant && $msg->user->tenant->room)
                 ? '<span class="chat-bubble-room">'.e($msg->user->tenant->room->name).'</span>'
@@ -186,9 +187,10 @@ class ChatController extends Controller
                 <div class="chat-avatar-wrap">
                     <div class="chat-avatar" data-user-id="'.$msg->user_id.'" onclick="openProfilePopup('.$msg->user_id.')">'.$avatarHtml.'</div>
                 </div>
-                <div class="chat-bubble">
+                <div class="chat-bubble chat-bubble-'.e($effect).'">
                     <div class="chat-bubble-head">
-                        '.($isSelf ? '' : '<span class="chat-bubble-name" data-user-id="'.$msg->user_id.'">'.e($msg->user->name).$titleHtml.'</span>'.$roomHtml).'
+                        '.($isSelf ? '' : '<span class="chat-bubble-name" data-user-id="'.$msg->user_id.'">'.e($msg->user->name).'</span>'.$roomHtml).'
+                        '.$titleHtml.'
                         <span class="chat-bubble-time">'.UiFormatter::date($msg->created_at, 'H:i').$editedBadge.'</span>
                     </div>
                     '.$imageHtml.'

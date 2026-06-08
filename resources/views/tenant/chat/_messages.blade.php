@@ -4,6 +4,7 @@
         $isSelf = $msg->user_id === Auth::id();
         $isEditable = $isSelf && $msg->created_at->diffInMinutes(now()) < 2;
         $isEdited = $msg->created_at->timestamp !== $msg->updated_at->timestamp;
+        $effect = $msg->user->title_effect ?: 'none';
     @endphp
     <div class="chat-message {{ $isSelf ? 'chat-message-self' : '' }}" data-message-id="{{ $msg->id }}">
         <div class="chat-avatar-wrap">
@@ -15,17 +16,16 @@
                 @endif
             </div>
         </div>
-        <div class="chat-bubble">
+        <div class="chat-bubble chat-bubble-{{ $effect }}">
             <div class="chat-bubble-head">
                 @if (!$isSelf)
-                    <span class="chat-bubble-name" data-user-id="{{ $msg->user_id }}">{{ $msg->user->name }}
-                        @if ($msg->user->title)
-                            <span class="user-title user-title-{{ $msg->user->title_effect ?: 'none' }}">{{ $msg->user->title }}</span>
-                        @endif
-                    </span>
+                    <span class="chat-bubble-name" data-user-id="{{ $msg->user_id }}">{{ $msg->user->name }}</span>
                     @if ($msg->user->show_room && $msg->user->tenant && $msg->user->tenant->room)
                         <span class="chat-bubble-room">{{ $msg->user->tenant->room->name }}</span>
                     @endif
+                @endif
+                @if ($msg->user->title)
+                    <span class="user-title user-title-{{ $msg->user->title_effect ?: 'none' }}">{{ $msg->user->title }}</span>
                 @endif
                 <span class="chat-bubble-time">
                     {{ \App\Support\UiFormatter::date($msg->created_at, 'H:i') }}

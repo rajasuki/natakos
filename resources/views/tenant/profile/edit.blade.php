@@ -109,6 +109,13 @@
 
                 <p style="font-size:13px;font-weight:600;color:var(--ui-body);margin:0 0 16px;">Badge & Gelar</p>
 
+                @if ($user->title)
+                    <div style="margin-bottom:16px;padding:12px 16px;background:var(--gray-50);border-radius:var(--radius-md);border:1px solid var(--ui-border);">
+                        <div style="font-size:12px;color:var(--ui-body);margin-bottom:4px;">Gelar saat ini</div>
+                        <span class="user-title user-title-{{ $user->title_effect ?: 'none' }}" style="font-size:13px;padding:3px 10px;">{{ $user->title }}</span>
+                    </div>
+                @endif
+
                 <div class="field">
                     <label>Pilih Badge</label>
                     <div style="display:grid;gap:8px;">
