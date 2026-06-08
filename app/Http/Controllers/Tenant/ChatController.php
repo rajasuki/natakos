@@ -58,12 +58,13 @@ class ChatController extends Controller
         $validated = $request->validate([
             'content' => ['nullable', 'string', 'max:1000'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
+            'audio' => ['nullable', 'file', 'mimes:webm,m4a,mp4,ogg,opus,wav,mp3,aac,oga', 'max:3072'],
         ]);
 
-        if (empty($validated['content']) && ! $request->hasFile('image')) {
+        if (empty($validated['content']) && ! $request->hasFile('image') && ! $request->hasFile('audio')) {
             return redirect()
                 ->route('tenant.chat.index')
-                ->with('error', 'Pesan atau gambar wajib diisi.');
+                ->with('error', 'Pesan, gambar, atau audio wajib diisi.');
         }
 
         $data = ['user_id' => $user->id];
@@ -74,6 +75,10 @@ class ChatController extends Controller
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('chat-images', 'public');
+        }
+
+        if ($request->hasFile('audio')) {
+            $data['audio'] = $request->file('audio')->store('chat-audio', 'public');
         }
 
         ChatMessage::create($data);
@@ -110,6 +115,10 @@ class ChatController extends Controller
             Storage::disk('public')->delete($message->image);
         }
 
+        if ($message->audio) {
+            Storage::disk('public')->delete($message->audio);
+        }
+
         $message->delete();
 
         return redirect()
@@ -144,6 +153,13 @@ class ChatController extends Controller
                 $imageHtml = '<a href="'.asset('storage/'.$msg->image).'" target="_blank" class="chat-image-link">
                     <img src="'.asset('storage/'.$msg->image).'" alt="Gambar" class="chat-image" loading="lazy">
                 </a>';
+            }
+
+            $audioHtml = '';
+            if ($msg->audio) {
+                $audioHtml = '<audio controls class="chat-audio" preload="metadata" style="width:100%;max-width:280px;height:40px;margin:4px 0;">
+                    <source src="'.asset('storage/'.$msg->audio).'">
+                </audio>';
             }
 
             $textHtml = $msg->content ? '<div class="chat-bubble-text">'.e($msg->content).'</div>' : '';
@@ -194,6 +210,7 @@ class ChatController extends Controller
                         <span class="chat-bubble-time">'.UiFormatter::date($msg->created_at, 'H:i').$editedBadge.'</span>
                     </div>
                     '.$imageHtml.'
+                    '.$audioHtml.'
                     '.$textHtml.'
                     '.$editFormHtml.'
                     '.$actionsHtml.'

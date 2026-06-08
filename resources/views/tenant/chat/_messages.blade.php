@@ -39,6 +39,11 @@
                     <img src="{{ asset('storage/'.$msg->image) }}" alt="Gambar" class="chat-image" loading="lazy">
                 </a>
             @endif
+            @if ($msg->audio)
+                <audio controls class="chat-audio" preload="metadata">
+                    <source src="{{ asset('storage/'.$msg->audio) }}">
+                </audio>
+            @endif
             @if ($msg->content)
                 <div class="chat-bubble-text" id="msg-text-{{ $msg->id }}">{{ $msg->content }}</div>
             @endif
