@@ -7,6 +7,7 @@ use App\Models\Payment;
 use App\Models\Tenant;
 use App\Support\ActivityLogger;
 use App\Support\PaymentWorkflow;
+use App\Support\RoomOccupancy;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -157,10 +158,16 @@ class PaymentController extends Controller
         $data = $this->validatedData($request, $payment);
         $data = PaymentWorkflow::prepare($data, $payment, (int) $request->user()->id);
 
+        $wasPaid = $payment->getOriginal('status') !== 'paid' && $data['status'] === 'paid';
+
         $payment->update($data);
 
         if (array_key_exists('proof_image', $data) && $oldImage !== $data['proof_image']) {
             $this->deleteProofImage($oldImage);
+        }
+
+        if ($wasPaid) {
+            RoomOccupancy::syncStatuses([$payment->tenant?->room_id]);
         }
 
         $tenantName = $payment->tenant?->user?->name ?? '#'.$payment->tenant_id;
@@ -198,6 +205,10 @@ class PaymentController extends Controller
         ], $payment, (int) $request->user()->id);
 
         $payment->update($data);
+
+        if ($status === 'paid') {
+            RoomOccupancy::syncStatuses([$payment->tenant?->room_id]);
+        }
 
         $tenantName = $payment->tenant?->user?->name ?? '#'.$payment->tenant_id;
         match ($status) {

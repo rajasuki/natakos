@@ -75,8 +75,6 @@ class BookingController extends Controller
             'status' => 'unpaid',
         ]);
 
-        RoomOccupancy::syncStatuses([$room->id]);
-
         $booking->update([
             'status' => 'approved',
             'approved_at' => now(),

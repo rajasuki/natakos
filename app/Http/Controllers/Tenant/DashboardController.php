@@ -95,7 +95,7 @@ class DashboardController extends Controller
             'paymentDeadlines' => $paymentDeadlines,
             'featuredPayment' => $featuredPayment,
             'paymentDeadline' => $paymentDeadline,
-            'paymentWarning' => $this->paymentWarning($paymentDeadline),
+            'paymentWarning' => $this->paymentWarning($paymentDeadline, $featuredPayment),
             'rentSummary' => $rentSummary,
             'rentWarning' => $this->rentWarning($rentSummary),
             'utilityBills' => $utilityBills,
@@ -142,6 +142,7 @@ class DashboardController extends Controller
         return [
             'paid' => 'Lunas',
             'safe' => 'Aman',
+            'fresh' => 'Baru',
             'due_soon' => 'Mendekati Tenggat',
             'due_today' => 'Jatuh Tempo Hari Ini',
             'overdue' => 'Terlambat',
@@ -193,13 +194,18 @@ class DashboardController extends Controller
     /**
      * @return array<string, string>|null
      */
-    private function paymentWarning(?object $paymentDeadline): ?array
+    private function paymentWarning(?object $paymentDeadline, ?Payment $featuredPayment = null): ?array
     {
         if ($paymentDeadline === null) {
             return null;
         }
 
         return match ($paymentDeadline->deadline_status) {
+            'fresh' => [
+                'tone' => 'info',
+                'title' => 'Tagihan Pertama',
+                'message' => 'Selamat datang! Tagihan pertama Anda sebesar Rp'.number_format($featuredPayment?->amount ?? 0, 0, ',', '.').' belum dibayar. Silakan hubungi pengelola untuk info pembayaran.',
+            ],
             'due_soon' => [
                 'tone' => 'warning',
                 'title' => 'Pembayaran Mendekati Tenggat',
@@ -278,11 +284,13 @@ class DashboardController extends Controller
             }
 
             $diff = $today->diffInDays($dueDate, false);
+            $isFresh = $payment->created_at && $payment->created_at->gte(Carbon::today()->subDays(3));
 
             $status = match (true) {
+                $isFresh && $diff >= 0 => 'fresh',
                 $diff < 0 => 'overdue',
                 $diff === 0 => 'due_today',
-                $diff <= 5 => 'due_soon',
+                $diff <= 7 => 'due_soon',
                 default => 'safe',
             };
 
