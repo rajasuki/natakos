@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\TenantMiddleware;
+use App\Http\Middleware\TrackUserActivity;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo('/login');
         $middleware->redirectUsersTo('/dashboard');
+        $middleware->append(TrackUserActivity::class);
         $middleware->alias([
             'admin' => AdminMiddleware::class,
             'tenant' => TenantMiddleware::class,

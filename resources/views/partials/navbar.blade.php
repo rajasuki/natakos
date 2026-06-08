@@ -41,6 +41,7 @@
                         <a href="{{ route('admin.maintenance-requests.index') }}" class="dropdown-link {{ request()->routeIs('admin.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
                         <a href="{{ route('admin.operational-expenses.index') }}" class="dropdown-link {{ request()->routeIs('admin.operational-expenses.*') ? 'is-active' : '' }}">Biaya Operasional</a>
                         <a href="{{ route('admin.logs.index') }}" class="dropdown-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}">Log Aktivitas</a>
+                        <a href="{{ route('admin.monitor.index') }}" class="dropdown-link {{ request()->routeIs('admin.monitor.*') ? 'is-active' : '' }}">Monitor</a>
                     </div>
                 </div>
                 @elseif(Auth::user()->role === 'tenant')
@@ -104,6 +105,7 @@
                             <a href="{{ route('admin.maintenance-requests.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
                             <a href="{{ route('admin.operational-expenses.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.operational-expenses.*') ? 'is-active' : '' }}">Biaya Operasional</a>
                             <a href="{{ route('admin.logs.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}">Log Aktivitas</a>
+                            <a href="{{ route('admin.monitor.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.monitor.*') ? 'is-active' : '' }}">Monitor</a>
                             @elseif(Auth::user()->role === 'tenant')
                             <div class="mobile-nav-divider"></div>
                             <span class="mobile-nav-label">Tenant</span>
