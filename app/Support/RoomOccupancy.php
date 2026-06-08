@@ -60,6 +60,7 @@ class RoomOccupancy
         return Tenant::query()
             ->where('room_id', $room->id)
             ->where('status', 'active')
+            ->whereHas('payments', fn ($q) => $q->where('status', 'paid'))
             ->exists();
     }
 
@@ -68,6 +69,7 @@ class RoomOccupancy
         return Tenant::query()
             ->where('room_id', $room->id)
             ->where('status', 'active')
+            ->whereHas('payments', fn ($q) => $q->where('status', 'paid'))
             ->count();
     }
 
