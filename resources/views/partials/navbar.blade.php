@@ -26,22 +26,52 @@
                         Dashboard
                         <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
                     </a>
-                    <div class="nav-dropdown">
-                        <a href="{{ route('admin.dashboard') }}" class="dropdown-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">Dashboard</a>
-                        <a href="{{ route('admin.rooms.index') }}" class="dropdown-link {{ request()->routeIs('admin.rooms.*') ? 'is-active' : '' }}">Kamar</a>
-                        <a href="{{ route('admin.facilities.index') }}" class="dropdown-link {{ request()->routeIs('admin.facilities.*') ? 'is-active' : '' }}">Fasilitas</a>
-                        <a href="{{ route('admin.tenants.index') }}" class="dropdown-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}">Penghuni</a>
-                        <a href="{{ route('admin.payments.index') }}" class="dropdown-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}">Pembayaran</a>
-                        <a href="{{ route('admin.bookings.index') }}" class="dropdown-link {{ request()->routeIs('admin.bookings.*') ? 'is-active' : '' }}">Pengajuan Sewa</a>
-                        <a href="{{ route('admin.users.index') }}" class="dropdown-link {{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}">Akun Pengguna</a>
-                        <a href="{{ route('admin.kos-profile.edit') }}" class="dropdown-link {{ request()->routeIs('admin.kos-profile.*') ? 'is-active' : '' }}">Profil</a>
-                        <div style="height:1px;background:var(--ui-border);margin:4px 0;"></div>
-                        <a href="{{ route('admin.utility-bills.index') }}" class="dropdown-link {{ request()->routeIs('admin.utility-bills.*') ? 'is-active' : '' }}">Tagihan Utilitas</a>
-                        <a href="{{ route('admin.chat.index') }}" class="dropdown-link {{ request()->routeIs('admin.chat.*') ? 'is-active' : '' }}">Obrolan</a>
-                        <a href="{{ route('admin.maintenance-requests.index') }}" class="dropdown-link {{ request()->routeIs('admin.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
-                        <a href="{{ route('admin.operational-expenses.index') }}" class="dropdown-link {{ request()->routeIs('admin.operational-expenses.*') ? 'is-active' : '' }}">Biaya Operasional</a>
-                        <a href="{{ route('admin.logs.index') }}" class="dropdown-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}">Log Aktivitas</a>
-                        <a href="{{ route('admin.monitor.index') }}" class="dropdown-link {{ request()->routeIs('admin.monitor.*') ? 'is-active' : '' }}">Monitor</a>
+                    <div class="nav-dropdown nav-dropdown-grid">
+                        <a href="{{ route('admin.dashboard') }}" class="dropdown-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">grid_view</span> Dashboard
+                        </a>
+                        <a href="{{ route('admin.rooms.index') }}" class="dropdown-link {{ request()->routeIs('admin.rooms.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">meeting_room</span> Kamar
+                        </a>
+                        <a href="{{ route('admin.facilities.index') }}" class="dropdown-link {{ request()->routeIs('admin.facilities.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">deck</span> Fasilitas
+                        </a>
+                        <a href="{{ route('admin.tenants.index') }}" class="dropdown-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">group</span> Penghuni
+                        </a>
+                        <a href="{{ route('admin.badges.index') }}" class="dropdown-link {{ request()->routeIs('admin.badges.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">verified</span> Badge
+                        </a>
+                        <a href="{{ route('admin.payments.index') }}" class="dropdown-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">payments</span> Pembayaran
+                        </a>
+                        <a href="{{ route('admin.bookings.index') }}" class="dropdown-link {{ request()->routeIs('admin.bookings.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">request_quote</span> Pengajuan Sewa
+                        </a>
+                        <a href="{{ route('admin.users.index') }}" class="dropdown-link {{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">manage_accounts</span> Akun Pengguna
+                        </a>
+                        <a href="{{ route('admin.utility-bills.index') }}" class="dropdown-link {{ request()->routeIs('admin.utility-bills.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">receipt_long</span> Tagihan Utilitas
+                        </a>
+                        <a href="{{ route('admin.chat.index') }}" class="dropdown-link {{ request()->routeIs('admin.chat.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">forum</span> Obrolan
+                        </a>
+                        <a href="{{ route('admin.maintenance-requests.index') }}" class="dropdown-link {{ request()->routeIs('admin.maintenance-requests.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">handyman</span> Perbaikan
+                        </a>
+                        <a href="{{ route('admin.operational-expenses.index') }}" class="dropdown-link {{ request()->routeIs('admin.operational-expenses.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">account_balance</span> Biaya Operasional
+                        </a>
+                        <a href="{{ route('admin.logs.index') }}" class="dropdown-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">history</span> Log Aktivitas
+                        </a>
+                        <a href="{{ route('admin.monitor.index') }}" class="dropdown-link {{ request()->routeIs('admin.monitor.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">monitor_heart</span> Monitor
+                        </a>
+                        <a href="{{ route('admin.kos-profile.edit') }}" class="dropdown-link {{ request()->routeIs('admin.kos-profile.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">store</span> Profil Kos
+                        </a>
                     </div>
                 </div>
                 @elseif(Auth::user()->role === 'tenant')
@@ -91,21 +121,23 @@
                             @if(Auth::user()->role === 'admin')
                             <div class="mobile-nav-divider"></div>
                             <span class="mobile-nav-label">Admin</span>
-                            <a href="{{ route('admin.dashboard') }}" class="mobile-nav-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">Dashboard</a>
-                            <a href="{{ route('admin.rooms.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.rooms.*') ? 'is-active' : '' }}">Kamar</a>
-                            <a href="{{ route('admin.facilities.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.facilities.*') ? 'is-active' : '' }}">Fasilitas</a>
-                            <a href="{{ route('admin.tenants.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}">Penghuni</a>
-                            <a href="{{ route('admin.payments.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}">Pembayaran</a>
-                            <a href="{{ route('admin.users.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}">Akun Pengguna</a>
-                            <a href="{{ route('admin.kos-profile.edit') }}" class="mobile-nav-link {{ request()->routeIs('admin.kos-profile.*') ? 'is-active' : '' }}">Profil</a>
+                            <a href="{{ route('admin.dashboard') }}" class="mobile-nav-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}"><span class="material-symbols-outlined">grid_view</span> Dashboard</a>
+                            <a href="{{ route('admin.rooms.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.rooms.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">meeting_room</span> Kamar</a>
+                            <a href="{{ route('admin.facilities.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.facilities.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">deck</span> Fasilitas</a>
+                            <a href="{{ route('admin.tenants.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">group</span> Penghuni</a>
+                            <a href="{{ route('admin.badges.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.badges.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">verified</span> Badge</a>
+                            <a href="{{ route('admin.payments.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">payments</span> Pembayaran</a>
+                            <a href="{{ route('admin.bookings.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.bookings.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">request_quote</span> Pengajuan Sewa</a>
+                            <a href="{{ route('admin.users.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">manage_accounts</span> Akun Pengguna</a>
                             <div class="mobile-nav-divider"></div>
                             <span class="mobile-nav-label">Lainnya</span>
-                            <a href="{{ route('admin.utility-bills.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.utility-bills.*') ? 'is-active' : '' }}">Tagihan Utilitas</a>
-                            <a href="{{ route('admin.chat.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.chat.*') ? 'is-active' : '' }}">Obrolan</a>
-                            <a href="{{ route('admin.maintenance-requests.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
-                            <a href="{{ route('admin.operational-expenses.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.operational-expenses.*') ? 'is-active' : '' }}">Biaya Operasional</a>
-                            <a href="{{ route('admin.logs.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}">Log Aktivitas</a>
-                            <a href="{{ route('admin.monitor.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.monitor.*') ? 'is-active' : '' }}">Monitor</a>
+                            <a href="{{ route('admin.utility-bills.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.utility-bills.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">receipt_long</span> Tagihan Utilitas</a>
+                            <a href="{{ route('admin.chat.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.chat.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">forum</span> Obrolan</a>
+                            <a href="{{ route('admin.maintenance-requests.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.maintenance-requests.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">handyman</span> Perbaikan</a>
+                            <a href="{{ route('admin.operational-expenses.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.operational-expenses.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">account_balance</span> Biaya Operasional</a>
+                            <a href="{{ route('admin.kos-profile.edit') }}" class="mobile-nav-link {{ request()->routeIs('admin.kos-profile.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">store</span> Profil Kos</a>
+                            <a href="{{ route('admin.logs.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">history</span> Log Aktivitas</a>
+                            <a href="{{ route('admin.monitor.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.monitor.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">monitor_heart</span> Monitor</a>
                             @elseif(Auth::user()->role === 'tenant')
                             <div class="mobile-nav-divider"></div>
                             <span class="mobile-nav-label">Tenant</span>
