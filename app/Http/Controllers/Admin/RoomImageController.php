@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Models\RoomImage;
+use App\Support\ActivityLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -70,6 +71,8 @@ class RoomImageController extends Controller
                 ->with('error', 'Foto galeri gagal diunggah. Silakan coba lagi.');
         }
 
+        ActivityLogger::created('gambar_kamar', $room->id, "Galeri {$room->name} (".count($storedPaths).' foto)');
+
         if ($request->ajax()) {
             $newImages = RoomImage::whereIn('id', $newImageIds)
                 ->get()
@@ -106,6 +109,8 @@ class RoomImageController extends Controller
         }
 
         $this->deleteImage($imagePath);
+
+        ActivityLogger::deleted('gambar_kamar', $image->id, "Foto {$room->name}");
 
         return redirect()
             ->route('admin.rooms.edit', $room)

@@ -89,7 +89,7 @@
                                     @if ($user->tenant && $user->tenant->room)
                                         <span style="font-weight:500;">{{ $user->tenant->room->name }}</span>
                                     @elseif ($user->tenant)
-                                        <span class="muted">Menunggu kamar</span>
+                                        <span class="muted">Belum ada kamar</span>
                                     @else
                                         <span class="muted">-</span>
                                     @endif
@@ -121,13 +121,24 @@
                                     </span>
                                 </td>
                                 <td>
-                                    @if ($user->role === 'tenant' && !$user->tenant)
-                                        <a href="{{ route('admin.tenants.create-existing') }}" class="button button-sm button-primary">
-                                            Assign kamar
-                                        </a>
-                                    @else
-                                        <span class="muted">-</span>
-                                    @endif
+                                    <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+                                        @if ($user->role === 'tenant' && !$user->tenant)
+                                            <a href="{{ route('admin.tenants.create-existing') }}" class="button button-sm button-primary">
+                                                Assign kamar
+                                            </a>
+                                        @endif
+                                        @if (!$user->is(Auth::user()))
+                                            <form method="POST" action="{{ route('admin.users.role', $user) }}" style="display:flex;gap:4px;align-items:center;" onsubmit="return confirm('Ubah role {{ $user->name }}?')">
+                                                @csrf @method('PUT')
+                                                <select name="role" class="title-select" style="width:90px;">
+                                                    @foreach ($roleLabels as $val => $label)
+                                                        <option value="{{ $val }}" @selected($user->role === $val)>{{ $label }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <button type="submit" class="button button-sm button-subtle" style="font-size:11px;padding:4px 8px;">Simpan</button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

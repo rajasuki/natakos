@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\KosProfile;
+use App\Support\ActivityLogger;
 use App\Support\WhatsappLink;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -42,6 +43,8 @@ class KosProfileController extends Controller
         }
 
         $profile->save();
+
+        ActivityLogger::updated('profil_kos', $profile->id, $profile->name ?? 'NATAKOS');
 
         return redirect()
             ->route('admin.kos-profile.edit')

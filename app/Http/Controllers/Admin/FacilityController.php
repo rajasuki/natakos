@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Facility;
+use App\Support\ActivityLogger;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,7 +30,9 @@ class FacilityController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        Facility::create($this->validatedData($request));
+        $facility = Facility::create($this->validatedData($request));
+
+        ActivityLogger::created('fasilitas', $facility->id, $facility->name);
 
         return redirect()
             ->route('admin.facilities.index')
@@ -48,6 +51,8 @@ class FacilityController extends Controller
     {
         $facility->update($this->validatedData($request, $facility));
 
+        ActivityLogger::updated('fasilitas', $facility->id, $facility->name);
+
         return redirect()
             ->route('admin.facilities.index')
             ->with('success', 'Fasilitas berhasil diperbarui.');
@@ -62,6 +67,8 @@ class FacilityController extends Controller
                 ->route('admin.facilities.index')
                 ->with('error', 'Fasilitas tidak dapat dihapus karena masih memiliki data terkait.');
         }
+
+        ActivityLogger::deleted('fasilitas', $facility->id, $facility->name);
 
         return redirect()
             ->route('admin.facilities.index')

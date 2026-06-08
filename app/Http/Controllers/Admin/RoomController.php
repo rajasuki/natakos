@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Facility;
 use App\Models\Room;
+use App\Support\ActivityLogger;
 use App\Support\RoomOccupancy;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\QueryException;
@@ -104,6 +105,8 @@ class RoomController extends Controller
         $room = Room::create($data);
         $room->facilities()->sync($facilityIds);
 
+        ActivityLogger::created('kamar', $room->id, $room->name);
+
         if ($request->hasFile('gallery_photos')) {
             $this->storeGalleryImages($request->file('gallery_photos'), $room);
         }
@@ -143,6 +146,8 @@ class RoomController extends Controller
         $room->update($data);
         $room->facilities()->sync($facilityIds);
 
+        ActivityLogger::updated('kamar', $room->id, $room->name);
+
         if (array_key_exists('main_image', $data) && $oldImage !== $data['main_image']) {
             $this->deleteImage($oldImage);
         }
@@ -164,17 +169,12 @@ class RoomController extends Controller
                 ->with('error', 'Kamar tidak dapat dihapus karena masih ditempati penghuni aktif.');
         }
 
-        if ($room->tenants()->exists()) {
-            return redirect()
-                ->route('admin.rooms.index')
-                ->with('error', 'Kamar tidak dapat dihapus karena masih memiliki riwayat penghuni.');
-        }
-
         $mainImage = $room->main_image;
         $galleryImages = $room->images()->pluck('image_path')->filter()->all();
 
         try {
             DB::transaction(function () use ($room) {
+                $room->tenants()->update(['room_id' => null]);
                 $room->images()->delete();
                 $room->delete();
             });
@@ -186,6 +186,8 @@ class RoomController extends Controller
 
         $this->deleteImage($mainImage);
         $this->deleteImages($galleryImages);
+
+        ActivityLogger::deleted('kamar', $room->id, $room->name);
 
         return redirect()
             ->route('admin.rooms.index')

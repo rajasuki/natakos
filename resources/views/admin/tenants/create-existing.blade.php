@@ -47,8 +47,12 @@
                             <select id="user_id" name="user_id" class="select" required>
                                 <option value="">Pilih penghuni...</option>
                                 @foreach ($existingUsers as $user)
+                                    @php
+                                        $userTenantStatus = $user->tenant?->status;
+                                        $statusSuffix = $userTenantStatus === 'moved_out' ? ' (Riwayat)' : ($userTenantStatus === 'inactive' ? ' (Tidak Aktif)' : '');
+                                    @endphp
                                     <option value="{{ $user->id }}" @selected(old('user_id') == $user->id)>
-                                        {{ $user->name }}
+                                        {{ $user->name }}{{ $statusSuffix }}
                                         @if ($user->email) — {{ $user->email }} @endif
                                         @if ($user->phone) ({{ $user->phone }}) @endif
                                     </option>

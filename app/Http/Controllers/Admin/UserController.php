@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -32,6 +33,29 @@ class UserController extends Controller
         ]);
     }
 
+    public function updateRole(Request $request, User $user): RedirectResponse
+    {
+        if ($user->is($request->user())) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('error', 'Tidak bisa mengubah role akun Anda sendiri.');
+        }
+
+        $validated = $request->validate([
+            'role' => ['required', Rule::in(array_keys($this->roleLabels()))],
+        ]);
+
+        $user->update(['role' => $validated['role']]);
+
+        $roleLabel = $this->roleLabels()[$validated['role']] ?? $validated['role'];
+
+        ActivityLogger::updated('user', $user->id, "Role {$user->name} menjadi {$roleLabel}");
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', "Role {$user->name} berhasil diubah menjadi {$roleLabel}.");
+    }
+
     public function updateTitle(Request $request, User $user): RedirectResponse
     {
         $validated = $request->validate([
@@ -43,6 +67,8 @@ class UserController extends Controller
             'title' => $validated['title'] ?: null,
             'title_effect' => $validated['title_effect'],
         ]);
+
+        ActivityLogger::updated('user', $user->id, "Title {$user->name}");
 
         return redirect()
             ->route('admin.users.index')

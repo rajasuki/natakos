@@ -2,7 +2,9 @@
 
 @section('title', 'Pindah Kamar')
 @section('eyebrow', 'Admin Penghuni')
-@section('page_title', 'Pindah Kamar: {{ $tenant->user?->name }}')
+@section('page_title')
+    Pindah Kamar: {{ $tenant->user?->name }}
+@endsection
 
 @section('page_description', 'Pindahkan penghuni ke kamar lain. Data pembayaran dan tagihan tetap terhubung ke penghuni.')
 

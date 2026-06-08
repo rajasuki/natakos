@@ -865,6 +865,26 @@
                  .gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
              }
 
+             @media (max-width: 767px) {
+                 .actions { width: 100%; }
+                 .actions .button { flex: 1; white-space: normal; text-align: center; min-height: 42px; }
+                 .card-body { padding: 16px; }
+                 .headline { font-size: 28px; }
+             }
+
+             @media (max-width: 480px) {
+                 .site-shell { padding-left: 14px; padding-right: 14px; }
+                 .card-body { padding: 12px; }
+                 .headline { font-size: 24px; }
+                 .button { padding: 8px 14px; min-height: 44px; font-size: 14px; }
+                 .button-sm { padding: 6px 12px; min-height: 38px; font-size: 13px; }
+                 .input, .select, .textarea { padding: 8px 12px; font-size: 16px; }
+                 th, td { padding: 10px 12px; font-size: 12.5px; }
+                 .badge { font-size: 10.5px; padding: 3px 8px; }
+                 .page-copy { font-size: 13px; }
+                 .pagination-shell { padding: 12px 12px 14px; }
+             }
+
              .facility-icon {
                  width: 32px;
                  height: 32px;

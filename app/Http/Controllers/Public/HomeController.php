@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Facility;
 use App\Models\KosProfile;
 use App\Models\Room;
+use App\Models\Tenant;
 use App\Support\WhatsappLink;
 use Illuminate\View\View;
 
@@ -37,11 +38,13 @@ class HomeController extends Controller
             ? [
                 'total_rooms' => 0,
                 'available_rooms' => 0,
+                'active_tenants' => 0,
                 'facility_total' => 0,
             ]
             : [
                 'total_rooms' => Room::query()->count(),
                 'available_rooms' => Room::query()->where('status', 'available')->count(),
+                'active_tenants' => Tenant::query()->where('status', 'active')->count(),
                 'facility_total' => Facility::query()->count(),
             ];
 

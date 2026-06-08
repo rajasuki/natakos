@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Tenant;
+use App\Support\ActivityLogger;
 use App\Support\PaymentWorkflow;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -106,7 +107,10 @@ class PaymentController extends Controller
         $data = $this->validatedData($request);
         $data = PaymentWorkflow::prepare($data, null, (int) $request->user()->id);
 
-        Payment::create($data);
+        $payment = Payment::create($data);
+
+        $tenantName = $payment->tenant?->user?->name ?? '#'.$payment->tenant_id;
+        ActivityLogger::created('pembayaran', $payment->id, "Pembayaran {$tenantName} Rp ".number_format($payment->amount, 0, ',', '.'));
 
         return redirect()
             ->route('admin.payments.index')
@@ -159,6 +163,9 @@ class PaymentController extends Controller
             $this->deleteProofImage($oldImage);
         }
 
+        $tenantName = $payment->tenant?->user?->name ?? '#'.$payment->tenant_id;
+        ActivityLogger::updated('pembayaran', $payment->id, "Pembayaran {$tenantName}");
+
         return redirect()
             ->route('admin.payments.index')
             ->with('success', 'Pembayaran berhasil diperbarui.');
@@ -192,6 +199,13 @@ class PaymentController extends Controller
 
         $payment->update($data);
 
+        $tenantName = $payment->tenant?->user?->name ?? '#'.$payment->tenant_id;
+        match ($status) {
+            'paid' => ActivityLogger::approved('pembayaran', $payment->id, "Pembayaran {$tenantName}"),
+            'rejected' => ActivityLogger::rejected('pembayaran', $payment->id, "Pembayaran {$tenantName}"),
+            default => ActivityLogger::updated('pembayaran', $payment->id, "Pembayaran {$tenantName} (kembali ke verifikasi)"),
+        };
+
         return redirect()
             ->route('admin.payments.review', $payment)
             ->with('success', match ($status) {
@@ -204,10 +218,14 @@ class PaymentController extends Controller
     public function destroy(Payment $payment): RedirectResponse
     {
         $proofImage = $payment->proof_image;
+        $payment->load('tenant.user');
+        $tenantName = $payment->tenant?->user?->name ?? '#'.$payment->tenant_id;
 
         $payment->delete();
 
         $this->deleteProofImage($proofImage);
+
+        ActivityLogger::deleted('pembayaran', $payment->id, "Pembayaran {$tenantName}");
 
         return redirect()
             ->route('admin.payments.index')

@@ -118,6 +118,7 @@ class TenantController extends Controller
             'statusLabels' => $this->statusLabels(),
             'existingUsers' => User::query()
                 ->where('role', 'tenant')
+                ->with(['tenant' => fn ($q) => $q->latest('id')])
                 ->orderBy('name')
                 ->get(),
         ]);
@@ -143,7 +144,7 @@ class TenantController extends Controller
         $this->validateRoomAssignment($validated['room_id'], $validated['status']);
 
         DB::transaction(function () use ($validated): void {
-            Tenant::create([
+            $tenant = Tenant::create([
                 'user_id' => $validated['user_id'],
                 'room_id' => $validated['room_id'],
                 'start_date' => $validated['start_date'],
@@ -153,6 +154,10 @@ class TenantController extends Controller
             ]);
 
             RoomOccupancy::syncStatuses([$validated['room_id']]);
+
+            $userName = User::query()->find($validated['user_id'])?->name ?? '#'.$validated['user_id'];
+            $roomName = Room::query()->find($validated['room_id'])?->name ?? '#'.$validated['room_id'];
+            ActivityLogger::log('checkin', 'tenant', $tenant->id, "Check-in {$userName} ke {$roomName}");
         });
 
         return redirect()
@@ -184,6 +189,9 @@ class TenantController extends Controller
             ]);
 
             RoomOccupancy::syncStatuses([$tenant->room_id]);
+
+            $roomName = Room::query()->find($validated['room_id'])?->name ?? '#'.$validated['room_id'];
+            ActivityLogger::log('checkin', 'tenant', $tenant->id, "Check-in {$user->name} ke {$roomName} (akun baru)");
         });
 
         return redirect()
@@ -245,16 +253,14 @@ class TenantController extends Controller
             ]);
 
             RoomOccupancy::syncStatuses([$previousRoomId, $tenant->room_id]);
-        });
 
-        return redirect()
-            ->route('admin.tenants.index')
-            ->with('success', 'Penghuni berhasil diperbarui.');
+            ActivityLogger::updated('tenant', $tenant->id, $tenant->user->name);
+        });
     }
 
     public function destroy(Tenant $tenant): RedirectResponse
     {
-        $tenant->load(['user', 'payments']);
+        $tenant->load('payments');
 
         if ($tenant->payments->isNotEmpty()) {
             return redirect()
@@ -263,21 +269,14 @@ class TenantController extends Controller
         }
 
         $roomId = $tenant->room_id;
-        $user = $tenant->user;
+        $tenant->load('user');
+        $userName = $tenant->user?->name ?? '#'.$tenant->user_id;
 
         try {
-            DB::transaction(function () use ($tenant, $user, $roomId): void {
+            DB::transaction(function () use ($tenant, $roomId): void {
                 $tenant->delete();
 
                 RoomOccupancy::syncStatuses([$roomId]);
-
-                if ($user !== null && $user->role === 'tenant') {
-                    $stillHasTenant = Tenant::query()->where('user_id', $user->id)->exists();
-
-                    if (! $stillHasTenant) {
-                        $user->delete();
-                    }
-                }
             });
         } catch (QueryException) {
             return redirect()
@@ -285,9 +284,11 @@ class TenantController extends Controller
                 ->with('error', 'Penghuni tidak dapat dihapus karena masih memiliki data terkait.');
         }
 
+        ActivityLogger::deleted('tenant', $tenant->id, $userName);
+
         return redirect()
             ->route('admin.tenants.index')
-            ->with('success', 'Penghuni berhasil dihapus.');
+            ->with('success', 'Penghuni berhasil dihapus. Akun pengguna tetap tersimpan untuk riwayat.');
     }
 
     public function processCheckout(Request $request, Tenant $tenant): RedirectResponse
@@ -318,6 +319,10 @@ class TenantController extends Controller
 
             RoomOccupancy::syncStatuses([$roomId]);
         });
+
+        $userName = $tenant->user?->name ?? '#'.$tenant->user_id;
+        $roomName = $tenant->room?->name ?? '#'.$tenant->room_id;
+        ActivityLogger::log('checkout', 'tenant', $tenant->id, "Check-out {$userName} dari {$roomName} per {$validated['end_date']}");
 
         return redirect()
             ->route('admin.tenants.history')

@@ -88,6 +88,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('operational-expenses', OperationalExpenseController::class)->except('show');
         Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
         Route::match(['put', 'patch'], 'users/{user}/title', [AdminUserController::class, 'updateTitle'])->name('users.title');
+        Route::match(['put', 'patch'], 'users/{user}/role', [AdminUserController::class, 'updateRole'])->name('users.role');
         Route::get('chat', [AdminChatController::class, 'index'])->name('chat.index');
         Route::get('chat/profile', [AdminChatController::class, 'profile'])->name('chat.profile');
         Route::match(['put', 'patch'], 'chat/{message}', [AdminChatController::class, 'update'])->name('chat.update');
