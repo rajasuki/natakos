@@ -76,6 +76,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'show_room' => 'boolean',
+            'last_seen_at' => 'datetime',
         ];
     }
 }
