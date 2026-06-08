@@ -182,6 +182,27 @@
                 color: var(--ui-ink);
             }
 
+            .nav-link-chat {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: var(--ui-accent-soft);
+                color: var(--ui-accent);
+                border-radius: 999px;
+                padding: 8px 18px;
+                font-weight: 600;
+                font-size: 14px;
+                transition: background .2s, color .2s;
+            }
+            .nav-link-chat:hover {
+                background: var(--ui-accent);
+                color: #fff;
+            }
+            .nav-link-chat.is-active {
+                background: var(--ui-accent);
+                color: #fff;
+            }
+
             .nav-link.is-active,
             .mobile-nav-link.is-active {
                 background: #fff;
@@ -224,6 +245,15 @@
                 font-weight: 600;
                 color: rgba(28,43,34,.45);
                 white-space: nowrap;
+            }
+
+            .nav-separator {
+                display: inline-block;
+                width: 1px;
+                height: 20px;
+                background: var(--ui-border);
+                margin: 0 8px;
+                vertical-align: middle;
             }
 
             .nav-logout-form {
