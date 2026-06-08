@@ -18,9 +18,9 @@ class ChatController extends Controller
     public function index(Request $request): View
     {
         $perPage = 50;
-        $page = (int) $request->query('page', 1);
         $total = ChatMessage::count();
         $lastPage = max(1, (int) ceil($total / $perPage));
+        $page = (int) $request->query('page', $lastPage);
 
         if ($page > $lastPage) {
             $page = $lastPage;

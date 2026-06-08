@@ -15,19 +15,32 @@
         }
 
         .hero-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 48px;
-            align-items: center;
-            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+            max-width: 800px;
             width: 100%;
+            margin: 0 auto;
         }
 
         .hero-content {
-            max-width: 540px;
+            max-width: 700px;
             display: flex;
             flex-direction: column;
             gap: 28px;
+            text-align: center;
+            align-items: center;
+        }
+
+        .hero-badge {
+            align-self: center;
+        }
+
+        .hero-desc {
+            max-width: 600px;
+        }
+
+        .hero-actions {
+            justify-content: center;
         }
 
         .hero-badge {
@@ -112,159 +125,8 @@
 
         @media (max-width: 767px) {
             .hero-section { min-height: auto; padding: 40px 16px; }
-            .hero-grid { grid-template-columns: 1fr; gap: 32px; }
             .hero-content { max-width: 100%; }
             .hero-heading { font-size: clamp(28px, 8vw, 36px); }
-        }
-
-        /* ── Hero visual (kanan) ── */
-        .hero-visual {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 420px;
-        }
-
-        .hero-visual-frame {
-            position: relative;
-            width: 100%;
-            max-width: 480px;
-            aspect-ratio: 4 / 5;
-            border-radius: 24px;
-            background: linear-gradient(145deg, var(--ui-soft) 0%, var(--ui-softer) 100%);
-            border: 1px solid var(--ui-border);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .hero-visual-frame::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(ellipse 70% 50% at 30% 20%, rgba(74,124,89,.15) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 60% at 70% 80%, rgba(74,124,89,.1) 0%, transparent 60%);
-        }
-
-        .hero-visual-shapes {
-            position: relative;
-            z-index: 1;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            padding: 24px;
-            width: 100%;
-        }
-
-        .hero-shape-card {
-            background: #fff;
-            border: 1px solid var(--ui-border);
-            border-radius: 16px;
-            padding: 20px 16px;
-            text-align: center;
-            box-shadow: 0 4px 16px rgba(28,43,34,.06);
-            transition: transform .3s ease, box-shadow .3s ease;
-        }
-
-        .hero-shape-card:nth-child(1) { transform: translateY(-8px); }
-        .hero-shape-card:nth-child(3) { transform: translateY(-8px); }
-
-        .hero-shape-card .icon-wrap {
-            width: 44px;
-            height: 44px;
-            margin: 0 auto 8px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .hero-shape-card .icon-wrap .material-symbols-outlined {
-            font-size: 24px;
-            font-variation-settings: 'FILL' 1;
-        }
-
-        .hero-shape-card .icon-green {
-            background: var(--ui-soft);
-            color: var(--ui-accent);
-        }
-
-        .hero-shape-card .icon-warm {
-            background: #fef3c7;
-            color: #b45309;
-        }
-
-        .hero-shape-card .icon-sky {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .hero-shape-card .icon-rose {
-            background: #fce7f3;
-            color: #be185d;
-        }
-
-        .hero-shape-card .label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--ui-ink);
-            margin-bottom: 2px;
-        }
-
-        .hero-shape-card .sublabel {
-            display: block;
-            font-size: 11px;
-            color: var(--ui-body);
-        }
-
-        .hero-visual-floating-icons {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 2;
-        }
-
-        .hero-visual-floating-icons .float-icon {
-            position: absolute;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #fff;
-            border: 1px solid var(--ui-border);
-            box-shadow: var(--ui-shadow);
-            animation: heroIconFloat 4s ease-in-out infinite;
-        }
-
-        .hero-visual-floating-icons .float-icon .material-symbols-outlined {
-            font-size: 20px;
-            font-variation-settings: 'FILL' 1;
-            color: var(--ui-accent);
-        }
-
-        .hero-visual-floating-icons .float-icon:nth-child(1) { top: 4%; left: -8%; animation-delay: 0s; }
-        .hero-visual-floating-icons .float-icon:nth-child(2) { top: 20%; right: -10%; animation-delay: .8s; }
-        .hero-visual-floating-icons .float-icon:nth-child(3) { bottom: 18%; left: -6%; animation-delay: 1.6s; }
-        .hero-visual-floating-icons .float-icon:nth-child(4) { bottom: 4%; right: -4%; animation-delay: 2.4s; }
-
-        @keyframes heroIconFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        @media (max-width: 767px) {
-            .hero-visual { min-height: 320px; }
-            .hero-visual-frame { max-width: 100%; aspect-ratio: auto; min-height: 300px; }
-            .hero-visual-floating-icons { display: none; }
-            .hero-shape-card { padding: 14px 10px; }
-            .hero-shape-card:nth-child(1),
-            .hero-shape-card:nth-child(3) { transform: none; }
         }
 
         .section-dark {
@@ -1309,40 +1171,6 @@
                     </div>
                 </div>
 
-                <div class="hero-visual" aria-hidden="true">
-                    <div class="hero-visual-frame">
-                        <div class="hero-visual-shapes">
-                            <div class="hero-shape-card">
-                                <div class="icon-wrap icon-green"><span class="material-symbols-outlined">bed</span></div>
-                                <span class="label">Kamar Bersih</span>
-                                <span class="sublabel">Furniture lengkap</span>
-                            </div>
-                            <div class="hero-shape-card">
-                                <div class="icon-wrap icon-warm"><span class="material-symbols-outlined">shield</span></div>
-                                <span class="label">Aman & Nyaman</span>
-                                <span class="sublabel">24 jam</span>
-                            </div>
-                            <div class="hero-shape-card">
-                                <div class="icon-wrap icon-sky"><span class="material-symbols-outlined">wifi</span></div>
-                                <span class="label">WiFi Cepat</span>
-                                <span class="sublabel">Unlimited</span>
-                            </div>
-                            <div class="hero-shape-card">
-                                <div class="icon-wrap icon-rose"><span class="material-symbols-outlined">local_laundry_service</span></div>
-                                <span class="label">Laundry</span>
-                                <span class="sublabel">Ada di lokasi</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="hero-visual-floating-icons">
-                        <span class="float-icon"><span class="material-symbols-outlined">ac_unit</span></span>
-                        <span class="float-icon"><span class="material-symbols-outlined">tv</span></span>
-                        <span class="float-icon"><span class="material-symbols-outlined">kitchen</span></span>
-                        <span class="float-icon"><span class="material-symbols-outlined">park</span></span>
-                    </div>
-                </div>
-
                 <div class="hero-floating" aria-hidden="true">
                     <div class="float-card" style="--delay: 0s; --x: -600px; --y: -80px;">
                         <span class="float-avatar">A</span>
@@ -1369,6 +1197,7 @@
                         <span class="float-text">"Fasilitas lengkap"</span>
                     </div>
                 </div>
+
             </div>
         </section>
 
