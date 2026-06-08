@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\BadgeController as AdminBadgeController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
+use App\Http\Controllers\Admin\MonitorController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FacilityController;
@@ -87,6 +88,7 @@ Route::middleware('auth')->group(function () {
         Route::get('operational-expenses/export', [OperationalExpenseController::class, 'export'])->name('operational-expenses.export');
         Route::get('operational-expenses/export-csv', [OperationalExpenseController::class, 'exportCsv'])->name('operational-expenses.export-csv');
         Route::resource('operational-expenses', OperationalExpenseController::class)->except('show');
+        Route::get('monitor', [MonitorController::class, 'index'])->name('monitor.index');
         Route::resource('badges', AdminBadgeController::class)->except('show');
         Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
         Route::match(['put', 'patch'], 'users/{user}/title', [AdminUserController::class, 'updateTitle'])->name('users.title');
