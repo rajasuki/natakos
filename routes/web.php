@@ -92,10 +92,14 @@ Route::middleware('auth')->group(function () {
         Route::get('monitor', [MonitorController::class, 'index'])->name('monitor.index');
         Route::resource('announcements', AdminAnnouncementController::class)->except('show');
         Route::patch('announcements/{announcement}/toggle', [AdminAnnouncementController::class, 'toggle'])->name('announcements.toggle');
+        Route::post('announcements/sounds', [AdminAnnouncementController::class, 'uploadSound'])->name('announcements.sounds.upload');
+        Route::delete('announcements/sounds/{sound}', [AdminAnnouncementController::class, 'destroySound'])->name('announcements.sounds.destroy');
         Route::resource('badges', AdminBadgeController::class)->except('show');
         Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
         Route::match(['put', 'patch'], 'users/{user}/title', [AdminUserController::class, 'updateTitle'])->name('users.title');
         Route::match(['put', 'patch'], 'users/{user}/role', [AdminUserController::class, 'updateRole'])->name('users.role');
+        Route::delete('users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+        Route::post('chat', [AdminChatController::class, 'store'])->name('chat.store');
         Route::get('chat', [AdminChatController::class, 'index'])->name('chat.index');
         Route::get('chat/profile', [AdminChatController::class, 'profile'])->name('chat.profile');
         Route::match(['put', 'patch'], 'chat/{message}', [AdminChatController::class, 'update'])->name('chat.update');

@@ -22,4 +22,20 @@ class UiFormatter
 
         return $date->translatedFormat($format);
     }
+
+    public static function chatDateLabel(\Carbon\CarbonInterface $date): string
+    {
+        $today = now()->startOfDay();
+        $target = $date->copy()->startOfDay();
+
+        if ($target->equalTo($today)) {
+            return 'Hari Ini';
+        }
+
+        if ($target->equalTo($today->copy()->subDay())) {
+            return 'Kemarin';
+        }
+
+        return ucfirst($date->locale('id')->isoFormat('dddd, D MMMM Y'));
+    }
 }

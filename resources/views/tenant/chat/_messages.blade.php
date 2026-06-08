@@ -1,4 +1,14 @@
+@php $prevDate = null; @endphp
 @forelse ($messages as $msg)
+    @php
+        $msgDate = $msg->created_at->startOfDay();
+    @endphp
+    @if ($prevDate === null || !$msgDate->equalTo($prevDate))
+        @php $prevDate = $msgDate; @endphp
+        <div class="chat-date-separator">
+            <span>{{ \App\Support\UiFormatter::chatDateLabel($msg->created_at) }}</span>
+        </div>
+    @endif
     @php
         $initial = strtoupper(substr($msg->user->name, 0, 1));
         $isSelf = $msg->user_id === Auth::id();

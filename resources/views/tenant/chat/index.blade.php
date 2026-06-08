@@ -187,6 +187,17 @@
         .chat-audio-preview { flex-wrap:wrap; }
         .chat-audio-preview audio { max-width:100%; }
     }
+
+    .chat-date-separator {
+        display:flex;align-items:center;gap:12px;margin:16px 0 4px;
+        font-size:11px;font-weight:600;color:var(--gray-400);
+        text-transform:uppercase;letter-spacing:.06em;
+    }
+    .chat-date-separator::before,
+    .chat-date-separator::after {
+        content:'';flex:1;height:1px;background:var(--ui-border);
+    }
+    .chat-messages .chat-date-separator:first-child { margin-top:0; }
 </style>
 @endpush
 
