@@ -79,6 +79,7 @@ class DashboardController extends Controller
             'rentStatusLabels' => $this->rentStatusLabels(),
             'paymentsDueSoon' => $this->paymentsDueSoon(),
             'paymentsOverdue' => $this->paymentsOverdue(),
+            'newTenantsUnpaid' => $this->newTenantsUnpaid(),
             'tenantEndWarnings' => $this->tenantEndWarnings(),
         ]);
     }
@@ -96,6 +97,7 @@ class DashboardController extends Controller
         return [
             'paid' => 'Lunas',
             'safe' => 'Aman',
+            'fresh' => 'Baru',
             'due_soon' => 'Mendekati Tenggat',
             'due_today' => 'Jatuh Tempo Hari Ini',
             'overdue' => 'Terlambat',
@@ -146,10 +148,14 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($payment) use ($today) {
                 $dueDate = $payment->due_date ? Carbon::parse($payment->due_date)->startOfDay() : null;
+                $isFresh = $payment->created_at && $payment->created_at->gte(Carbon::today()->subDays(3));
 
                 if ($dueDate === null) {
                     $deadlineStatus = 'safe';
                     $daysRemaining = null;
+                } elseif ($isFresh && !$dueDate->lt($today)) {
+                    $deadlineStatus = 'fresh';
+                    $daysRemaining = (int) $dueDate->diffInDays($today);
                 } elseif ($dueDate->lt($today)) {
                     $deadlineStatus = 'overdue';
                     $daysRemaining = (int) $dueDate->diffInDays($today, false);
@@ -195,12 +201,17 @@ class DashboardController extends Controller
         Payment::query()
             ->whereHas('tenant', fn ($q) => $q->where('status', 'active'))
             ->where('status', '!=', 'paid')
-            ->select('due_date')
+            ->select('due_date', 'created_at')
             ->get()
             ->each(function ($payment) use ($today, &$counts) {
                 $dueDate = $payment->due_date ? Carbon::parse($payment->due_date)->startOfDay() : null;
+                $isFresh = $payment->created_at && $payment->created_at->gte(Carbon::today()->subDays(3));
 
                 if ($dueDate === null) {
+                    return;
+                }
+
+                if ($isFresh && !$dueDate->lt($today)) {
                     return;
                 }
 
@@ -246,6 +257,14 @@ class DashboardController extends Controller
             });
 
         return $counts;
+    }
+
+    private function newTenantsUnpaid(): Collection
+    {
+        return $this->paymentWarningRows()
+            ->filter(fn (object $payment): bool => $payment->deadline_status === 'fresh')
+            ->values()
+            ->take(5);
     }
 
     private function tenantEndWarnings(): Collection
