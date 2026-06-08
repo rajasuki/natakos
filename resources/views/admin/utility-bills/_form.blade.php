@@ -38,7 +38,7 @@
 
                         <div class="field">
                             <label for="amount">Jumlah <span class="muted">*</span></label>
-                            <input id="amount" name="amount" type="number" min="0" step="1" value="{{ old('amount', $bill?->amount) }}" class="input" required>
+                            <input id="amount" name="amount" type="text" inputmode="numeric" pattern="[0-9.]*" value="{{ old('amount', $bill?->amount) }}" class="input" data-format-number required>
                             @error('amount') <div class="field-error">{{ $message }}</div> @enderror
                         </div>
 

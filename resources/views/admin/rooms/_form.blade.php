@@ -352,7 +352,7 @@
 
                             <div class="field">
                                 <label for="price">Harga sewa / bulan <span class="muted">*</span></label>
-                                <input id="price" name="price" type="number" min="0" step="1" value="{{ old('price', $room?->price) }}" class="input" required>
+                                <input id="price" name="price" type="text" inputmode="numeric" pattern="[0-9.]*" value="{{ old('price', $room?->price) }}" class="input" data-format-number required>
                                 @if ($errorBag?->has('price'))
                                     <div class="field-error">{{ $errorBag->first('price') }}</div>
                                 @endif

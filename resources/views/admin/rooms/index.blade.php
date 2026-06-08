@@ -204,12 +204,18 @@
                                         <a href="{{ route('admin.rooms.edit', $room) }}" class="rm-btn rm-btn-edit" title="Edit">
                                             <span class="material-symbols-outlined">edit</span>
                                         </a>
-                                        <form method="POST" action="{{ route('admin.rooms.destroy', $room) }}" onsubmit="return confirm('Hapus kamar {{ $room->name }}?');" style="display:inline;">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="rm-btn rm-btn-delete" title="Hapus">
+                                        @if ($room->status === 'occupied')
+                                            <span class="rm-btn" title="Checkout penghuni terlebih dahulu" style="opacity:0.35;cursor:not-allowed;">
                                                 <span class="material-symbols-outlined">delete</span>
-                                            </button>
-                                        </form>
+                                            </span>
+                                        @else
+                                            <form method="POST" action="{{ route('admin.rooms.destroy', $room) }}" onsubmit="return confirm('Hapus kamar {{ $room->name }}?');" style="display:inline;">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="rm-btn rm-btn-delete" title="Hapus">
+                                                    <span class="material-symbols-outlined">delete</span>
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

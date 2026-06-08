@@ -302,7 +302,7 @@ class TenantController extends Controller
         }
 
         $validated = $request->validate([
-            'end_date' => ['required', 'date', 'after_or_equal:'.$tenant->start_date?->format('Y-m-d')],
+            'end_date' => ['required', 'date'],
             'notes' => ['nullable', 'string'],
         ], [], [
             'end_date' => 'tanggal check-out',

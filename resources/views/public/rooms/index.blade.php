@@ -676,7 +676,7 @@
             <div class="rooms-layout">
                 <aside class="rooms-sidebar">
                     <div class="rooms-sidebar-inner">
-                        <form method="GET" action="{{ route('rooms.index') }}" class="filter-card" onsubmit="document.querySelectorAll('[data-price-format]').forEach(function(e){e.value=e.value.replaceAll('.','');});">
+                        <form method="GET" action="{{ route('rooms.index') }}" class="filter-card" onsubmit="document.querySelectorAll('[data-format-number]').forEach(function(e){e.value=e.value.replaceAll('.','');});">
                             <input type="hidden" name="sort" value="{{ $filters['sort'] }}">
 
                             <div class="filter-header">
@@ -692,9 +692,9 @@
                             <div class="filter-group">
                                 <h3 class="filter-group-title">Rentang harga</h3>
                                 <div class="filter-price-row">
-                                    <input name="min_price" type="text" inputmode="numeric" value="{{ $filters['min_price'] !== null ? number_format((int) $filters['min_price'], 0, ',', '.') : '' }}" class="filter-price-input" placeholder="Min" data-price-format>
+                                    <input name="min_price" type="text" inputmode="numeric" value="{{ $filters['min_price'] !== null ? number_format((int) $filters['min_price'], 0, ',', '.') : '' }}" class="filter-price-input" placeholder="Min" data-format-number>
                                     <span class="filter-price-sep">–</span>
-                                    <input name="max_price" type="text" inputmode="numeric" value="{{ $filters['max_price'] !== null ? number_format((int) $filters['max_price'], 0, ',', '.') : '' }}" class="filter-price-input" placeholder="Max" data-price-format>
+                                    <input name="max_price" type="text" inputmode="numeric" value="{{ $filters['max_price'] !== null ? number_format((int) $filters['max_price'], 0, ',', '.') : '' }}" class="filter-price-input" placeholder="Max" data-format-number>
                                 </div>
                             </div>
 
@@ -940,6 +940,19 @@
         }
         u.searchParams.delete('page');
         window.location.href = u.toString();
+    });
+
+    document.addEventListener('input', function (e) {
+        var el = e.target;
+        if (!el.matches('[data-format-number]')) return;
+        var raw = el.value.replace(/[^\d]/g, '');
+        if (raw === '') { el.value = ''; return; }
+        var out = '';
+        for (var i = 0; i < raw.length; i++) {
+            if (i > 0 && (raw.length - i) % 3 === 0) out += '.';
+            out += raw[i];
+        }
+        el.value = out;
     });
     </script>
 @endsection
