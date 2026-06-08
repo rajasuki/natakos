@@ -16,7 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo('/login');
         $middleware->redirectUsersTo('/dashboard');
-        $middleware->append(TrackUserActivity::class);
+        $middleware->web(append: [
+            TrackUserActivity::class,
+        ]);
         $middleware->alias([
             'admin' => AdminMiddleware::class,
             'tenant' => TenantMiddleware::class,
