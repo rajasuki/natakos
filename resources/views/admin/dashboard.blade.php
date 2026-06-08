@@ -574,6 +574,73 @@
             @endif
         </section>
 
+        {{-- Penghuni Baru Belum Bayar --}}
+        <section class="card">
+            <div class="dashboard-table-head">
+                <h3 class="dashboard-table-title">Penghuni Baru Belum Bayar</h3>
+            </div>
+
+            @if ($newTenantsUnpaid->isEmpty())
+                <div class="card-body">
+                    <div class="status-row">
+                        <span class="status-dot status-dot-safe"></span>
+                        <span class="muted">Tidak ada penghuni baru dengan tagihan belum dibayar.</span>
+                    </div>
+                </div>
+            @else
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Penghuni</th>
+                                <th>Kamar</th>
+                                <th>Nominal</th>
+                                <th>Tenggat</th>
+                                <th>Status</th>
+                                <th>Follow Up</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($newTenantsUnpaid as $payment)
+                                <tr>
+                                    <td style="font-weight:600">{{ $payment->tenant_name }}</td>
+                                    <td>{{ $payment->room_name }}</td>
+                                    <td style="font-weight:600">{{ \App\Support\UiFormatter::currency($payment->amount) }}</td>
+                                    <td>{{ \App\Support\UiFormatter::date($payment->due_date) }}</td>
+                                    <td>
+                                        <span class="badge badge-due-soon">{{ $deadlineStatusLabels['fresh'] ?? 'Baru' }}</span>
+                                    </td>
+                                    <td>
+                                        @php
+                                            $reminderUrl = \App\Support\PaymentReminder::link(
+                                                $payment->tenant_phone,
+                                                $payment->tenant_name,
+                                                $payment->room_name,
+                                                $payment->amount,
+                                                $payment->period_start,
+                                                $payment->period_end,
+                                                $payment->due_date,
+                                            );
+                                        @endphp
+                                        @if ($reminderUrl)
+                                            <a href="{{ $reminderUrl }}" target="_blank" rel="noopener noreferrer" class="btn-whatsapp">
+                                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M19.05 4.91A9.816 9.816 0 0012.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01zm-7.01 15.24c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.264 8.264 0 01-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.27.86 5.82 2.42a8.183 8.183 0 012.41 5.83c.02 4.54-3.68 8.23-8.22 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.44.12-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.84-.2-.48-.41-.42-.56-.43-.14-.01-.31-.01-.48-.01-.17 0-.44.06-.66.31-.22.25-.86.84-.86 2.05 0 1.21.88 2.38 1 2.54.12.17 1.72 2.63 4.18 3.69.58.25 1.04.4 1.39.51.59.19 1.13.16 1.55.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.12-.22-.19-.47-.31z"/>
+                                                </svg>
+                                                <span>WhatsApp</span>
+                                            </a>
+                                        @else
+                                            <span class="muted">—</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </section>
+
         {{-- Masa Tinggal Perlu Perhatian --}}
         <section class="card">
             <div class="dashboard-table-head">
