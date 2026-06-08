@@ -109,7 +109,7 @@
                 </thead>
                 <tbody>
                     @foreach ($allUsers as $user)
-                        @php $isOnline = $user->last_seen_at && $user->last_seen_at >= $onlineThreshold; @endphp
+                        @php $isOnline = $user->last_seen_at && $user->last_seen_at->diffInMinutes() < 5; @endphp
                         <tr>
                             <td><span class="monitor-name">{{ $user->name }}</span></td>
                             <td><span class="monitor-role monitor-role-{{ $user->role }}">{{ $user->role === 'admin' ? 'Admin' : 'Penghuni' }}</span></td>
