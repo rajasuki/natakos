@@ -27,6 +27,7 @@
                         <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
                     </a>
                     <div class="nav-dropdown nav-dropdown-grid">
+                        <span class="dropdown-section">Utama</span>
                         <a href="{{ route('admin.dashboard') }}" class="dropdown-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">
                             <span class="material-symbols-outlined">grid_view</span> Dashboard
                         </a>
@@ -39,20 +40,25 @@
                         <a href="{{ route('admin.tenants.index') }}" class="dropdown-link {{ request()->routeIs('admin.tenants.*') ? 'is-active' : '' }}">
                             <span class="material-symbols-outlined">group</span> Penghuni
                         </a>
-                        <a href="{{ route('admin.badges.index') }}" class="dropdown-link {{ request()->routeIs('admin.badges.*') ? 'is-active' : '' }}">
-                            <span class="material-symbols-outlined">verified</span> Badge
-                        </a>
+                        <span class="dropdown-section">Keuangan</span>
                         <a href="{{ route('admin.payments.index') }}" class="dropdown-link {{ request()->routeIs('admin.payments.*') ? 'is-active' : '' }}">
                             <span class="material-symbols-outlined">payments</span> Pembayaran
                         </a>
                         <a href="{{ route('admin.bookings.index') }}" class="dropdown-link {{ request()->routeIs('admin.bookings.*') ? 'is-active' : '' }}">
                             <span class="material-symbols-outlined">request_quote</span> Pengajuan Sewa
                         </a>
+                        <a href="{{ route('admin.utility-bills.index') }}" class="dropdown-link {{ request()->routeIs('admin.utility-bills.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">receipt_long</span> Tagihan Utilitas
+                        </a>
+                        <a href="{{ route('admin.operational-expenses.index') }}" class="dropdown-link {{ request()->routeIs('admin.operational-expenses.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">account_balance</span> Biaya Operasional
+                        </a>
+                        <span class="dropdown-section">Pengguna &amp; Layanan</span>
                         <a href="{{ route('admin.users.index') }}" class="dropdown-link {{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}">
                             <span class="material-symbols-outlined">manage_accounts</span> Akun Pengguna
                         </a>
-                        <a href="{{ route('admin.utility-bills.index') }}" class="dropdown-link {{ request()->routeIs('admin.utility-bills.*') ? 'is-active' : '' }}">
-                            <span class="material-symbols-outlined">receipt_long</span> Tagihan Utilitas
+                        <a href="{{ route('admin.badges.index') }}" class="dropdown-link {{ request()->routeIs('admin.badges.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">verified</span> Badge
                         </a>
                         <a href="{{ route('admin.chat.index') }}" class="dropdown-link {{ request()->routeIs('admin.chat.*') ? 'is-active' : '' }}">
                             <span class="material-symbols-outlined">forum</span> Obrolan
@@ -60,9 +66,7 @@
                         <a href="{{ route('admin.maintenance-requests.index') }}" class="dropdown-link {{ request()->routeIs('admin.maintenance-requests.*') ? 'is-active' : '' }}">
                             <span class="material-symbols-outlined">handyman</span> Perbaikan
                         </a>
-                        <a href="{{ route('admin.operational-expenses.index') }}" class="dropdown-link {{ request()->routeIs('admin.operational-expenses.*') ? 'is-active' : '' }}">
-                            <span class="material-symbols-outlined">account_balance</span> Biaya Operasional
-                        </a>
+                        <span class="dropdown-section">Sistem</span>
                         <a href="{{ route('admin.logs.index') }}" class="dropdown-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}">
                             <span class="material-symbols-outlined">history</span> Log Aktivitas
                         </a>
