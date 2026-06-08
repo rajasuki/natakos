@@ -37,10 +37,20 @@ class DashboardController extends Controller
             'rooms_available' => $this->countFrom($roomCounts, 'available'),
             'rooms_occupied' => $this->countFrom($roomCounts, 'occupied'),
             'rooms_maintenance' => $this->countFrom($roomCounts, 'maintenance'),
+            'total_tenants' => Tenant::query()->count(),
             'active_tenants' => Tenant::query()->where('status', 'active')->count(),
+            'new_tenants_this_month' => Tenant::query()
+                ->whereYear('created_at', now()->year)
+                ->whereMonth('created_at', now()->month)
+                ->count(),
             'payments_unpaid' => $this->countFrom($paymentCounts, 'unpaid'),
             'payments_pending_verification' => $this->countFrom($paymentCounts, 'pending_verification'),
             'payments_paid' => $this->countFrom($paymentCounts, 'paid'),
+            'monthly_revenue' => Payment::query()
+                ->where('status', 'paid')
+                ->whereYear('paid_at', now()->year)
+                ->whereMonth('paid_at', now()->month)
+                ->sum('amount'),
             'payments_due_soon' => $deadlineCounts['due_soon'] ?? 0,
             'payments_due_today' => $deadlineCounts['due_today'] ?? 0,
             'payments_overdue' => $deadlineCounts['overdue'] ?? 0,
@@ -56,6 +66,7 @@ class DashboardController extends Controller
                 ->sum('amount'),
             'late_fee_per_day' => KosProfile::query()->value('late_fee_per_day') ?? 0,
             'overdue_with_fees' => Payment::query()
+                ->whereHas('tenant', fn ($q) => $q->where('status', 'active'))
                 ->where('status', 'unpaid')
                 ->where('due_date', '<', now())
                 ->where('late_fee', '>', 0)
@@ -129,6 +140,7 @@ class DashboardController extends Controller
 
         return Payment::query()
             ->with(['tenant.user', 'tenant.room'])
+            ->whereHas('tenant', fn ($q) => $q->where('status', 'active'))
             ->where('status', '!=', 'paid')
             ->orderBy('due_date')
             ->get()
@@ -144,7 +156,7 @@ class DashboardController extends Controller
                 } elseif ($dueDate->eq($today)) {
                     $deadlineStatus = 'due_today';
                     $daysRemaining = 0;
-                } elseif ($dueDate->diffInDays($today) <= 5) {
+                } elseif ($dueDate->diffInDays($today) <= 7) {
                     $deadlineStatus = 'due_soon';
                     $daysRemaining = (int) $dueDate->diffInDays($today);
                 } else {
@@ -181,6 +193,7 @@ class DashboardController extends Controller
         ];
 
         Payment::query()
+            ->whereHas('tenant', fn ($q) => $q->where('status', 'active'))
             ->where('status', '!=', 'paid')
             ->select('due_date')
             ->get()
@@ -195,7 +208,7 @@ class DashboardController extends Controller
                     $counts['overdue']++;
                 } elseif ($dueDate->eq($today)) {
                     $counts['due_today']++;
-                } elseif ($dueDate->diffInDays($today) <= 5) {
+                } elseif ($dueDate->diffInDays($today) <= 7) {
                     $counts['due_soon']++;
                 }
             });
@@ -227,7 +240,7 @@ class DashboardController extends Controller
                     $counts['ended']++;
                 } elseif ($endDate->eq($today)) {
                     $counts['ends_today']++;
-                } elseif ($endDate->diffInDays($today) <= 14) {
+                } elseif ($endDate->diffInDays($today) <= 7) {
                     $counts['ending_soon']++;
                 }
             });
@@ -255,7 +268,7 @@ class DashboardController extends Controller
                 } elseif ($diff === 0) {
                     $status = 'ends_today';
                     $daysUntilEnd = 0;
-                } elseif ($diff <= 14) {
+                } elseif ($diff <= 7) {
                     $status = 'ending_soon';
                     $daysUntilEnd = (int) $diff;
                 } else {

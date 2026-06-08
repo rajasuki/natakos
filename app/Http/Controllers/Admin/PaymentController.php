@@ -384,7 +384,7 @@ class PaymentController extends Controller
                 ]];
             }
 
-            if ($diff <= 5) {
+            if ($diff <= 7) {
                 return [$id => [
                     'status' => 'due_soon',
                     'label' => $labels['due_soon'],

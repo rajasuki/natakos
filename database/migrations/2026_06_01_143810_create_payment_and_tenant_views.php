@@ -45,7 +45,7 @@ return new class extends Migration
                     WHEN payments.status = 'paid' THEN 'paid'
                     WHEN payments.due_date < {$currentDate} THEN 'overdue'
                     WHEN payments.due_date = {$currentDate} THEN 'due_today'
-                    WHEN {$daysRemaining} BETWEEN 1 AND 5 THEN 'due_soon'
+                    WHEN {$daysRemaining} BETWEEN 1 AND 7 THEN 'due_soon'
                     ELSE 'safe'
                 END AS deadline_status
             FROM payments
@@ -67,7 +67,7 @@ return new class extends Migration
                     WHEN tenants.end_date IS NULL THEN 'no_end_date'
                     WHEN tenants.end_date < {$currentDate} THEN 'ended'
                     WHEN tenants.end_date = {$currentDate} THEN 'ends_today'
-                    WHEN {$daysUntilEnd} BETWEEN 1 AND 5 THEN 'ending_soon'
+                    WHEN {$daysUntilEnd} BETWEEN 1 AND 7 THEN 'ending_soon'
                     ELSE 'safe'
                 END AS rent_period_status
             FROM tenants
