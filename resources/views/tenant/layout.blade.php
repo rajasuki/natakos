@@ -259,6 +259,24 @@
                 background: var(--ui-accent);
                 color: #fff;
             }
+            .unread-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 18px;
+                height: 18px;
+                padding: 0 5px;
+                border-radius: 999px;
+                background: #be123c;
+                color: #fff;
+                font-size: 10px;
+                font-weight: 700;
+                line-height: 1;
+                margin-left: 2px;
+            }
+            .mobile-nav-link .unread-badge {
+                margin-left: 6px;
+            }
 
             /* ── Dashboard dropdown ── */
             .nav-item {
@@ -1113,15 +1131,9 @@
                 flex-shrink: 0;
             }
             .announcement-banner-item .ab-title {
-                display: inline-block;
-                background: var(--gray-600);
-                color: #fff;
-                font-size: 10px;
-                font-weight: 700;
-                letter-spacing: .06em;
-                text-transform: uppercase;
-                padding: 3px 10px;
-                border-radius: 999px;
+                color: var(--ui-accent);
+                font-weight: 600;
+                font-size: 14px;
                 flex-shrink: 0;
             }
             .announcement-banner-item .ab-sep {
@@ -1148,7 +1160,7 @@
                 .announcement-banner-icon .material-symbols-outlined { font-size: 15px; }
                 .announcement-banner-track { height: 26px; }
                 .announcement-banner-item { font-size: 13px; gap: 8px; }
-                .announcement-banner-item .ab-title { font-size: 9px; padding: 2px 8px; }
+                .announcement-banner-item .ab-title { font-size: 13px; }
                 .announcement-banner-item .ab-text { font-size: 13px; }
             }
         </style>
