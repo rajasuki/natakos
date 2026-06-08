@@ -1007,6 +1007,100 @@
                 .pagination-shell { padding: 12px 12px 14px; }
                 .page-copy { font-size: 13px; }
             }
+
+            /* ── Announcement Banner ── */
+            .announcement-banner {
+                background: #fff;
+                border-bottom: 2px solid var(--ui-border);
+                overflow: hidden;
+                position: relative;
+            }
+            .announcement-banner::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, var(--ui-accent-soft) 0%, transparent 40%);
+                pointer-events: none;
+            }
+            .announcement-banner-inner {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 10px 24px;
+                min-height: 48px;
+                position: relative;
+            }
+            .announcement-banner-icon {
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: var(--ui-accent);
+                color: #fff;
+            }
+            .announcement-banner-icon .material-symbols-outlined {
+                font-size: 18px;
+                font-variation-settings: 'FILL' 1;
+            }
+            .announcement-banner-track {
+                flex: 1;
+                overflow: hidden;
+                position: relative;
+                height: 28px;
+                display: flex;
+                align-items: center;
+                mask-image: linear-gradient(to right, transparent 12px, #000 40px, #000 calc(100% - 40px), transparent calc(100% - 12px));
+                -webkit-mask-image: linear-gradient(to right, transparent 12px, #000 40px, #000 calc(100% - 40px), transparent calc(100% - 12px));
+            }
+            .announcement-banner-scroll {
+                display: flex;
+                gap: 64px;
+                white-space: nowrap;
+                animation: banner-scroll 50s linear infinite;
+            }
+            .announcement-banner-track:hover .announcement-banner-scroll {
+                animation-play-state: paused;
+            }
+            .announcement-banner-item {
+                display: inline-flex;
+                gap: 10px;
+                align-items: center;
+                font-size: 14px;
+            }
+            .announcement-banner-item .ab-title {
+                display: inline-block;
+                background: var(--ui-accent);
+                color: #fff;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: .04em;
+                text-transform: uppercase;
+                padding: 2px 10px;
+                border-radius: 999px;
+                flex-shrink: 0;
+            }
+            .announcement-banner-item .ab-text {
+                color: var(--ui-ink);
+                font-weight: 500;
+            }
+            @keyframes banner-scroll {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+            }
+
+            @media (max-width: 640px) {
+                .announcement-banner-inner { padding: 8px 14px; min-height: 42px; gap: 8px; }
+                .announcement-banner-icon { width: 26px; height: 26px; }
+                .announcement-banner-icon .material-symbols-outlined { font-size: 15px; }
+                .announcement-banner-track { height: 26px; }
+                .announcement-banner-item { font-size: 13px; gap: 8px; }
+                .announcement-banner-item .ab-title { font-size: 10px; padding: 1px 8px; }
+            }
         </style>
 
         @stack('styles')
@@ -1016,6 +1110,52 @@
 
             {{-- ── NAVBAR ── --}}
             @include('partials.navbar')
+
+            @php
+                $announcements = null;
+                $user = Auth::user();
+                if ($user && $user->role === 'tenant') {
+                    $hasRoom = \App\Models\Tenant::query()
+                        ->where('user_id', $user->id)
+                        ->whereNotNull('room_id')
+                        ->where('status', 'active')
+                        ->exists();
+                    if ($hasRoom) {
+                        $announcements = \App\Models\Announcement::query()
+                            ->where('is_active', true)
+                            ->orderByDesc('id')
+                            ->get();
+                    }
+                }
+            @endphp
+
+            @if ($announcements && $announcements->isNotEmpty())
+                <div class="announcement-banner">
+                    <div class="announcement-banner-inner">
+                        <div class="announcement-banner-icon">
+                            <span class="material-symbols-outlined">campaign</span>
+                        </div>
+                        <div class="announcement-banner-track">
+                            <div class="announcement-banner-scroll">
+                                @foreach ($announcements as $a)
+                                    <span class="announcement-banner-item">
+                                        <span class="ab-title">{{ $a->title }}</span>
+                                        <span class="ab-text">{{ $a->content }}</span>
+                                    </span>
+                                @endforeach
+                            </div>
+                            <div class="announcement-banner-scroll" aria-hidden="true">
+                                @foreach ($announcements as $a)
+                                    <span class="announcement-banner-item">
+                                        <span class="ab-title">{{ $a->title }}</span>
+                                        <span class="ab-text">{{ $a->content }}</span>
+                                    </span>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             {{-- ── MAIN ── --}}
             <main class="main-wrap">
