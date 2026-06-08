@@ -13,7 +13,7 @@
 
             <div class="field">
                 <label for="amount">Jumlah (Rp)</label>
-                <input id="amount" name="amount" type="number" class="input" value="{{ old('amount', $expense?->amount) }}" min="0">
+                <input id="amount" name="amount" type="text" inputmode="numeric" pattern="[0-9.]*" value="{{ old('amount', $expense?->amount) }}" class="input" data-format-number>
                 @error('amount') <span class="field-error">{{ $message }}</span> @enderror
             </div>
 

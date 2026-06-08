@@ -1223,6 +1223,25 @@
                     }
                 }
             });
+
+            document.addEventListener('input', function (e) {
+                var el = e.target;
+                if (!el.matches('[data-format-number]')) return;
+                var raw = el.value.replace(/[^\d]/g, '');
+                if (raw === '') { el.value = ''; return; }
+                var out = '';
+                for (var i = 0; i < raw.length; i++) {
+                    if (i > 0 && (raw.length - i) % 3 === 0) out += '.';
+                    out += raw[i];
+                }
+                el.value = out;
+            });
+
+            document.addEventListener('submit', function (e) {
+                e.target.querySelectorAll('[data-format-number]').forEach(function (el) {
+                    el.value = el.value.replace(/\./g, '');
+                });
+            });
         </script>
 
         @stack('scripts')

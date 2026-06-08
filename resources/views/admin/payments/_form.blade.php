@@ -47,7 +47,7 @@
 
                     <div class="field">
                         <label for="amount">Nominal</label>
-                        <input id="amount" name="amount" type="number" min="0" step="1" value="{{ old('amount', $payment?->amount) }}" class="input" required>
+                        <input id="amount" name="amount" type="text" inputmode="numeric" pattern="[0-9.]*" value="{{ old('amount', $payment?->amount) }}" class="input" data-format-number required>
                         @if ($errorBag?->has('amount'))
                             <div class="field-error">{{ $errorBag->first('amount') }}</div>
                         @endif

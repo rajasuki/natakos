@@ -188,13 +188,13 @@
                 <div class="form-layout grid-two">
                     <div class="field">
                         <label for="late_fee_per_day">Denda per hari (Rp)</label>
-                        <input id="late_fee_per_day" name="late_fee_per_day" type="number" class="input" value="{{ old('late_fee_per_day', $profile->late_fee_per_day ?? 0) }}" min="0">
+                        <input id="late_fee_per_day" name="late_fee_per_day" type="text" inputmode="numeric" pattern="[0-9.]*" value="{{ old('late_fee_per_day', $profile->late_fee_per_day ?? 0) }}" class="input" data-format-number>
                         @error('late_fee_per_day') <span class="field-error">{{ $message }}</span> @enderror
                         <div class="helper">Jumlah denda yang dikenakan setiap hari keterlambatan. Contoh: Rp1.000/hari.</div>
                     </div>
                     <div class="field">
                         <label for="max_late_fee">Maksimal denda (Rp) <span class="muted">(opsional)</span></label>
-                        <input id="max_late_fee" name="max_late_fee" type="number" class="input" value="{{ old('max_late_fee', $profile->max_late_fee) }}" min="0" placeholder="Kosongkan jika tanpa batas">
+                        <input id="max_late_fee" name="max_late_fee" type="text" inputmode="numeric" pattern="[0-9.]*" value="{{ old('max_late_fee', $profile->max_late_fee) }}" class="input" data-format-number placeholder="Kosongkan jika tanpa batas">
                         @error('max_late_fee') <span class="field-error">{{ $message }}</span> @enderror
                         <div class="helper">Batas maksimal akumulasi denda. Misal: maksimal Rp50.000 meskipun sudah telat 60 hari.</div>
                     </div>
