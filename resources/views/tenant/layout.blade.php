@@ -1059,34 +1059,53 @@
             }
             .announcement-banner-scroll {
                 display: flex;
-                gap: 64px;
+                gap: 48px;
                 white-space: nowrap;
-                animation: banner-scroll 50s linear infinite;
+                animation: banner-scroll 180s linear infinite;
+                will-change: transform;
             }
             .announcement-banner-track:hover .announcement-banner-scroll {
                 animation-play-state: paused;
             }
             .announcement-banner-item {
                 display: inline-flex;
-                gap: 10px;
                 align-items: center;
+                gap: 10px;
                 font-size: 14px;
+            }
+            .announcement-banner-item + .announcement-banner-item::before {
+                content: '';
+                display: inline-block;
+                width: 4px;
+                height: 4px;
+                border-radius: 50%;
+                background: var(--ui-border);
+                flex-shrink: 0;
             }
             .announcement-banner-item .ab-title {
                 display: inline-block;
-                background: var(--ui-accent);
+                background: var(--gray-600);
                 color: #fff;
-                font-size: 11px;
+                font-size: 10px;
                 font-weight: 700;
-                letter-spacing: .04em;
+                letter-spacing: .06em;
                 text-transform: uppercase;
-                padding: 2px 10px;
+                padding: 3px 10px;
                 border-radius: 999px;
+                flex-shrink: 0;
+            }
+            .announcement-banner-item .ab-sep {
+                display: inline-block;
+                width: 3px;
+                height: 3px;
+                border-radius: 50%;
+                background: var(--ui-border);
                 flex-shrink: 0;
             }
             .announcement-banner-item .ab-text {
                 color: var(--ui-ink);
                 font-weight: 500;
+                font-size: 14px;
             }
             @keyframes banner-scroll {
                 0% { transform: translateX(0); }
@@ -1099,7 +1118,8 @@
                 .announcement-banner-icon .material-symbols-outlined { font-size: 15px; }
                 .announcement-banner-track { height: 26px; }
                 .announcement-banner-item { font-size: 13px; gap: 8px; }
-                .announcement-banner-item .ab-title { font-size: 10px; padding: 1px 8px; }
+                .announcement-banner-item .ab-title { font-size: 9px; padding: 2px 8px; }
+                .announcement-banner-item .ab-text { font-size: 13px; }
             }
         </style>
 
@@ -1121,10 +1141,19 @@
                         ->where('status', 'active')
                         ->exists();
                     if ($hasRoom) {
-                        $announcements = \App\Models\Announcement::query()
+                        $all = \App\Models\Announcement::query()
                             ->where('is_active', true)
                             ->orderByDesc('id')
                             ->get();
+                        if ($all->isNotEmpty()) {
+                            $repeat = max(1, (int) ceil(80 / $all->count()));
+                            $announcements = collect();
+                            for ($i = 0; $i < $repeat; $i++) {
+                                foreach ($all as $a) {
+                                    $announcements->push($a);
+                                }
+                            }
+                        }
                     }
                 }
             @endphp
@@ -1140,6 +1169,7 @@
                                 @foreach ($announcements as $a)
                                     <span class="announcement-banner-item">
                                         <span class="ab-title">{{ $a->title }}</span>
+                                        <span class="ab-sep"></span>
                                         <span class="ab-text">{{ $a->content }}</span>
                                     </span>
                                 @endforeach
@@ -1148,6 +1178,7 @@
                                 @foreach ($announcements as $a)
                                     <span class="announcement-banner-item">
                                         <span class="ab-title">{{ $a->title }}</span>
+                                        <span class="ab-sep"></span>
                                         <span class="ab-text">{{ $a->content }}</span>
                                     </span>
                                 @endforeach
