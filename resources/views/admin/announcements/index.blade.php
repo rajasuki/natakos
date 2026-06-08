@@ -19,6 +19,7 @@
                 <tr>
                     <th>Judul</th>
                     <th>Konten</th>
+                    <th>Suara</th>
                     <th>Status</th>
                     <th>Dibuat</th>
                     <th></th>
@@ -30,8 +31,18 @@
                         <td>
                             <strong>{{ $a->title }}</strong>
                         </td>
-                        <td style="max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        <td style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                             {{ Str::limit($a->content, 80) }}
+                        </td>
+                        <td>
+                            @if ($a->has_sound && $a->sound)
+                                <span class="badge badge-active">
+                                    <span class="material-symbols-outlined" style="font-size:12px;vertical-align:middle;">volume_up</span>
+                                    {{ $a->sound->name }}
+                                </span>
+                            @else
+                                <span style="color:var(--gray-400);font-size:12px;">—</span>
+                            @endif
                         </td>
                         <td>
                             @if ($a->is_active)
@@ -60,7 +71,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--ui-body);">Belum ada pengumuman.</td></tr>
+                    <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--ui-body);">Belum ada pengumuman.</td></tr>
                 @endforelse
             </tbody>
         </table>

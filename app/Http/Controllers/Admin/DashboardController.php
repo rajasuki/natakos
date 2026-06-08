@@ -37,9 +37,10 @@ class DashboardController extends Controller
             'rooms_available' => $this->countFrom($roomCounts, 'available'),
             'rooms_occupied' => $this->countFrom($roomCounts, 'occupied'),
             'rooms_maintenance' => $this->countFrom($roomCounts, 'maintenance'),
-            'total_tenants' => Tenant::query()->count(),
+            'total_tenants' => Tenant::query()->where('status', 'active')->count(),
             'active_tenants' => Tenant::query()->where('status', 'active')->count(),
             'new_tenants_this_month' => Tenant::query()
+                ->where('status', 'active')
                 ->whereYear('created_at', now()->year)
                 ->whereMonth('created_at', now()->month)
                 ->count(),
@@ -47,6 +48,7 @@ class DashboardController extends Controller
             'payments_pending_verification' => $this->countFrom($paymentCounts, 'pending_verification'),
             'payments_paid' => $this->countFrom($paymentCounts, 'paid'),
             'monthly_revenue' => Payment::query()
+                ->whereHas('tenant', fn ($q) => $q->where('status', 'active'))
                 ->where('status', 'paid')
                 ->whereYear('paid_at', now()->year)
                 ->whereMonth('paid_at', now()->month)

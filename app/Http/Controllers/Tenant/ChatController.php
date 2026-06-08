@@ -138,7 +138,16 @@ class ChatController extends Controller
 
         $html = '';
 
+        $lastMsg = $afterId > 0 ? ChatMessage::find($afterId) : null;
+        $prevDate = $lastMsg?->created_at?->startOfDay();
+
         foreach ($messages as $msg) {
+            $msgDate = $msg->created_at->startOfDay();
+            if ($prevDate === null || !$msgDate->equalTo($prevDate)) {
+                $html .= '<div class="chat-date-separator"><span>'.UiFormatter::chatDateLabel($msg->created_at).'</span></div>';
+                $prevDate = $msgDate;
+            }
+
             $initial = strtoupper(substr($msg->user->name, 0, 1));
             $isSelf = $msg->user_id === Auth::id();
             $isEditable = $isSelf && $msg->created_at->diffInMinutes(now()) < 2;

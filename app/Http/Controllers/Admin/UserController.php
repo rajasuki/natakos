@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Support\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -112,5 +113,31 @@ class UserController extends Controller
     private function effectLabels(): array
     {
         return Badge::effectOptions();
+    }
+
+    public function destroy(Request $request, User $user): RedirectResponse
+    {
+        if ($user->is($request->user())) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('error', 'Tidak bisa menghapus akun Anda sendiri.');
+        }
+
+        $name = $user->name;
+
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+        if ($user->profile_bg) {
+            Storage::disk('public')->delete($user->profile_bg);
+        }
+
+        $user->delete();
+
+        ActivityLogger::deleted('user', $user->id, $name);
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', "Akun {$name} berhasil dihapus.");
     }
 }

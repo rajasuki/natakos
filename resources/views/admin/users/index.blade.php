@@ -146,6 +146,10 @@
                                                 </select>
                                                 <button type="submit" class="button button-sm button-subtle" style="font-size:11px;padding:4px 8px;">Simpan</button>
                                             </form>
+                                            <form method="POST" action="{{ route('admin.users.destroy', $user) }}" onsubmit="return confirm('Hapus akun {{ $user->name }}? Semua data terkait akan ikut terhapus.')" style="display:inline;">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="button button-sm button-subtle" style="font-size:11px;padding:4px 8px;color:#be123c;">Hapus</button>
+                                            </form>
                                         @endif
                                     </div>
                                 </td>

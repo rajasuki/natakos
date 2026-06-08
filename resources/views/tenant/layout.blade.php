@@ -1047,6 +1047,17 @@
                 font-size: 18px;
                 font-variation-settings: 'FILL' 1;
             }
+            .announcement-sound-indicator {
+                flex-shrink:0;
+                width:28px;height:28px;border-radius:50%;
+                background:#be123c;color:#fff;
+                display:flex;align-items:center;justify-content:center;
+                cursor:pointer;border:2px solid #fff;
+                transition:background .15s,transform .15s;
+            }
+            .announcement-sound-indicator:hover { background:#9f1239;transform:scale(1.1); }
+            .announcement-sound-indicator.is-playing { animation:soundPulse 2s ease-in-out infinite; }
+            @keyframes soundPulse { 0%,100%{box-shadow:0 0 0 0 rgba(190,18,60,.4)} 50%{box-shadow:0 0 0 6px rgba(190,18,60,.15)} }
             .announcement-banner-track {
                 flex: 1;
                 overflow: hidden;
@@ -1061,7 +1072,7 @@
                 display: flex;
                 gap: 48px;
                 white-space: nowrap;
-                animation: banner-scroll 180s linear infinite;
+                animation: banner-scroll var(--scroll-speed, 180s) linear infinite;
                 will-change: transform;
             }
             .announcement-banner-track:hover .announcement-banner-scroll {
@@ -1133,6 +1144,8 @@
 
             @php
                 $announcements = null;
+                $scrollSpeed = 180;
+                $soundUrl = null;
                 $user = Auth::user();
                 if ($user && $user->role === 'tenant') {
                     $hasRoom = \App\Models\Tenant::query()
@@ -1142,15 +1155,20 @@
                         ->exists();
                     if ($hasRoom) {
                         $all = \App\Models\Announcement::query()
+                            ->with('sound')
                             ->where('is_active', true)
                             ->orderByDesc('id')
                             ->get();
                         if ($all->isNotEmpty()) {
+                            $scrollSpeed = $all->first()->scroll_speed ?? 180;
                             $repeat = max(1, (int) ceil(80 / $all->count()));
                             $announcements = collect();
                             for ($i = 0; $i < $repeat; $i++) {
                                 foreach ($all as $a) {
                                     $announcements->push($a);
+                                    if ($soundUrl === null && $a->has_sound && $a->sound) {
+                                        $soundUrl = asset('storage/'.$a->sound->file_path);
+                                    }
                                 }
                             }
                         }
@@ -1164,8 +1182,13 @@
                         <div class="announcement-banner-icon">
                             <span class="material-symbols-outlined">campaign</span>
                         </div>
+                        @if ($soundUrl)
+                            <div class="announcement-sound-indicator" id="sound-indicator" title="Suara notifikasi aktif">
+                                <span class="material-symbols-outlined" style="font-size:14px;">volume_up</span>
+                            </div>
+                        @endif
                         <div class="announcement-banner-track">
-                            <div class="announcement-banner-scroll">
+                            <div class="announcement-banner-scroll" style="--scroll-speed: {{ $scrollSpeed }}s">
                                 @foreach ($announcements as $a)
                                     <span class="announcement-banner-item">
                                         <span class="ab-title">{{ $a->title }}</span>
@@ -1186,6 +1209,53 @@
                         </div>
                     </div>
                 </div>
+                @if ($soundUrl)
+                    <audio id="announcement-sound" preload="auto" loop style="display:none;">
+                        <source src="{{ $soundUrl }}">
+                    </audio>
+                @endif
+            @endif
+
+            @if ($soundUrl)
+            <script>
+                (function() {
+                    var audio = document.getElementById('announcement-sound');
+                    var indicator = document.getElementById('sound-indicator');
+                    var playing = false;
+
+                    function toggleSound() {
+                        if (playing) {
+                            audio.pause();
+                            playing = false;
+                            indicator.classList.remove('is-playing');
+                            indicator.title = 'Suara notifikasi dimatikan';
+                        } else {
+                            audio.volume = 0.5;
+                            audio.play().catch(function(){});
+                            playing = true;
+                            indicator.classList.add('is-playing');
+                            indicator.title = 'Matikan suara notifikasi';
+                        }
+                    }
+
+                    if (indicator) {
+                        indicator.addEventListener('click', toggleSound);
+                    }
+
+                    document.addEventListener('click', function handler() {
+                        if (!playing && audio) {
+                            audio.volume = 0.5;
+                            audio.play().catch(function(){});
+                            playing = true;
+                            if (indicator) {
+                                indicator.classList.add('is-playing');
+                                indicator.title = 'Matikan suara notifikasi';
+                            }
+                        }
+                        document.removeEventListener('click', handler);
+                    }, { once: true });
+                })();
+            </script>
             @endif
 
             {{-- ── MAIN ── --}}

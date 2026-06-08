@@ -104,7 +104,7 @@
                 <div class="split-actions">
                     <div>
                         <h2 class="card-title">Semua pesan</h2>
-                        <p class="card-copy">Pesan terbaru dari penghuni. Hapus pesan yang melanggar aturan.</p>
+                        <p class="card-copy">Pantau dan kelola obrolan penghuni. Hapus pesan, mute, atau blokir akun yang melanggar.</p>
                     </div>
                 </div>
             </div>
@@ -136,14 +136,27 @@
                 </form>
 
                 <div style="margin-top:16px;">
+                    @php $prevDate = null; @endphp
                     @forelse ($messages as $msg)
+                        @php
+                            $msgDate = $msg->created_at->startOfDay();
+                        @endphp
+                        @if ($prevDate === null || !$msgDate->equalTo($prevDate))
+                            @php $prevDate = $msgDate; @endphp
+                            <div style="display:flex;align-items:center;gap:12px;margin:16px 0 8px;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;">
+                                <span style="flex:1;height:1px;background:var(--ui-border);"></span>
+                                <span>{{ \App\Support\UiFormatter::chatDateLabel($msg->created_at) }}</span>
+                                <span style="flex:1;height:1px;background:var(--ui-border);"></span>
+                            </div>
+                        @endif
                         @php
                             $initial = strtoupper(substr($msg->user->name, 0, 1));
                             $isEdited = $msg->created_at->timestamp !== $msg->updated_at->timestamp;
                             $effect = $msg->user->title_effect ?: 'none';
+                            $isOwn = $msg->user_id === Auth::id();
                         @endphp
-                        <div style="display:flex; gap:12px; padding:14px 0; {{ !$loop->last ? 'border-bottom:1px solid var(--ui-border);' : '' }} align-items:flex-start; {{ $effect !== 'none' ? "background:var(--gray-50);border-radius:var(--radius-md);padding:14px;margin-bottom:8px;border:1px solid var(--ui-border);" : '' }}" class="{{ $effect !== 'none' ? "msg-row-{$effect}" : '' }}">
-                            <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--ui-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;overflow:hidden;cursor:pointer;transition:opacity .15s;" data-user-id="{{ $msg->user_id }}" onclick="openProfilePopup(this.dataset.userId)">
+                        <div style="display:flex; gap:12px; padding:14px 0; {{ !$loop->last ? 'border-bottom:1px solid var(--ui-border);' : '' }} align-items:flex-start; {{ $effect !== 'none' ? "background:var(--gray-50);border-radius:var(--radius-md);padding:14px;margin-bottom:8px;border:1px solid var(--ui-border);" : '' }} {{ $isOwn ? 'background:#f0fdf4;border-radius:var(--radius-md);padding:14px;margin-bottom:8px;border:1px solid #86efac;' : '' }}" class="{{ $effect !== 'none' ? "msg-row-{$effect}" : '' }}">
+                            <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;background:{{ $isOwn ? 'var(--gray-600)' : 'var(--ui-accent)' }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;overflow:hidden;cursor:pointer;transition:opacity .15s;" data-user-id="{{ $msg->user_id }}" onclick="openProfilePopup(this.dataset.userId)">
                                 @if ($msg->user->avatar)
                                     <img src="{{ asset('storage/'.$msg->user->avatar) }}" alt="" style="width:100%;height:100%;object-fit:cover;">
                                 @else
@@ -152,7 +165,8 @@
                             </div>
                             <div style="flex:1;min-width:0;">
                                 <div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;">
-                                    <strong style="font-size:13px;cursor:pointer;color:var(--ui-accent);" data-user-id="{{ $msg->user_id }}" onclick="openProfilePopup(this.dataset.userId)">{{ $msg->user->name }}</strong>
+                                    <strong style="font-size:13px;cursor:pointer;color:{{ $isOwn ? 'var(--gray-600)' : 'var(--ui-accent)' }};" data-user-id="{{ $msg->user_id }}" onclick="openProfilePopup(this.dataset.userId)">{{ $msg->user->name }}</strong>
+                                    @if ($isOwn) <span style="font-size:10px;color:var(--gray-400);font-style:italic;">· admin</span> @endif
                                     @if ($msg->user->title)
                                         <span class="user-title user-title-{{ $msg->user->title_effect ?: 'none' }}">{{ $msg->user->title }}</span>
                                     @endif
@@ -164,6 +178,11 @@
                                     <a href="{{ asset('storage/'.$msg->image) }}" target="_blank" style="display:inline-block;margin-top:6px;">
                                         <img src="{{ asset('storage/'.$msg->image) }}" alt="Gambar" style="max-width:100%;max-height:300px;border-radius:var(--radius-md);display:block;border:1px solid var(--ui-border);" loading="lazy">
                                     </a>
+                                @endif
+                                @if ($msg->audio)
+                                    <audio controls class="chat-audio" preload="metadata" style="width:100%;max-width:280px;height:40px;margin-top:6px;">
+                                        <source src="{{ asset('storage/'.$msg->audio) }}">
+                                    </audio>
                                 @endif
                                 <form method="POST" action="{{ route('admin.chat.update', $msg) }}" id="admin-msg-edit-{{ $msg->id }}" style="display:none;margin-top:8px;">
                                     @csrf @method('PUT')
@@ -185,7 +204,7 @@
                     @empty
                         <section class="empty-state">
                             <h2>Belum ada pesan</h2>
-                            <p>Penghuni belum mengirim pesan apapun.</p>
+                            <p>Belum ada pesan. Kirim pesan pertama melalui form di bawah.</p>
                         </section>
                     @endforelse
                 </div>
@@ -193,6 +212,18 @@
                 <div style="margin-top:16px;">
                     {{ $messages->appends($filters)->links() }}
                 </div>
+
+                {{-- SEND MESSAGE --}}
+                <form method="POST" action="{{ route('admin.chat.store') }}" style="margin-top:20px;padding-top:20px;border-top:1px solid var(--ui-border);display:flex;gap:12px;align-items:flex-end;">
+                    @csrf
+                    <div class="field" style="flex:1;">
+                        <label for="chat-input">Kirim pesan sebagai admin</label>
+                        <textarea id="chat-input" name="content" class="textarea" rows="2" maxlength="1000" placeholder="Tulis pesan..." required style="min-height:60px;"></textarea>
+                    </div>
+                    <button type="submit" class="button button-primary" style="margin-bottom:16px;white-space:nowrap;">
+                        <span class="material-symbols-outlined" style="font-size:16px;">send</span> Kirim
+                    </button>
+                </form>
             </div>
         </section>
 
