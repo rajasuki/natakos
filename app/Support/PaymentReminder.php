@@ -7,7 +7,7 @@ class PaymentReminder
     public static function link(
         ?string $phone,
         string $tenantName,
-        string $roomName,
+        ?string $roomName,
         int|float|string|null $amount,
         mixed $periodStart,
         mixed $periodEnd,
@@ -21,7 +21,7 @@ class PaymentReminder
 
         return WhatsappLink::build(
             WhatsappLink::normalizeNumber($phone),
-            'Halo '.$tenantName.', ini pengingat pembayaran kos Anda untuk kamar '.$roomName
+            'Halo '.$tenantName.', ini pengingat pembayaran kos Anda untuk kamar '.($roomName ?? '(tanpa kamar)')
             .' sebesar '.UiFormatter::currency($amount)
             .' untuk periode '.UiFormatter::date($periodStart).' s/d '.UiFormatter::date($periodEnd)
             .'. Tenggat pembayaran: '.UiFormatter::date($dueDate)
