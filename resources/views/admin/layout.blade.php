@@ -284,6 +284,23 @@
                 color: var(--ui-accent);
             }
 
+            .dropdown-section {
+                grid-column: 1 / -1;
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: .08em;
+                text-transform: uppercase;
+                color: var(--gray-400);
+                padding: 6px 10px 2px;
+                margin-top: 4px;
+                border-top: 1px solid var(--gray-100);
+            }
+            .dropdown-section:first-child {
+                border-top: none;
+                margin-top: 0;
+                padding-top: 2px;
+            }
+
             .nav-item.is-open .nav-dropdown {
                 opacity: 1;
                 visibility: visible;
