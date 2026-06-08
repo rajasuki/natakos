@@ -13,13 +13,13 @@
             <div class="card-head has-divider">
                 <div class="split-actions">
                     <div>
-                        <h2 class="card-title">Pengaturan blokir & mute</h2>
+                        <h2 class="card-title">Pengaturan blokir &amp; mute</h2>
                         <p class="card-copy">Blokir atau mute penghuni agar tidak bisa mengirim pesan di obrolan.</p>
                     </div>
                 </div>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ route('admin.chat.ban') }}" class="form-layout" style="margin-bottom:20px;">
+                <form method="POST" action="{{ route('admin.chat.ban') }}" style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--ui-border);">
                     @csrf
                     <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
                         <div class="field" style="flex:1;min-width:180px;">
@@ -31,7 +31,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="field" style="flex:0 0 130px;">
+                        <div class="field" style="flex:0 0 120px;">
                             <label for="type">Tipe</label>
                             <select id="type" name="type" class="select" required>
                                 <option value="mute">Mute</option>
@@ -109,82 +109,86 @@
                 </div>
             </div>
             <div class="card-body">
-                <form method="GET" action="{{ route('admin.chat.index') }}" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--ui-border);">
-                    <div class="field" style="flex:1;min-width:160px;">
-                        <label for="filter_user">Penghuni</label>
-                        <select id="filter_user" name="user_id" class="select">
-                            <option value="">Semua penghuni</option>
-                            @foreach ($users as $u)
-                                <option value="{{ $u->id }}" @selected((int)($filters['user_id'] ?? '') === $u->id)>{{ $u->name }}</option>
-                            @endforeach
-                        </select>
+                <form method="GET" action="{{ route('admin.chat.index') }}" class="toolbar-form" style="margin-bottom:0;">
+                    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+                        <div class="field" style="flex:1;min-width:160px;">
+                            <label for="filter_user">Penghuni</label>
+                            <select id="filter_user" name="user_id" class="select">
+                                <option value="">Semua penghuni</option>
+                                @foreach ($users as $u)
+                                    <option value="{{ $u->id }}" @selected((int)($filters['user_id'] ?? '') === $u->id)>{{ $u->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="field" style="flex:0 0 170px;">
+                            <label for="date_from">Dari tanggal</label>
+                            <input id="date_from" name="date_from" type="date" class="input" value="{{ $filters['date_from'] ?? '' }}">
+                        </div>
+                        <div class="field" style="flex:0 0 170px;">
+                            <label for="date_to">Sampai tanggal</label>
+                            <input id="date_to" name="date_to" type="date" class="input" value="{{ $filters['date_to'] ?? '' }}">
+                        </div>
+                        <button type="submit" class="button button-primary" style="margin-bottom:16px;">Filter</button>
+                        @if (count(array_filter($filters ?? [])))
+                            <a href="{{ route('admin.chat.index') }}" class="button button-subtle" style="margin-bottom:16px;">Hapus filter</a>
+                        @endif
                     </div>
-                    <div class="field" style="flex:0 0 180px;">
-                        <label for="date_from">Dari tanggal</label>
-                        <input id="date_from" name="date_from" type="date" class="input" value="{{ $filters['date_from'] ?? '' }}">
-                    </div>
-                    <div class="field" style="flex:0 0 180px;">
-                        <label for="date_to">Sampai tanggal</label>
-                        <input id="date_to" name="date_to" type="date" class="input" value="{{ $filters['date_to'] ?? '' }}">
-                    </div>
-                    <button type="submit" class="button button-primary" style="margin-bottom:16px;">Filter</button>
-                    @if (count(array_filter($filters ?? [])))
-                        <a href="{{ route('admin.chat.index') }}" class="button button-subtle" style="margin-bottom:16px;">Hapus filter</a>
-                    @endif
                 </form>
 
-                @forelse ($messages as $msg)
-                    @php
-                        $initial = strtoupper(substr($msg->user->name, 0, 1));
-                        $isEdited = $msg->created_at->timestamp !== $msg->updated_at->timestamp;
-                        $effect = $msg->user->title_effect ?: 'none';
-                    @endphp
-                    <div style="display:flex; gap:12px; padding:12px 0; {{ !$loop->last ? 'border-bottom:1px solid var(--ui-border);' : '' }} align-items:flex-start; {{ $effect !== 'none' ? "padding:12px;" : '' }}" class="{{ $effect !== 'none' ? "msg-row-{$effect}" : '' }}">
-                        <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--ui-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;overflow:hidden;cursor:pointer;" data-user-id="{{ $msg->user_id }}" onclick="openProfilePopup(this.dataset.userId)">
-                            @if ($msg->user->avatar)
-                                <img src="{{ asset('storage/'.$msg->user->avatar) }}" alt="" style="width:100%;height:100%;object-fit:cover;">
-                            @else
-                                {{ $initial }}
-                            @endif
-                        </div>
-                        <div style="flex:1;min-width:0;">
-                            <div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;">
-                                <strong style="font-size:13px;cursor:pointer;" data-user-id="{{ $msg->user_id }}" onclick="openProfilePopup(this.dataset.userId)">{{ $msg->user->name }}</strong>
-                                @if ($msg->user->title)
-                                    <span class="user-title user-title-{{ $msg->user->title_effect ?: 'none' }}">{{ $msg->user->title }}</span>
+                <div style="margin-top:16px;">
+                    @forelse ($messages as $msg)
+                        @php
+                            $initial = strtoupper(substr($msg->user->name, 0, 1));
+                            $isEdited = $msg->created_at->timestamp !== $msg->updated_at->timestamp;
+                            $effect = $msg->user->title_effect ?: 'none';
+                        @endphp
+                        <div style="display:flex; gap:12px; padding:14px 0; {{ !$loop->last ? 'border-bottom:1px solid var(--ui-border);' : '' }} align-items:flex-start; {{ $effect !== 'none' ? "background:var(--gray-50);border-radius:var(--radius-md);padding:14px;margin-bottom:8px;border:1px solid var(--ui-border);" : '' }}" class="{{ $effect !== 'none' ? "msg-row-{$effect}" : '' }}">
+                            <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--ui-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;overflow:hidden;cursor:pointer;transition:opacity .15s;" data-user-id="{{ $msg->user_id }}" onclick="openProfilePopup(this.dataset.userId)">
+                                @if ($msg->user->avatar)
+                                    <img src="{{ asset('storage/'.$msg->user->avatar) }}" alt="" style="width:100%;height:100%;object-fit:cover;">
+                                @else
+                                    {{ $initial }}
                                 @endif
-                                <span style="font-size:11px;color:var(--ui-body);">{{ \App\Support\UiFormatter::date($msg->created_at, 'd M Y H:i') }}</span>
-                                @if ($isEdited) <span style="font-size:10px;color:var(--ui-body);font-style:italic;">· diedit</span> @endif
                             </div>
-                            <div id="admin-msg-text-{{ $msg->id }}" style="font-size:14px;line-height:1.6;margin-top:2px;white-space:pre-wrap;">{{ $msg->content }}</div>
-                            @if ($msg->image)
-                                <a href="{{ asset('storage/'.$msg->image) }}" target="_blank" style="display:inline-block;margin-top:4px;">
-                                    <img src="{{ asset('storage/'.$msg->image) }}" alt="Gambar" style="max-width:100%;max-height:300px;border-radius:var(--radius-md);display:block;" loading="lazy">
-                                </a>
-                            @endif
-                            <form method="POST" action="{{ route('admin.chat.update', $msg) }}" id="admin-msg-edit-{{ $msg->id }}" style="display:none;margin-top:6px;">
-                                @csrf @method('PUT')
-                                <textarea name="content" class="admin-edit-textarea" maxlength="1000" style="width:100%;border:1px solid var(--ui-accent);border-radius:6px;padding:8px 10px;font-size:14px;resize:none;min-height:60px;font-family:inherit;box-sizing:border-box;">{{ $msg->content }}</textarea>
-                                <div style="display:flex;gap:6px;margin-top:6px;">
-                                    <button type="submit" class="button button-primary" style="padding:4px 12px;font-size:12px;">Simpan</button>
-                                    <button type="button" class="button button-subtle" style="padding:4px 12px;font-size:12px;" onclick="cancelAdminEdit({{ $msg->id }})">Batal</button>
+                            <div style="flex:1;min-width:0;">
+                                <div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;">
+                                    <strong style="font-size:13px;cursor:pointer;color:var(--ui-accent);" data-user-id="{{ $msg->user_id }}" onclick="openProfilePopup(this.dataset.userId)">{{ $msg->user->name }}</strong>
+                                    @if ($msg->user->title)
+                                        <span class="user-title user-title-{{ $msg->user->title_effect ?: 'none' }}">{{ $msg->user->title }}</span>
+                                    @endif
+                                    <span style="font-size:11px;color:var(--gray-400);">{{ \App\Support\UiFormatter::date($msg->created_at, 'd M Y H:i') }}</span>
+                                    @if ($isEdited) <span style="font-size:10px;color:var(--gray-400);font-style:italic;">· diedit</span> @endif
                                 </div>
-                            </form>
+                                <div id="admin-msg-text-{{ $msg->id }}" style="font-size:14px;line-height:1.6;margin-top:4px;white-space:pre-wrap;color:var(--ui-ink);">{{ $msg->content }}</div>
+                                @if ($msg->image)
+                                    <a href="{{ asset('storage/'.$msg->image) }}" target="_blank" style="display:inline-block;margin-top:6px;">
+                                        <img src="{{ asset('storage/'.$msg->image) }}" alt="Gambar" style="max-width:100%;max-height:300px;border-radius:var(--radius-md);display:block;border:1px solid var(--ui-border);" loading="lazy">
+                                    </a>
+                                @endif
+                                <form method="POST" action="{{ route('admin.chat.update', $msg) }}" id="admin-msg-edit-{{ $msg->id }}" style="display:none;margin-top:8px;">
+                                    @csrf @method('PUT')
+                                    <textarea name="content" class="admin-edit-textarea" maxlength="1000" style="width:100%;border:1px solid var(--ui-accent);border-radius:6px;padding:8px 10px;font-size:14px;resize:none;min-height:60px;font-family:inherit;box-sizing:border-box;">{{ $msg->content }}</textarea>
+                                    <div style="display:flex;gap:6px;margin-top:6px;">
+                                        <button type="submit" class="button button-primary" style="padding:4px 12px;font-size:12px;">Simpan</button>
+                                        <button type="button" class="button button-subtle" style="padding:4px 12px;font-size:12px;" onclick="cancelAdminEdit({{ $msg->id }})">Batal</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div style="display:flex;gap:4px;flex-shrink:0;align-items:flex-start;">
+                                <button type="button" class="button button-subtle" style="font-size:12px;" onclick="startAdminEdit({{ $msg->id }})">Edit</button>
+                                <form method="POST" action="{{ route('admin.chat.destroy', $msg) }}" onsubmit="return confirm('Hapus pesan ini?');">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="button button-subtle" style="font-size:12px;color:#be123c;">Hapus</button>
+                                </form>
+                            </div>
                         </div>
-                        <div style="display:flex;gap:4px;flex-shrink:0;align-items:flex-start;">
-                            <button type="button" class="button button-subtle" style="font-size:12px;" onclick="startAdminEdit({{ $msg->id }})">Edit</button>
-                            <form method="POST" action="{{ route('admin.chat.destroy', $msg) }}" onsubmit="return confirm('Hapus pesan ini?');">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="button button-subtle" style="font-size:12px;color:#be123c;">Hapus</button>
-                            </form>
-                        </div>
-                    </div>
-                @empty
-                    <section class="empty-state">
-                        <h2>Belum ada pesan</h2>
-                        <p>Penghuni belum mengirim pesan apapun.</p>
-                    </section>
-                @endforelse
+                    @empty
+                        <section class="empty-state">
+                            <h2>Belum ada pesan</h2>
+                            <p>Penghuni belum mengirim pesan apapun.</p>
+                        </section>
+                    @endforelse
+                </div>
 
                 <div style="margin-top:16px;">
                     {{ $messages->appends($filters)->links() }}
@@ -247,7 +251,6 @@
     .user-title-royal { background:linear-gradient(135deg,#7c3aed,#a855f7,#fbbf24); color:#fff; box-shadow:0 0 10px rgba(124,58,237,.3); }
     .user-title-cyber { background:#000; color:#22d3ee; border:1px solid #22d3ee; box-shadow:0 0 10px rgba(34,211,238,.5),inset 0 0 10px rgba(34,211,238,.1); text-shadow:0 0 4px rgba(34,211,238,.6); }
 
-    /* ── Chat bubble effects ── */
     .msg-row-gold { background:linear-gradient(135deg,#fef3c7,#fde68a); border-radius:8px; padding:8px 12px; margin:0 -12px; }
     .msg-row-rainbow { background:linear-gradient(135deg,#fce7f3,#fef3c7,#d1fae5,#dbeafe,#f3e8ff); border-radius:8px; padding:8px 12px; margin:0 -12px; }
     .msg-row-glow { background:#f0fdf4; border-radius:8px; padding:8px 12px; margin:0 -12px; }
