@@ -877,6 +877,25 @@
                  outline-offset: 2px;
              }
 
+            /* ── Toast ── */
+            .toast-notification {
+                position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);
+                z-index:9999;display:flex;align-items:center;gap:10px;
+                padding:14px 24px;border-radius:var(--radius-lg);
+                background:var(--ui-ink);color:#fff;
+                font-size:14px;font-weight:600;line-height:1.3;
+                box-shadow:0 8px 32px rgba(0,0,0,.2);
+                opacity:0;transition:all .4s cubic-bezier(.22,1,.36,1);
+                pointer-events:none;
+            }
+            .toast-notification.toast-show {
+                opacity:1;transform:translateX(-50%) translateY(0);
+                pointer-events:auto;
+            }
+            .toast-notification.toast-hide {
+                opacity:0;transform:translateX(-50%) translateY(-20px);
+            }
+
             /* ── Responsive ────────────────────────── */
             @media (max-width: 767px) {
                 .headline { font-size: 32px; }
@@ -1168,6 +1187,27 @@
                tick();
            })();
         </script>
+
+        {{-- Toast Notification --}}
+        @if (session('toast'))
+            <div id="toast-notification" class="toast-notification">
+                <span class="material-symbols-outlined" style="font-size:18px;">{{ session('toast_type') === 'error' ? 'error' : 'check_circle' }}</span>
+                <span>{{ session('toast') }}</span>
+            </div>
+            <script>
+                (function() {
+                    var t = document.getElementById('toast-notification');
+                    if (t) {
+                        setTimeout(function() { t.classList.add('toast-show'); }, 100);
+                        setTimeout(function() {
+                            t.classList.remove('toast-show');
+                            t.classList.add('toast-hide');
+                            setTimeout(function() { t.remove(); }, 400);
+                        }, 5000);
+                    }
+                })();
+            </script>
+        @endif
 
     </body>
 </html>

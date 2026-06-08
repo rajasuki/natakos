@@ -42,7 +42,7 @@ class AuthenticatedSessionController extends Controller
             return $this->logoutInvalidRole($request);
         }
 
-        return redirect()->to($redirectPath);
+        return redirect()->to($redirectPath)->with('toast', 'Selamat datang kembali, ' . $request->user()->name . '!');
     }
 
     public function destroy(Request $request): RedirectResponse
@@ -52,7 +52,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route('login')->with('toast', 'Anda telah logout. Sampai jumpa!');
     }
 
     public function dashboard(Request $request): RedirectResponse
