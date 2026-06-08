@@ -79,16 +79,25 @@
                     </div>
                 </div>
                 @elseif(Auth::user()->role === 'tenant')
+                <a href="{{ route('tenant.chat.index') }}" class="nav-link nav-link-chat {{ request()->routeIs('tenant.chat.*') ? 'is-active' : '' }}" @if(request()->routeIs('tenant.chat.*')) aria-current="page" @endif>
+                    <span class="material-symbols-outlined" style="font-size:18px;">forum</span>
+                    Obrolan
+                </a>
                 <div class="nav-item has-dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-nav-dropdown>
                         Dashboard
                         <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
                     </a>
                     <div class="nav-dropdown">
-                        <a href="{{ route('tenant.dashboard') }}" class="dropdown-link {{ request()->routeIs('tenant.dashboard') ? 'is-active' : '' }}">Dashboard</a>
-                        <a href="{{ route('tenant.chat.index') }}" class="dropdown-link {{ request()->routeIs('tenant.chat.*') ? 'is-active' : '' }}">Obrolan</a>
-                        <a href="{{ route('tenant.maintenance-requests.index') }}" class="dropdown-link {{ request()->routeIs('tenant.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
-                        <a href="{{ route('tenant.profile.edit') }}" class="dropdown-link {{ request()->routeIs('tenant.profile.*') ? 'is-active' : '' }}">Profil</a>
+                        <a href="{{ route('tenant.dashboard') }}" class="dropdown-link {{ request()->routeIs('tenant.dashboard') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">grid_view</span> Dashboard
+                        </a>
+                        <a href="{{ route('tenant.maintenance-requests.index') }}" class="dropdown-link {{ request()->routeIs('tenant.maintenance-requests.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">handyman</span> Perbaikan
+                        </a>
+                        <a href="{{ route('tenant.profile.edit') }}" class="dropdown-link {{ request()->routeIs('tenant.profile.*') ? 'is-active' : '' }}">
+                            <span class="material-symbols-outlined">person</span> Profil
+                        </a>
                     </div>
                 </div>
                 @endif
@@ -98,6 +107,7 @@
         <div class="header-actions">
             @auth
                 <span class="nav-greeting">Halo, {{ Auth::user()->role === 'admin' ? 'Admin' : Auth::user()->name }}!</span>
+                <span class="nav-separator"></span>
                 <form method="POST" action="{{ route('logout') }}" class="nav-logout-form">
                     @csrf
                     <button type="submit" class="nav-auth-link">Logout</button>
