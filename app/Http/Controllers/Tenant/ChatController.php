@@ -31,6 +31,8 @@ class ChatController extends Controller
             ->orderBy('created_at')
             ->paginate($perPage, ['*'], 'page', $page);
 
+        $request->user()->update(['chat_last_read_at' => now()]);
+
         $latestId = ChatMessage::max('id') ?? 0;
 
         return view('tenant.chat.index', [

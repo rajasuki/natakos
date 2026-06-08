@@ -82,9 +82,11 @@
                     </div>
                 </div>
                 @elseif(Auth::user()->role === 'tenant')
+                @php $unreadCount = Auth::user()->unreadChatMessagesCount(); @endphp
                 <a href="{{ route('tenant.chat.index') }}" class="nav-link nav-link-chat {{ request()->routeIs('tenant.chat.*') ? 'is-active' : '' }}" @if(request()->routeIs('tenant.chat.*')) aria-current="page" @endif>
-                    <span class="material-symbols-outlined" style="font-size:18px;">forum</span>
+                    <span class="material-symbols-outlined" style="font-size:18px;">notifications</span>
                     Obrolan
+                    @if($unreadCount > 0)<span class="unread-badge">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>@endif
                 </a>
                 <div class="nav-item has-dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-nav-dropdown>
@@ -157,10 +159,14 @@
                             <a href="{{ route('admin.logs.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.logs.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">history</span> Log Aktivitas</a>
                             <a href="{{ route('admin.monitor.index') }}" class="mobile-nav-link {{ request()->routeIs('admin.monitor.*') ? 'is-active' : '' }}"><span class="material-symbols-outlined">monitor_heart</span> Monitor</a>
                             @elseif(Auth::user()->role === 'tenant')
+                            @php $unreadCount = Auth::user()->unreadChatMessagesCount(); @endphp
                             <div class="mobile-nav-divider"></div>
                             <span class="mobile-nav-label">Tenant</span>
                             <a href="{{ route('tenant.dashboard') }}" class="mobile-nav-link {{ request()->routeIs('tenant.dashboard') ? 'is-active' : '' }}" @if(request()->routeIs('tenant.dashboard')) aria-current="page" @endif>Dashboard</a>
-                            <a href="{{ route('tenant.chat.index') }}" class="mobile-nav-link {{ request()->routeIs('tenant.chat.*') ? 'is-active' : '' }}">Obrolan</a>
+                            <a href="{{ route('tenant.chat.index') }}" class="mobile-nav-link {{ request()->routeIs('tenant.chat.*') ? 'is-active' : '' }}">
+                                Obrolan
+                                @if($unreadCount > 0)<span class="unread-badge">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>@endif
+                            </a>
                             <a href="{{ route('tenant.maintenance-requests.index') }}" class="mobile-nav-link {{ request()->routeIs('tenant.maintenance-requests.*') ? 'is-active' : '' }}">Perbaikan</a>
                             <a href="{{ route('tenant.profile.edit') }}" class="mobile-nav-link {{ request()->routeIs('tenant.profile.*') ? 'is-active' : '' }}">Profil</a>
                             @endif

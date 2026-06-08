@@ -44,6 +44,14 @@ class User extends Authenticatable
         return $this->hasMany(ChatMessage::class);
     }
 
+    public function unreadChatMessagesCount(): int
+    {
+        return ChatMessage::query()
+            ->whereHas('user', fn ($q) => $q->where('role', 'admin'))
+            ->where('created_at', '>', $this->chat_last_read_at ?? $this->created_at)
+            ->count();
+    }
+
     public function chatBans(): HasMany
     {
         return $this->hasMany(ChatBan::class, 'user_id');
@@ -77,6 +85,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'show_room' => 'boolean',
             'last_seen_at' => 'datetime',
+            'chat_last_read_at' => 'datetime',
         ];
     }
 }
