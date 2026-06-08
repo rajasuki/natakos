@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Badge;
 use App\Models\User;
 use App\Support\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
@@ -23,6 +24,7 @@ class UserController extends Controller
 
         return view('admin.users.index', [
             'users' => $users,
+            'badges' => Badge::where('is_active', true)->get(),
             'roleLabels' => $this->roleLabels(),
             'effectLabels' => $this->effectLabels(),
             'counts' => [
@@ -59,14 +61,38 @@ class UserController extends Controller
     public function updateTitle(Request $request, User $user): RedirectResponse
     {
         $validated = $request->validate([
+            'selected_badge_id' => ['nullable', 'exists:badges,id'],
             'title' => ['nullable', 'string', 'max:100'],
             'title_effect' => ['required', Rule::in(array_keys($this->effectLabels()))],
         ]);
 
-        $user->update([
-            'title' => $validated['title'] ?: null,
-            'title_effect' => $validated['title_effect'],
-        ]);
+        if (array_key_exists('selected_badge_id', $validated)) {
+            Badge::syncUnlockedFor($user);
+
+            if ($validated['selected_badge_id']) {
+                $badge = Badge::find($validated['selected_badge_id']);
+                if ($badge && $badge->is_active && $badge->isUnlockedFor($user)) {
+                    $user->badges()->syncWithoutDetaching([$badge->id => ['is_selected' => true]]);
+                    $user->badges()->where('badge_id', '!=', $badge->id)->wherePivot('is_selected', true)->each(function ($b) use ($user) {
+                        $user->badges()->updateExistingPivot($b->id, ['is_selected' => false]);
+                    });
+                    $user->update([
+                        'title' => $badge->name,
+                        'title_effect' => $badge->effect,
+                    ]);
+                }
+            } else {
+                $user->badges()->wherePivot('is_selected', true)->each(function ($b) use ($user) {
+                    $user->badges()->updateExistingPivot($b->id, ['is_selected' => false]);
+                });
+                $user->update(['title' => $validated['title'] ?: null, 'title_effect' => $validated['title_effect']]);
+            }
+        } else {
+            $user->update([
+                'title' => $validated['title'] ?: null,
+                'title_effect' => $validated['title_effect'],
+            ]);
+        }
 
         ActivityLogger::updated('user', $user->id, "Title {$user->name}");
 
@@ -85,12 +111,6 @@ class UserController extends Controller
 
     private function effectLabels(): array
     {
-        return [
-            'none' => 'Tidak ada',
-            'gold' => 'Emas',
-            'rainbow' => 'Pelangi',
-            'glow' => 'Cahaya',
-            'fire' => 'Api',
-        ];
+        return Badge::effectOptions();
     }
 }

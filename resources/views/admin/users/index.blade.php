@@ -11,8 +11,8 @@
     .title-input { width:100px; padding:4px 6px; font-size:12px; border:1px solid var(--ui-border); border-radius:4px; }
     .title-select { padding:4px 6px; font-size:12px; border:1px solid var(--ui-border); border-radius:4px; background:#fff; }
     .title-save { padding:4px 10px; font-size:11px; }
-    .user-title-badge { display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; }
-    .user-title-none { background:var(--ui-soft); color:var(--ui-body); }
+    .badge-select { padding:4px 6px; font-size:12px; border:1px solid var(--ui-border); border-radius:4px; background:#fff; max-width:130px; }
+    .badge-preview { display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; }
 </style>
 @endpush
 
@@ -106,10 +106,19 @@
                                 <td>
                                     <form method="POST" action="{{ route('admin.users.title', $user) }}" class="title-form">
                                         @csrf @method('PUT')
-                                        <input type="text" name="title" class="title-input" value="{{ $user->title }}" placeholder="Title..." maxlength="100">
+                                        @php $selectedBadge = $user->badges()->wherePivot('is_selected', true)->first(); @endphp
+                                        <select name="selected_badge_id" class="badge-select">
+                                            <option value="">-- Badge --</option>
+                                            @foreach ($badges as $badge)
+                                                <option value="{{ $badge->id }}" style="font-weight:{{ $badge->isUnlockedFor($user) ? '600' : '400' }};" {{ $selectedBadge && $selectedBadge->id === $badge->id ? 'selected' : '' }}>
+                                                    {{ $badge->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <input type="text" name="title" class="title-input" value="{{ $selectedBadge ? $selectedBadge->name : $user->title }}" placeholder="Title..." maxlength="100">
                                         <select name="title_effect" class="title-select">
                                             @foreach ($effectLabels as $val => $label)
-                                                <option value="{{ $val }}" @selected($user->title_effect === $val)>{{ $label }}</option>
+                                                <option value="{{ $val }}" @selected(($selectedBadge ? $selectedBadge->effect : $user->title_effect) === $val)>{{ $label }}</option>
                                             @endforeach
                                         </select>
                                         <button type="submit" class="button button-sm button-subtle title-save">Simpan</button>

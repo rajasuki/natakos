@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Facades\Auth;
 
 #[Fillable(['name', 'effect', 'requirement_type', 'requirement_value', 'description', 'is_active'])]
 class Badge extends Model
@@ -84,6 +83,16 @@ class Badge extends Model
             'rainbow' => 'Pelangi',
             'glow' => 'Cahaya',
             'fire' => 'Api',
+            'neon' => 'Neon',
+            'ocean' => 'Lautan',
+            'sunset' => 'Senja',
+            'galaxy' => 'Galaksi',
+            'shadow' => 'Bayangan',
+            'thunder' => 'Petir',
+            'rose' => 'Mawar',
+            'ice' => 'Es',
+            'royal' => 'Kerajaan',
+            'cyber' => 'Cyber',
         ];
     }
 }

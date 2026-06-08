@@ -19,6 +19,36 @@
     .chat-bubble { flex:1; min-width:0; background:var(--gray-50); border:1px solid var(--ui-border); border-radius:12px 12px 12px 4px; padding:8px 12px; }
     .chat-message-self .chat-bubble { background:#e8f5e9; border-color:#c8e6c9; border-radius:12px 12px 4px 12px; }
 
+    /* ── Chat bubble effects ── */
+    .chat-bubble-gold { background:linear-gradient(135deg,#fef3c7,#fde68a); border-color:#f59e0b; }
+    .chat-message-self .chat-bubble-gold { background:linear-gradient(135deg,#fef3c7,#fde68a); border-color:#f59e0b; }
+    .chat-bubble-rainbow { background:linear-gradient(135deg,#fce7f3,#fef3c7,#d1fae5,#dbeafe,#f3e8ff); border-color:#cbd5e1; }
+    .chat-message-self .chat-bubble-rainbow { background:linear-gradient(135deg,#fce7f3,#fef3c7,#d1fae5,#dbeafe,#f3e8ff); border-color:#cbd5e1; }
+    .chat-bubble-glow { background:#f0fdf4; border-color:#86efac; }
+    .chat-message-self .chat-bubble-glow { background:#f0fdf4; border-color:#86efac; }
+    .chat-bubble-fire { background:#fef2f2; border-color:#fca5a5; }
+    .chat-message-self .chat-bubble-fire { background:#fef2f2; border-color:#fca5a5; }
+    .chat-bubble-neon { background:#ecfeff; border-color:#67e8f9; }
+    .chat-message-self .chat-bubble-neon { background:#ecfeff; border-color:#67e8f9; }
+    .chat-bubble-ocean { background:#f0fdff; border-color:#7dd3fc; }
+    .chat-message-self .chat-bubble-ocean { background:#f0fdff; border-color:#7dd3fc; }
+    .chat-bubble-sunset { background:#fff7ed; border-color:#fdba74; }
+    .chat-message-self .chat-bubble-sunset { background:#fff7ed; border-color:#fdba74; }
+    .chat-bubble-galaxy { background:#f5f3ff; border-color:#c4b5fd; }
+    .chat-message-self .chat-bubble-galaxy { background:#f5f3ff; border-color:#c4b5fd; }
+    .chat-bubble-shadow { background:#f3f4f6; border-color:#9ca3af; }
+    .chat-message-self .chat-bubble-shadow { background:#f3f4f6; border-color:#9ca3af; }
+    .chat-bubble-thunder { background:#fffbeb; border-color:#fde68a; }
+    .chat-message-self .chat-bubble-thunder { background:#fffbeb; border-color:#fde68a; }
+    .chat-bubble-rose { background:#fff1f2; border-color:#fecdd3; }
+    .chat-message-self .chat-bubble-rose { background:#fff1f2; border-color:#fecdd3; }
+    .chat-bubble-ice { background:#f0f9ff; border-color:#bae6fd; }
+    .chat-message-self .chat-bubble-ice { background:#f0f9ff; border-color:#bae6fd; }
+    .chat-bubble-royal { background:#f5f3ff; border-color:#d8b4fe; }
+    .chat-message-self .chat-bubble-royal { background:#f5f3ff; border-color:#d8b4fe; }
+    .chat-bubble-cyber { background:#f0fdfa; border-color:#5eead4; }
+    .chat-message-self .chat-bubble-cyber { background:#f0fdfa; border-color:#5eead4; }
+
     .chat-bubble-head { display:flex; align-items:baseline; gap:6px; margin-bottom:2px; }
     .chat-message-self .chat-bubble-head { justify-content:flex-end; }
     .chat-bubble-name { font-size:12px; font-weight:700; color:var(--ui-accent); cursor:pointer; }
@@ -36,6 +66,16 @@
     .user-title-glow { background:var(--ui-accent); color:#fff; animation:titleGlow 2s ease-in-out infinite; }
     @keyframes titleGlow { 0%,100%{box-shadow:0 0 4px rgba(74,124,89,.3)} 50%{box-shadow:0 0 14px rgba(74,124,89,.6)} }
     .user-title-fire { background:linear-gradient(135deg,#ef4444,#f97316); color:#fff; box-shadow:0 0 10px rgba(239,68,68,.3); }
+    .user-title-neon { background:#06b6d4; color:#fff; box-shadow:0 0 12px rgba(6,182,212,.6),0 0 4px rgba(236,72,153,.4); text-shadow:0 0 4px rgba(255,255,255,.4); }
+    .user-title-ocean { background:linear-gradient(135deg,#0ea5e9,#06b6d4,#14b8a6); color:#fff; }
+    .user-title-sunset { background:linear-gradient(135deg,#f43f5e,#fb923c,#fbbf24); color:#fff; }
+    .user-title-galaxy { background:linear-gradient(135deg,#4c1d95,#7e22ce,#a855f7); color:#fff; box-shadow:0 0 16px rgba(124,58,237,.4); }
+    .user-title-shadow { background:#1f2937; color:#f9fafb; box-shadow:0 4px 12px rgba(0,0,0,.4); }
+    .user-title-thunder { background:linear-gradient(135deg,#fbbf24,#3b82f6); color:#1e293b; box-shadow:0 0 12px rgba(251,191,36,.5); }
+    .user-title-rose { background:linear-gradient(135deg,#fb7185,#f43f5e,#e11d48); color:#fff; }
+    .user-title-ice { background:linear-gradient(135deg,#e0f2fe,#bae6fd,#7dd3fc); color:#0c4a6e; box-shadow:0 0 8px rgba(125,211,252,.4); }
+    .user-title-royal { background:linear-gradient(135deg,#7c3aed,#a855f7,#fbbf24); color:#fff; box-shadow:0 0 10px rgba(124,58,237,.3); }
+    .user-title-cyber { background:#000; color:#22d3ee; border:1px solid #22d3ee; box-shadow:0 0 10px rgba(34,211,238,.5),inset 0 0 10px rgba(34,211,238,.1); text-shadow:0 0 4px rgba(34,211,238,.6); }
 
     .chat-image { max-width:100%; max-height:300px; border-radius:var(--radius-md); display:block; margin:4px 0; cursor:pointer; }
     .chat-image-link { display:block; }
@@ -217,8 +257,26 @@
                     bgEl.className = 'profile-popup-bg';
                     bgEl.innerHTML = '<img src="' + data.bg_url + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
                 } else {
+                    var effect = data.title_effect || 'none';
+                    var gradients = {
+                        gold: 'linear-gradient(135deg,#f59e0b,#d97706)',
+                        rainbow: 'linear-gradient(135deg,#f43f5e,#f59e0b,#22c55e,#3b82f6,#a855f7)',
+                        glow: 'linear-gradient(135deg,#22c55e,#16a34a)',
+                        fire: 'linear-gradient(135deg,#ef4444,#f97316)',
+                        neon: 'linear-gradient(135deg,#06b6d4,#ec4899)',
+                        ocean: 'linear-gradient(135deg,#0ea5e9,#06b6d4,#14b8a6)',
+                        sunset: 'linear-gradient(135deg,#f43f5e,#fb923c,#fbbf24)',
+                        galaxy: 'linear-gradient(135deg,#4c1d95,#7e22ce,#a855f7)',
+                        shadow: 'linear-gradient(135deg,#374151,#111827)',
+                        thunder: 'linear-gradient(135deg,#fbbf24,#3b82f6)',
+                        rose: 'linear-gradient(135deg,#fb7185,#e11d48)',
+                        ice: 'linear-gradient(135deg,#e0f2fe,#7dd3fc,#0ea5e9)',
+                        royal: 'linear-gradient(135deg,#7c3aed,#a855f7,#fbbf24)',
+                        cyber: 'linear-gradient(135deg,#000,#22d3ee)',
+                    };
                     bgEl.className = 'profile-popup-bg-empty';
                     bgEl.textContent = 'Latar profil';
+                    bgEl.style.background = gradients[effect] || '';
                 }
 
                 var bioEl = document.getElementById('popup-bio');
