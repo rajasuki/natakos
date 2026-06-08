@@ -567,13 +567,19 @@
                                         <a href="{{ route('admin.rooms.edit', $room) }}" class="room-table-btn room-table-btn-edit" title="Edit">
                                             <span class="material-symbols-outlined">edit</span>
                                         </a>
-                                        <form method="POST" action="{{ route('admin.rooms.destroy', $room) }}" onsubmit="return confirm('Hapus kamar ini?');" style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="room-table-btn room-table-btn-delete" title="Hapus">
+                                        @if ($room->status === 'occupied')
+                                            <span class="room-table-btn room-table-btn-disabled" title="Checkout penghuni terlebih dahulu" style="display:inline-flex;align-items:center;padding:6px;opacity:0.35;cursor:not-allowed;">
                                                 <span class="material-symbols-outlined">delete</span>
-                                            </button>
-                                        </form>
+                                            </span>
+                                        @else
+                                            <form method="POST" action="{{ route('admin.rooms.destroy', $room) }}" onsubmit="return confirm('Hapus kamar ini?');" style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="room-table-btn room-table-btn-delete" title="Hapus">
+                                                    <span class="material-symbols-outlined">delete</span>
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

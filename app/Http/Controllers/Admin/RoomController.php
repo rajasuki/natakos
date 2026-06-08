@@ -166,7 +166,7 @@ class RoomController extends Controller
         if ($room->tenants()->where('status', 'active')->exists()) {
             return redirect()
                 ->route('admin.rooms.index')
-                ->with('error', 'Kamar tidak dapat dihapus karena masih ditempati penghuni aktif.');
+                ->with('error', 'Kamar tidak dapat dihapus karena masih ditempati penghuni aktif. Silakan lakukan check-out penghuni terlebih dahulu sebelum menghapus kamar ini.');
         }
 
         $mainImage = $room->main_image;
