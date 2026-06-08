@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'content', 'image'])]
+#[Fillable(['user_id', 'content', 'image', 'audio'])]
 class ChatMessage extends Model
 {
     protected $table = 'chat_messages';
