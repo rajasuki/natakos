@@ -256,6 +256,10 @@ class TenantController extends Controller
 
             ActivityLogger::updated('tenant', $tenant->id, $tenant->user->name);
         });
+
+        return redirect()
+            ->route('admin.tenants.index')
+            ->with('success', 'Data penghuni berhasil diperbarui.');
     }
 
     public function destroy(Tenant $tenant): RedirectResponse
