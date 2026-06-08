@@ -250,7 +250,7 @@
 <style>
     .profile-popup-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.3); z-index:999; align-items:center; justify-content:center; }
     .profile-popup-overlay.is-open { display:flex; }
-    .profile-popup { background:#fff; border-radius:var(--radius-xl); max-width:380px; width:90%; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.15); animation:popIn .2s ease; }
+    .profile-popup { background:#fff; border-radius:var(--radius-xl); max-width:380px; width:90%; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.15); animation:popIn .2s ease; position:relative; }
     @keyframes popIn { from{transform:scale(.95);opacity:0} to{transform:scale(1);opacity:1} }
     .profile-popup-bg { width:100%; height:140px; object-fit:cover; display:block; background:var(--ui-soft); }
     .profile-popup-bg-empty { width:100%; height:140px; background:linear-gradient(135deg, var(--ui-accent), #2d5a3e); display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; opacity:.6; }
@@ -372,7 +372,7 @@
 
                 document.getElementById('profile-popup').classList.add('is-open');
             })
-            .catch(function() {});
+            .catch(function(err) { console.error('Profile fetch gagal:', err); });
     };
 
     window.closeProfilePopup = function() {

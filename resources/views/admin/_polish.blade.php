@@ -5,7 +5,7 @@
         from { opacity: 0; transform: translateY(12px); }
         to   { opacity: 1; transform: translateY(0); }
     }
-    .app-layout { animation: fadeUp .35s ease both; }
+    .page-shell { animation: fadeUp .35s ease both; }
 
     /* ── Better card depth ── */
     .card {
