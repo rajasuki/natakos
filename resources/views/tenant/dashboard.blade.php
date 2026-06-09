@@ -660,9 +660,10 @@
     @if ($tenant === null)
         <section class="tenant-empty">
             <h2>Data penghuni belum tersedia</h2>
-            <p>Akun Anda belum terhubung ke data tenant aktif. Silakan hubungi pengelola IchiKOS agar data kamar dan masa tinggal Anda dapat ditampilkan di dashboard ini.</p>
+            <p>Akun Anda belum terhubung ke data tenant aktif. Ajukan sewa kamar terlebih dahulu melalui halaman kamar, atau hubungi pengelola IchiKOS jika Anda sudah memiliki kamar.</p>
             <div class="tenant-empty-actions">
-                <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="button button-primary">Hubungi Pemilik via WhatsApp</a>
+                <a href="{{ route('rooms.index') }}" class="button button-primary">Lihat Kamar & Ajukan Sewa</a>
+                <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="button button-secondary">Hubungi Pemilik via WhatsApp</a>
             </div>
         </section>
     @else
