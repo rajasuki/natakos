@@ -158,7 +158,7 @@ npm run dev
 ### 10. Buka Aplikasi
 
 Akses di browser: **http://localhost:8000**
-
+atau membuka link : **http://ardhan-dev.com**
 ---
 
 ## Setup Cepat (Satu Perintah)
