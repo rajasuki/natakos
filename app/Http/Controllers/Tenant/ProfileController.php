@@ -34,11 +34,16 @@ class ProfileController extends Controller
             'phone' => ['nullable', 'string', 'max:30'],
             'bio' => ['nullable', 'string', 'max:1000'],
             'show_room' => ['boolean'],
-            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
-            'profile_bg' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:10240'],
+            'profile_bg' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:10240'],
             'current_password' => ['nullable', 'required_with:new_password', 'string', 'current_password'],
             'new_password' => ['nullable', 'string', 'min:8'],
             'selected_badge_id' => ['nullable', 'exists:badges,id'],
+        ], [
+            'avatar.max' => 'Ukuran foto profil maksimal 10 MB.',
+            'avatar.mimes' => 'Foto profil harus berupa JPG, JPEG, PNG, WebP, atau GIF.',
+            'profile_bg.max' => 'Ukuran latar profil maksimal 10 MB.',
+            'profile_bg.mimes' => 'Latar profil harus berupa JPG, JPEG, PNG, WebP, atau GIF.',
         ]);
 
         $data = [
