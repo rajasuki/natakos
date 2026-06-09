@@ -210,8 +210,7 @@
                                             </span>
                                         @else
                                             <form method="POST" action="{{ route('admin.rooms.destroy', $room) }}" onsubmit="return confirm('Hapus kamar {{ $room->name }}?');" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
+                                                @csrf @method('DELETE')
                                                 <button type="submit" class="rm-btn rm-btn-delete" title="Hapus">
                                                     <span class="material-symbols-outlined">delete</span>
                                                 </button>
